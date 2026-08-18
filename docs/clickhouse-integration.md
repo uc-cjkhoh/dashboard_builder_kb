@@ -57,6 +57,10 @@ keep read-only queries safe. Server code lives under `src/DashboardBuilder/Click
 | Row count (KPI) | `SELECT count() FROM {db}.{table}` | ✅ |
 | Chart aggregate (single table) | `SELECT {dim}, {agg}({m}) FROM {db}.{t} [WHERE …] [GROUP BY {dim}] ORDER BY value DESC LIMIT n` | ✅ |
 | Worksheet query (joined, crosstab) | `SELECT {rd…} AS k0…, {cd…} AS kR…, {agg}({m0}) AS v0, … FROM t0 [INNER JOIN tN ON …] [WHERE …] [GROUP BY k0, …] ORDER BY (k0,… \| v0 DESC) LIMIT n` | ✅ |
+| Distinct values (P14 filter) | `SELECT DISTINCT {col} AS v FROM {db}.{t} WHERE v IS NOT NULL ORDER BY v LIMIT n` | ✅ |
+| Histogram (P12) | `WITH (SELECT min({c}) FROM … [WHERE]) AS lo, (SELECT max({c}) …) AS hi, if(hi>lo,(hi-lo)/{bins},1) AS width SELECT least(toUInt32(floor(({c}-lo)/width)),{bins-1}) AS bin, lo+bin*width AS x0, …, count() FROM … [WHERE] GROUP BY bin,x0,x1 ORDER BY bin` | ✅ |
+| Box plot (P12) | `SELECT [{dim} AS label,] min({m}), quantile(0.25)({m}), quantile(0.5)({m}), quantile(0.75)({m}), max({m}) FROM {db}.{t} [WHERE] [GROUP BY label] LIMIT n` | ✅ |
+| CSV export (P13) | *reuses the worksheet query* → serialised by `CsvUtil` (RFC-4180 + formula-injection guard) | ✅ |
 
 > **Worksheet join query (`QueryAsync`).** The base table is `t0`; each join edge attaches a table
 > (`INNER JOIN … AS tN ON t0.k = tN.k`) aliased in order, so any dimension/measure/filter can live
@@ -81,6 +85,19 @@ the last mapped to `uniqExact`) and filter
 > parameters** (`{p0:Float64}` for numeric columns else `{p0:String}`, via ClickHouse.Client's
 > `AddParameter` extension — `using ClickHouse.Client.Utility`) — never interpolated. Row count is
 > clamped. An invalid identifier/agg/op → the endpoint's **400**.
+>
+> **Statistical shapes (P12) & richer filters (P14) keep the same defences.** `HistogramAsync` and
+> `BoxPlotAsync` are **single-table** (a distribution is one column): the column is `DESCRIBE`-validated,
+> quoted, and required to be **numeric**; the bin count is clamped (1..100) and the max value is clamped
+> into the last bucket so a bucketing query can't explode; the box plot's `LIMIT` is clamped. Filter
+> `WHERE` clauses on these paths run through the pure **`BuildSingleTableFilters`** (same whitelist +
+> binding). `DistinctValuesAsync` powers the P14 `in`-filter dropdown — one column, `DISTINCT … ORDER BY
+> … LIMIT n` with `n` clamped (1..1000) so a high-cardinality column can't flood the client. The P14
+> filter operators **`in`** and **`between`** are built by the pure **`BuildCondition`**: `in` binds an
+> `Array(String)` (or `Array(Float64)` when every value parses) — `{p0:Array(String)}` — and `between`
+> binds two typed bounds; **all values stay bound, never interpolated**, an empty `in`/partial range is a
+> **no-op** (never `IN ()`), and an unknown operator → **400**. These pure builders are unit-tested with
+> hostile columns/operators.
 
 > **List tables validates `{db}` first.** `ListTablesAsync` calls `SHOW DATABASES` and confirms
 > the requested name is present (ordinal match) before interpolating `SHOW TABLES FROM

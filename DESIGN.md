@@ -92,6 +92,11 @@ that is **loading its preview**, a **failed query**, an **unused/idle** entity.
 Red stays **reserved for critical** (danger + the brand accent). Status is always
 communicated by **icon + text + color**, never color alone.
 
+**Encoding tint (not a status):** `--info-*` (bg `#ede9fb` / ink `#4a3aa7` / line `#cfc6f0`, a
+violet matching `--chart-cat-7`) tints the worksheet **Colour-mark pill** (`.ws-pill--color`, P7 /
+[D14](docs/project/decisions.md)) so it reads apart from a dimension (red) and a measure (green).
+It's a field-role tint, not a traffic-light state — keep it out of status pills.
+
 ### Relationship / cardinality colors
 Relationship links on the canvas use `--ink-2` for the line and `--brand` when a link
 is **selected or being drawn**. Cardinality endpoints (the "one" vs. "many" markers)

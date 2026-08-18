@@ -127,12 +127,30 @@ Each dashboard **is a worksheet**: a **field pane** (each model table's columns 
   unmanageable once P10/P11 added Sort/Chart/Format). Data pills never enter the view bar; new view
   controls extend the view bar / Format card, new data goes to the shelf lanes.
 - **Multi-field shelves.** **Columns** and **Rows** each hold **any number** of field pills; the
-  **shelf sets the crosstab axis**. A pill's role defaults from type but is **convertible** via its
-  button — `Σ` turns a dimension into a measure, `#` turns a measure into a dimension — so a numeric
+  **shelf sets the crosstab axis**. **Drag a pill's grip (⠿) to reorder** it within a shelf or move it
+  to the other field shelf (`moveField`); dropping onto a pill inserts before it, onto empty space
+  appends. The order is meaningful — dimension order sets the crosstab **nesting** / category order,
+  measure order sets the **series** order. **Invariant: measures always sit behind dimensions**
+  (`normaliseShelf` re-sorts each shelf after any drop, role-convert or add, keeping relative order
+  within the dimension and measure groups). A pill's role defaults from type but is **convertible** via
+  its button — `Σ` turns a dimension into a measure, `#` turns a measure into a dimension — so a numeric
   field can group as a dimension, or any field be aggregated. Measure pills show an agg dropdown
   (`sum/avg/min/max/count/countDistinct` for numbers; `count/countDistinct/min/max` for text);
-  **countDistinct** counts unique values (`uniqExact`). **Filters** ← fields (op + value pills).
-  Dimension pills are red-tinted, measure pills green.
+  **countDistinct** counts unique values (`uniqExact`). **Filters** ← fields: a scalar op + value, or
+  (P14) **`in`** — a multi-select populated from a **bounded distinct-values** query
+  (`GET …/columns/{col}/distinct`) — or **`between`** — a two-bound range. All values bind as typed
+  parameters (`in` → `Array(…)`); an empty `in`/partial range is a no-op.
+  Dimension pills are red-tinted, measure pills green, the Colour pill violet.
+- **Colour marks (P7, [D14](../project/decisions.md)).** A **Color** lane holds **one dimension**: a
+  Tableau-style Color encoding. It's sent as **one more group-by** (appended last to the query's
+  column dimensions — *no new query shape*), and the client **pivots** that trailing key into **one
+  coloured series per value**: `bar` → grouped, `stacked` → stacked, `line`/`area` → one line each;
+  a **Table** takes it as a free extra top-header level. Colour-split renders for **one measure**
+  (multi-measure + colour → a hint); chart types that can't use colour (pie/donut/scatter/combo/KPI)
+  show a **lane note** and ignore the pill (`COLOR_USES`/`COLOR_SPLIT_TYPES` in `dashboards.js`,
+  pivoted by `renderColorSplit`). Series draw the `--chart-cat-*` ramp with a legend (never
+  colour-alone). This is distinct from the P10 **colour-by-category** format toggle (per-*bar* colour
+  on a single-measure bar); the Color shelf splits into *series* by a dimension's values.
 - **Table = a true Rows×Columns crosstab** (`crosstabTable()`). Row-shelf dimensions form the **left
   stub** (nested, with rowSpan-merged repeats); Column-shelf dimensions the **top header** (nested,
   colSpan); measures are the **cell values**. The **measure-name band sits on whichever shelf the
@@ -147,9 +165,26 @@ Each dashboard **is a worksheet**: a **field pane** (each model table's columns 
   for ≥2 series; single = brand red, multiple = dataviz categorical palette). No dimensions → **KPI
   tiles**. An invalid field mapping shows a **hint** (e.g. "Scatter plots two measures"), never an
   error. Scatter/combo/stacked read the first two measure pills — **no separate 2nd-measure shelf**,
-  since a shelf already holds any number of measures. All on the existing bounded aggregate/join query;
-  **histogram** needs a bucketing query shape and lands in P12. True chart-axis orientation
-  (measure-on-Columns → horizontal bars, row-dims → facets) is still **Phase 2**.
+  since a shelf already holds any number of measures.
+- **Chart orientation (Tableau-style).** A **dimension on Rows** (and none on Columns) renders
+  **horizontal** bars — category down the left (y-axis, first on top), value along the bottom; a
+  **dimension on Columns** renders **vertical** (the default). `chartOrientation(sheet)` decides it from
+  the shelves and `buildCartesian` swaps the category/value axes accordingly (bar/stacked/line/area;
+  **combo** stays vertical for its dual y-axis). Axis *titles* still name the **physical** axes
+  (X = bottom, Y = left) so the Format inputs stay literal. (Row-dimension **facets/small-multiples**
+  remain future work.)
+- **Statistical chart types (P12).** **Heatmap** (2 dims → axes, 1 measure → a token-driven single-hue
+  colour scale) and **Treemap** (1–2 dims → nested rectangles sized by a measure) **reuse the existing
+  multi-dimension `/api/query`** — the client pivots the flat 2-dim result (`renderHeatmap`/`renderTreemap`).
+  **Histogram** (equal-width bins over one numeric column) and **Box plot** (min/Q1/median/Q3/max,
+  optionally grouped) are **new single-table query shapes** on their own endpoints
+  (`POST …/histogram`, `…/boxplot`); they bypass `buildPlan` and read the first numeric field directly
+  (`runStatChart`). All bounded (bins clamped 1..100, `LIMIT` clamped) + identifier-safe — see
+  [clickhouse-integration.md](../clickhouse-integration.md).
+- **Export (P13).** An **Export ▾** menu on the view bar (`exportControl`): **PNG/SVG** of the chart
+  (from the live ECharts SVG instance; PNG rasterised via canvas — offered only when a chart is
+  rendered, so Table/KPI export CSV instead) and **CSV** of the rows behind it
+  (`POST /api/query/export.csv` — the same bounded worksheet plan, RFC-4180 + formula-injection-safe).
 - **Sort** (`sortControl`). A dropdown of the in-play fields (dimensions + measures) plus an
   **Asc ↑ / Desc ↓** toggle; **default is ascending by the first field**. It drives the query
   `ORDER BY` (the chosen field's `k{n}`/`v{n}` alias); the crosstab always appends the remaining
@@ -164,13 +199,27 @@ Each dashboard **is a worksheet**: a **field pane** (each model table's columns 
   relationships — the client finds a **join path** (BFS over the relationship graph) and the
   server (`POST /api/query`) builds the aliased `JOIN`s. Unrelated tables → a "draw a
   relationship" warning, not a bad query.
+- **Click-to-filter (P15).** Clicking a chart mark selects its **primary-dimension** value
+  (`chart.js` forwards the ECharts `click`; `selectHandler`/`toggleSelection` in `dashboards.js` map
+  `dataIndex` → the raw value). A **selection chip** under the shelves shows it with **Keep only**
+  (`col = value`) / **Exclude** (`col != value`) / clear; the action appends a **bound-parameter**
+  filter in `buildPlan` (only when the column's table is already in the query — never forces a join),
+  re-querying via the P14 path. Clicking the same mark or ✕ clears. Worksheet-scoped for now — the
+  same `sheet.selection` machinery drives cross-*widget* filtering once P24 lands multi-worksheet
+  dashboards ([D16](../project/decisions.md)).
 - Classes: `.worksheet`, `.ws-fields`, `.ws-field`; header (P17): `.ws-viewbar`
-  (`.ws-viewbar__group--right`), `.ws-shelf-stack`, `.ws-shelf`, `.ws-toolbtn`, `.ws-charttype__sel`,
-  `.ws-format`; `.ws-pill` (`.ws-pill--dimension` / `.ws-pill--measure`), `.ws-kpi-row`, `.ws-spark`;
+  (`.ws-viewbar__group--right`), `.ws-shelf-stack`, `.ws-shelf` (incl. the `--color` lane +
+  `.ws-shelf__note`), `.ws-toolbtn`, `.ws-charttype__sel`, `.ws-format`, export (P13): `.ws-export`
+  (`.ws-export__menu`, `.ws-menu-item`); `.ws-pill`
+  (`.ws-pill--dimension` / `.ws-pill--measure` / `.ws-pill--color`), filters (P14): `.ws-pill__in`,
+  `.ws-pill__range`, reorder: `.ws-pill__grip` (`.ws-pill.is-dragging` / `.is-drop-target`);
+  selection (P15): `.ws-select` (`.ws-select__btn`); `.ws-kpi-row`, `.ws-spark`;
   crosstab: `.xtab`, `.xt-corner`, `.xt-colhdr`, `.xt-rowhdr`, `.xt-meas`, `.xt-wrap`.
-- **Next (Phase 2):** chart-axis orientation (crosstab semantics for bar/line) and **click-to-filter
-  actions** (click a bar to filter the sheet — P15). Colour-by-category marks shipped in P10 (single-
-  measure bar); a categorical **colour-by a second dimension** across series is still open.
+- **Next (Phase 2):** row-dimension **facets/small-multiples** (chart orientation itself now ships —
+  see above); cross-*widget* click-to-filter follows P24 (multi-worksheet dashboards). Both P7 mark
+  encodings have shipped:
+  **colour-by-category** (P10, per-bar on a single-measure bar) and the **Color shelf**
+  ([D14](../project/decisions.md)) — colour-by a dimension's values across series.
 
 ## Cross-cutting UI
 - **Toast** (`.toast`, `aria-live`) for transient feedback — success uses `--ok-bg`,

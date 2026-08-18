@@ -134,9 +134,81 @@ DOM** — neither is a charting-library concern.
   theming/resize for our token-driven look).
 - **Series colour:** single series wears the brand accent; **multi-measure** charts use the
   **validated categorical** ramp `--chart-cat-1..8` (dataviz colourblind/contrast-checked) with a
-  legend. **Colour-by-dimension** (categorical ramp keyed to a dimension's *values*) is still
-  future work. *See [BUILD_PLAN P9](../../BUILD_PLAN.md),
-  [frontend-patterns.md](../frontend-patterns.md#charts-p9), [DESIGN.md](../../DESIGN.md).*
+  legend. **Colour-by a dimension's *values*** across series shipped in P7 — see
+  [D14](#d14--colour-marks-are-an-extra-group-by-the-client-pivots-into-series). *See
+  [BUILD_PLAN P9](../../BUILD_PLAN.md), [frontend-patterns.md](../frontend-patterns.md#charts-p9),
+  [DESIGN.md](../../DESIGN.md).*
+
+### D14 — Colour marks are an extra group-by the client pivots into series (P7 — 2026-08-18)
+The worksheet gained a Tableau-style **Color shelf** (one dimension). Rather than a new query shape,
+the colour dimension is sent as **one more group-by**, appended **last** to the request's
+`ColumnDimensions`; the server's key order stays `[rowDims…, colDims…, color]`. The client
+(`renderColorSplit` in `dashboards.js`) treats that trailing key specially: for **bar/stacked/line/
+area** it **pivots** the flat grouped rows into **one series per distinct colour value** (bar →
+grouped, stacked → stacked, line/area → one line each); a **Table** takes it for free as an extra
+top-header level. This keeps [D1](#d1--read-only-against-clickhouse) read-only and stays on the
+**existing bounded aggregate/join path** ([D6](#d6--identifiers-validated-against-the-live-catalog--backtick-quoted)
+identifier safety unchanged), so no `QueryModels`/gateway change was needed.
+- **Constraints:** colour-split renders for **one measure** (multi-measure + colour → a hint, not an
+  error, per P11); chart types that don't consume colour (pie/donut/scatter/combo/KPI) show a **lane
+  note** and ignore the pill rather than silently mis-querying (colour is only added to the query for
+  those types in `COLOR_USES`). Category × colour combos are still capped by the query `LIMIT`
+  (Top-N), so the result stays bounded; beyond 8 values the `--chart-cat-*` ramp repeats (legend
+  disambiguates — never colour-alone).
+- **Pill colour:** a new **`--info-*`** violet token trio (matching `--chart-cat-7`) distinguishes the
+  Color pill from dimension (red) and measure (green) — tokens only, per
+  [D7](#d7--design-language-red--black--white-fixed-no-scroll-shell) / DESIGN rule 6.
+- **Rejected:** a dedicated server `color` field / new query shape (unnecessary — it's just a
+  group-by); a continuous colour gradient for measure-on-colour (deferred; v1 groups by value).
+- **Not click-to-filter:** the other P7 "next" item (click a mark to filter the sheet) still lands in
+  [P15](../../BUILD_PLAN.md), which depends on the P14 dashboard-filter machinery.
+
+### D15 — Statistical charts, export & richer filters stay on read-only, bounded, bound-param paths (P12–P14 — 2026-08-18)
+P12–P14 added visualisation and interactivity without weakening the two invariants
+([D1](#d1--read-only-against-clickhouse) read-only, [D6](#d6--identifiers-validated-against-the-live-catalog--backtick-quoted) identifier safety):
+- **P12 statistical charts.** **Heatmap/treemap reuse the existing multi-dimension `/api/query`** (no
+  new shape — the client pivots the 2-dim result). **Histogram** and **box plot** are the genuinely new
+  single-table shapes: histogram buckets one numeric column with a `WITH (min)/(max)` +
+  `floor((col-lo)/width)` in **one bounded statement** (bins clamped 1..100, the max value clamped into
+  the last bin); box plot is `min`/`quantile(.25|.5|.75)`/`max`, optionally grouped, bounded `LIMIT`.
+  Both are **single-table** (a distribution is one column) — joins add nothing here, so they take their
+  own endpoints rather than complicating `QueryAsync`.
+- **P13 export.** Chart image is client-only (**SVG** native from the SVG renderer; **PNG** rasterised
+  from that SVG via canvas). **CSV** reuses `QueryAsync` (same bounded plan) and serialises through a
+  pure `CsvUtil` — RFC-4180 quoting **plus a formula-injection guard** (a leading `= + - @` is prefixed
+  with `'`), because exported cells open in spreadsheets. No new query surface; read-only.
+- **P14 filters.** A dashboard is still one worksheet ([D12](#d12--subtabs-are-dashboards-over-one-shared-data-model-not-per-tab-entity-canvases)),
+  so P14 landed as **richer Filters-shelf controls**, not cross-widget wiring (that needs P24). New ops
+  **`in`** (multi-select from a **bounded distinct-values** query) and **`between`** (range) join the
+  scalars; all values are **bound parameters** — `in` as an `Array(String|Float64)`, `between` as two
+  bounds — via a new pure **`BuildCondition`** that `QueryAsync` now calls. An empty `in` / partial
+  range is a **no-op** (never `IN ()`).
+- **Testing.** The safety-critical logic was extracted into **pure, unit-tested** helpers
+  (`ClampBuckets`, `ClampDistinct`, `BuildSingleTableFilters`, `BuildCondition`, `CsvUtil`) reachable via
+  `InternalsVisibleTo` — the SQL string/param shapes and hostile-input rejection are asserted without a
+  live server; the endpoints keep the without-connection **409** gate. 63 → **100 tests**.
+- **Deferred:** histogram/box-plot CSV (their shape isn't a `QueryRequest`); cross-**widget** filters +
+  parameters proper (→ P24 multi-worksheet dashboards); click-to-filter (→ P15).
+
+### D16 — Click-to-filter ships as worksheet-scoped selection machinery (P15 — 2026-08-18)
+P15's "click a mark to filter the dashboard's other widgets" presumes **multiple widgets** — but a
+dashboard is still **one worksheet** (multi-view composition is P24). So P15 landed as the **transient
+mark-selection machinery** on that single worksheet, which is exactly what P24 will reuse for cross-widget
+filtering. Clicking a chart mark forwards the ECharts `click` (`chart.js`), the client maps the mark's
+`dataIndex` → the **primary dimension**'s raw value, and stores `sheet.selection`. A **selection chip**
+offers **Keep only** (`col = value`) / **Exclude** (`col != value`) / clear; the action becomes a
+**bound-parameter** filter appended in `buildPlan` — reusing the P14 path, and **only when the selected
+column's table is already in the query** so a click can never force an unresolved join. Clicking the same
+mark or ✕ clears; the chip is the visible selection.
+- **Why not filter on click immediately (Tableau's filter action)?** On a single widget, self-filtering to
+  the clicked value collapses the chart to one mark. Making the click a **selection** with explicit
+  Keep-only/**Exclude** keeps it useful (Exclude is genuinely handy on one chart) and non-destructive until
+  the user chooses — and matches Tableau's select-then-act model.
+- **Scope:** wired for bar/stacked/line/area/combo/pie/donut/scatter (incl. colour-split, where the primary
+  value is the first non-colour dimension). Heatmap/treemap/histogram/box-plot/KPI/table are no-ops (their
+  marks don't map 1:1 to a single primary-dimension value); a null value is a no-op (can't cleanly bind
+  `= NULL`). **Pure client** — no new query surface (reuses [D15](#d15--statistical-charts-export--richer-filters-stay-on-read-only-bounded-bound-param-paths-p12p14--2026-08-18)'s bound-param filters), so the read-only invariant is untouched.
+- **Deferred:** cross-**widget** propagation + an event-bus fan-out (→ P24 multi-worksheet dashboards).
 
 ## Open questions
 
