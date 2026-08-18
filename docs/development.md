@@ -12,7 +12,7 @@ The project must be built on host **`10.168.49.20`**, under
 `src/DashboardBuilder` lives at
 `/unified/user/cj/web_development/prototype/dashboard_builder/src/DashboardBuilder`. Run the scaffold, `dotnet
 run`, `dotnet build`, and `dotnet test` on that host, from that folder. (This KB lives
-separately under `.../knowledge/web_development/drag_and_drop_dashboard_builder`; keep the
+separately under `.../knowledge/web_development/dashboard_builder`; keep the
 built app in the prototype folder above.)
 
 **Credentials** (SSH to the build host, and the ClickHouse login) are in the local,

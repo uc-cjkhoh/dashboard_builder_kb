@@ -89,7 +89,7 @@ write/DDL endpoints (see [what-it-is-NOT](README.md#what-this-is-not-kills-false
 > code agree from day one.
 
 ```
-drag_and_drop_dashboard_builder/
+dashboard_builder/
 ├── src/
 │   └── DashboardBuilder/                 # the ASP.NET Core project
 │       ├── DashboardBuilder.csproj

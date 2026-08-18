@@ -24,7 +24,7 @@ preview rows → relate & subtab entirely client-side. Full picture and the API 
 ## Build, run & test — and *where*
 
 > **This KB directory is not where the app is built.** This folder
-> (`.../knowledge/web_development/drag_and_drop_dashboard_builder`) holds docs only. The
+> (`.../knowledge/web_development/dashboard_builder`) holds docs only. The
 > app must be created and compiled on host **`10.168.49.20`**, under
 > **`/unified/user/cj/web_development/prototype/dashboard_builder/`** — so `src/DashboardBuilder` lives at
 > `/unified/user/cj/web_development/prototype/dashboard_builder/src/DashboardBuilder`. Run every `dotnet`
