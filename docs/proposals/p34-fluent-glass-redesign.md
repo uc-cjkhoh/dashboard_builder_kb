@@ -116,7 +116,7 @@ The fixed, no-scroll shell and the resizable sidebar stay
 | **Tab bar** | Fluent tabs with an accent underline on the active tab. Import + Export merge into one **Workbook** overflow menu (⋯). Autosave shows as a quiet `--ink-3` "Saved" text. |
 | **Worksheet view bar** | Chart-type picker stays a labelled control; Sort, Format, Export become icon buttons with tooltips and `aria-label`s. |
 | **Encodings toolbar** | A visible row plus a **More** menu, by the rule in [Toolbar visibility](#toolbar-visibility). |
-| **Field pane** | Collapsible **Dimensions** / **Measures** groups; each field shows a type icon (text, number, date, bool) — not a coloured letter. |
+| **Field pane** | Each table's field group is collapsible (`<details>`), with small Dimensions / Measures labels inside; each field shows a type icon (text, number, date, bool) — not a coloured letter. |
 | **Entity cards** | Flat solid card, 1px stroke, `--elev-2`. Head: table name (600) with the database muted before it; key columns get the key icon. Collapse caret kept. |
 | **Pills** | Shape + text + colour ([golden rule 9](../conventions/golden-rules.md)): dimensions `--dim-*`, measures `--meas-*`, encodings `--enc-*`; invalid pills get a dashed `--danger-line` border + warning icon + tooltip. |
 | **Empty states** | One sentence + one button, centred, `--ink-2`. |
@@ -163,12 +163,12 @@ Bar/Line/…") are kept.
 | Host | required; hostname, IPv4 or bracketed/plain IPv6; ≤ 253; no scheme, port or path | inline: "Enter the host name only — put the port in Port" (when `://` or `:port` is present) |
 | Port | required integer 1–65535 (blank no longer defaults) | inline |
 | User / Password | user required ≤ 64; password ≤ 256 | inline |
-| Tab rename | trim; 1–60 chars; `F2`/`Enter` starts rename from the keyboard | empty → revert + toast "Tab name can't be empty"; over-length blocked by `maxlength` + counter |
+| Tab rename | trim; 1–60 chars; `F2`/`Enter` starts rename from the keyboard | empty → revert + toast "Tab name is required."; over-length blocked by `maxlength` |
 | Axis titles | ≤ 80 chars (`maxlength`) | — |
 | Table drop | `db`/`table` are non-empty strings; table not already on canvas | duplicate → focus existing card + toast |
 | Relationship | not a duplicate of an existing link; key categories compatible (number↔number, text↔text, date↔date) | blocked + toast naming both columns and types |
 | Measure aggregation | only aggregations valid for the column's category are offered | — (server also accepts min/max on text/date, see B2) |
-| Scalar filter | parsed by column category: number → strict number; date/datetime → native date inputs; bool → select | invalid pill, not applied; inline message in the filter editor |
+| Scalar filter | parsed by column category: number → strict number; date/datetime → strict ISO text (`YYYY-MM-DD[ HH:MM:SS]`, works for Date and DateTime columns); bool → `true`/`false`/`1`/`0` | invalid pill, not applied; inline message in the filter editor |
 | Between filter | both bounds parse; lo ≤ hi | invalid pill + inline "From must be ≤ To" |
 | In-list | values from distinct query | when the 200-value cap is hit: "Showing the first 200 values — more exist" |
 | Pages | members cap 200 | same notice; load failure shows the server's message |
@@ -235,8 +235,8 @@ date/datetime → ISO-8601 parse, bool → `true|false|0|1`. Failure → 400
   strings instead of `Convert.ToDouble` (which throws today → 502). `QueryResultRow.Values` becomes
   `IReadOnlyList<object?>`; the client formats by measure category.
 - **Histogram / box plot filters:** `in` and `between` are applied (reusing `BuildCondition`). Filters on
-  other tables can't apply to these single-table views — the response lists them in `IgnoredFilters`
-  and the client shows a notice.
+  other tables can't apply to these single-table views — the client (which chooses what to send) counts
+  them and shows a notice.
 - **Remove** the uncalled `POST …/aggregate`, `GET …/preview` and `GET …/count` endpoints and their
   gateway methods, models and tests.
 
