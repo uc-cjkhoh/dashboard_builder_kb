@@ -63,6 +63,7 @@ Overview: [../DESIGN.md](../DESIGN.md).
 |---|---|
 | [proposals/roadmap.md](proposals/roadmap.md) | every phase not built yet, in recommended order, with a coverage table against Tableau, Power BI and Looker Studio |
 | [proposals/roadmap-bi-parity.md](proposals/roadmap-bi-parity.md) | detail of the open phases from the Power BI / Looker Studio review (P35–P45 series) |
+| [proposals/p24-dashboards.md](proposals/p24-dashboards.md) | P24a + P24b spec: instantiable worksheet views, worksheet + dashboard tabs, snap-grid dashboards, workbook v2 |
 | [proposals/competitive-analysis.md](proposals/competitive-analysis.md) | Gap analysis vs. Tableau and GA4, ordered by difficulty |
 
 ## Not here

@@ -77,6 +77,9 @@ Audited against Tableau Desktop's [workspace anatomy](https://help.tableau.com/c
 
 ## P24 — Multi-worksheet dashboards & stories
 
+Split into 24a (worksheet views) + 24b (dashboards) — spec: [p24-dashboards.md](p24-dashboards.md) — then 24c
+(cross-widget filtering) and 24d (stories).
+
 - A dashboard-composition view hosting **several worksheet widgets** (charts, crosstabs, KPI tiles) with
   per-widget size/placement over the one data model; optional **story** points (ordered, captioned
   snapshots).
