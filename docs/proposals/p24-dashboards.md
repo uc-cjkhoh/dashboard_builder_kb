@@ -163,10 +163,11 @@ widget:  { id: "w#7", kind: "sheet", sheetId: "ws#3", x, y, w, h }
 |---|---|
 | `Features/Dashboard/chart.js` | per-container state (24a) |
 | `Features/Dashboard/worksheet-view.js` | **new** — the query-and-render path (24a) |
+| `Features/Dashboard/sheet-plan.js` | **new** — DOM-free plan building (`buildPlan`, `planDims`, `planMeasures`, sort targets), shared by the editor and the view (24a) |
 | `Features/Dashboard/dashboards.js` | editor only; uses one view; store renames (24a) |
 | `Features/Core/store.js`, `Core/validate.js`, `Core/icons.js` | `tabs`, widgets, renames, limits, `dashboard` icon |
 | `Features/Tabs/tabs.js` | two tab kinds, **+** menu, worksheet-in-use confirm |
-| `Features/Board/` | **new** — `_Board.cshtml`, `board.js` (canvas, widgets, side panel, undo), `board.css`, `board-layout.js` (pure: snap, collide, first free, clamp) |
+| `Features/Board/` | **new** — `_Board.cshtml`, `board.js` (canvas, widgets, side panel, undo), `board.css`, `board-drag.js` (pointer move / resize), `board-layout.js` (pure: snap, collide, first free, clamp) |
 | `Features/Workbook/workbook-model.js`, `workbook.js` | v2 format, `migrateV1`, widget validation, v2 autosave key with v1 fallback |
 | `Features/Shell/Index.cshtml`, `app.js` | mount the Board feature |
 | tests | `board-layout.test.mjs` (new), `workbook-model.test.mjs` (v2 + migration), `chart.js` per-container and `worksheet-view` where pure |
