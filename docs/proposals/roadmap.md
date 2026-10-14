@@ -79,6 +79,7 @@ Audited against Tableau Desktop's [workspace anatomy](https://help.tableau.com/c
 ## P22 — Show Me
 
 Recommend the view types that fit the fields in play and build one in a click.
+Spec: [p22-show-me.md](p22-show-me.md).
 
 - A panel lists chart types with the valid ones enabled for the current selection (reusing
   `chartIssue()`), and on pick **auto-places** fields on shelves/encodings.
