@@ -1,125 +1,125 @@
-# CLAUDE.md — working conventions
+# CLAUDE.md — working conventions (index)
 
-Rules and sharp edges for anyone (human or agent) building the drag-and-drop
-dashboard builder. Read [README.md](README.md) and [ARCHITECTURE.md](ARCHITECTURE.md)
-first for context. **Nothing is built yet** — when you start coding, follow the layout
-in [ARCHITECTURE.md](ARCHITECTURE.md) so the code and this KB stay in agreement, and
-**update the relevant doc in the same change** whenever a decision shifts.
+Index for anyone (human or agent) working on the **Dashboard Builder**. This file is the map: where the
+code is, setup commands, directory layout, and the golden rules in one line each. The detail lives in
+[`docs/`](docs/README.md) — follow the links.
 
-## Architecture in one screen
+> **Read first:** [README.md](README.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [DESIGN.md](DESIGN.md),
+> then the [`docs/`](docs/README.md) file for whatever you're touching. **Update that doc in the same
+> change** — this KB tracks current state, not history ([kb-maintenance.md](docs/conventions/kb-maintenance.md)).
 
-One ASP.NET Core app (Kestrel) serves **a single HTML page** plus a small **read-only
-JSON API**. The **browser holds all builder state** — which tables are on the canvas, the
-relationships drawn, the open subtabs — in vanilla-JS ES modules (`connection`, `schema`,
-`canvas`, `relations`, `tabs`). The **server is a thin, stateless-per-request proxy to
-ClickHouse**: it holds the active connection in a **session-scoped `ConnectionRegistry`**,
-runs introspection (`SHOW`/`DESCRIBE`) and `SELECT … LIMIT` previews through
-`ClickHouseGateway`, and returns JSON. **There is no application database** — ClickHouse is
-the only external system; dashboards persist (if at all) as JSON. The request loop:
-connect (`SELECT 1` → store) → list databases → list tables → on drop, `DESCRIBE` columns +
-preview rows → relate & subtab entirely client-side. Full picture and the API table:
-[ARCHITECTURE.md](ARCHITECTURE.md); the two invariants that shape every server change
-(read-only, identifier-validation) are the golden rules below.
+> **This KB is docs only.** The source is at `/unified/user/cj/web_development/prototype/dashboard_builder/`
+> on the build host `10.168.49.20` (same shared filesystem — build it from here). Never scaffold code
+> into the KB. The app folder is a local git repo (no remote); this KB is a separate git repo.
 
-## Build, run & test — and *where*
+## ⚠️ The most important rules
 
-> **This KB directory is not where the app is built.** This folder
-> (`.../knowledge/web_development/dashboard_builder`) holds docs only. The
-> app must be created and compiled on host **`10.168.49.20`**, under
-> **`/unified/user/cj/web_development/prototype/dashboard_builder/`** — so `src/DashboardBuilder` lives at
-> `/unified/user/cj/web_development/prototype/dashboard_builder/src/DashboardBuilder`. Run every `dotnet`
-> command there, from that folder. Do **not** scaffold into this KB. See
-> [docs/development.md](docs/development.md).
+**The server is read-only against ClickHouse** — in our SQL builders *and* via ClickHouse's own
+`readonly=2` on every query — and **never interpolates an identifier it hasn't validated against the
+live catalog** (ClickHouse binds values, not identifiers). Every query is bounded and time-limited, every
+value bound. These shape every server change:
+[golden-rules.md](docs/conventions/golden-rules.md) rules 1–3.
 
-Once scaffolded (from `src/DashboardBuilder` on the build host):
+## What this is in one screen
+
+One ASP.NET Core MVC app (Kestrel) serves **a single page** (`GET /`, composed from feature partials)
+plus a **read-only JSON API**. The **browser holds all builder state** — the shared data model
+(entities + relationships) and one worksheet per dashboard tab — in vanilla-JS ES modules. The
+**server is a thin, session-scoped proxy to ClickHouse**: `ConnectionRegistry` holds the session's
+connection; `ClickHouseGateway` runs introspection and bounded, identifier-safe aggregate/join queries
+and returns JSON. **There is no application database.** Full picture:
+[ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Build, run, test, deploy
+
+From the solution root `/unified/user/cj/web_development/prototype/dashboard_builder`:
 
 ```bash
-dotnet run                       # serve the one page + /api (Kestrel)
 dotnet build -c Release
-dotnet test                      # full suite
-dotnet test --filter Identifier  # a single test/class (e.g. the identifier-safety unit tests)
-dotnet publish -c Release -o out # framework-dependent; deploy behind a reverse proxy + systemd
+dotnet test                                   # .NET suite; --filter Identifier for one class
+~/.nvm/versions/node/v24.20.0/bin/node --test tests/js/*.test.mjs   # JS unit tests
+cd src/DashboardBuilder && dotnet run         # http://localhost:5080
+dotnet run --no-launch-profile --urls http://localhost:5180   # a spare port
+dotnet publish src/DashboardBuilder/DashboardBuilder.csproj -c Release -o publish
 ```
 
-- **Prereq:** `.NET SDK 10 (LTS)` (`sudo dnf install -y dotnet-sdk-10.0`).
-- **A ClickHouse to point at** for anything past the shell — a throwaway container is
-  fastest: `podman run -d --name ch -p 8123:8123 clickhouse/clickhouse-server`.
-- **Credentials** (SSH to the build host + ClickHouse login) are in the git-ignored
-  [docs/project/credentials.local.md](docs/project/credentials.local.md) — never in shared docs.
-- **Highest-value tests** to keep green: the `Identifier` validate/quote helper (feed it
-  hostile names) and the ClickHouse-type → display-category mapper. See
-  [docs/development.md](docs/development.md).
+- **Prereqs:** .NET SDK 10 (on the host's `PATH`); a ClickHouse to point at — details and a throwaway
+  container in [development.md](docs/operations/development.md).
+- **Live:** `webapps-dev.dashboardbuilder.service`, Kestrel `:5105`, Apache `:8443`, path
+  `/dashboardbuilder`. Stop → copy → start for server changes — never copy a DLL over the running
+  process ([deployment.md](docs/operations/deployment.md)).
+- **Never `pkill -f DashboardBuilder.dll`** (matches the live service) — stop dev runs by port.
+- **Credentials** (SSH + ClickHouse): git-ignored
+  [credentials.local.md](docs/operations/credentials.local.md) — never in shared docs.
 
-## Golden rules
+## Source layout
 
-1. **The server is read-only against ClickHouse.** Introspection (`SHOW`, `DESCRIBE`,
-   `system.*`) and `SELECT … LIMIT` previews only. There is **no DDL/DML endpoint** and
-   there must not be one in v1. If a feature seems to need writes, it's out of scope —
-   check [README's "what this is NOT"](README.md#what-this-is-not-kills-false-assumptions).
+```
+src/DashboardBuilder/
+├── Program.cs              # host, session, PathBase, no-cache static files, /features provider
+├── ClickHouse/             # shared server infra: Gateway (all SQL), Identifier, ClickHouseType,
+│                           #   RequestValidation (limits, rules, typed filter values),
+│                           #   ConnectionRegistry, CsvUtil, *Models.cs
+└── Features/               # one folder per feature: controller + _View.cshtml + .css + .js
+    ├── ApiControllerBase.cs  ApiErrors.cs   # RunAsync / SafeError; the one { error, field? } shape
+    ├── Shell/  Core/  Connection/  Schema/  Canvas/  Relations/  Tabs/  Dashboard/  Workbook/
+tests/DashboardBuilder.Tests/   # xUnit
+tests/js/                       # node --test, for the pure JS modules
+```
 
-2. **Never interpolate an identifier you haven't validated.** Database, table, and
-   column names come from the client and end up inside SQL text — ClickHouse parameters
-   bind **values, not identifiers**. Before an identifier reaches a query it must be
-   (a) confirmed to exist in the live catalog for that connection, and (b) backtick-quoted
-   with internal backticks escaped. Do this in one place (`ClickHouse/Identifier.cs`).
-   Details + the failure it prevents: [clickhouse-integration.md](docs/clickhouse-integration.md).
+Feature assets are served at `/features/<Feature>/<file>` (`.css`/`.js` only). Map:
+[ARCHITECTURE.md § Code map](ARCHITECTURE.md#code-map).
 
-3. **Credentials live in the session and nowhere else.** Never return the password to the
-   client, never write it to logs or error messages, never put it in a URL/query string.
-   The `ConnectionRegistry` is session-scoped; a new session starts with no connection.
+## KB directory map
 
-4. **Relationships are logical declarations, not database facts.** ClickHouse enforces no
-   foreign keys and no uniqueness — a MergeTree "primary key" is a sparse index, not a
-   constraint. The one-to-one / one-to-many links are the *user's* assertions that the app
-   uses for joins and layout. Do not imply the DB validated them. See
-   [data-model.md](docs/data-model.md).
+```
+dashboard_builder/          (this KB)
+├── CLAUDE.md  README.md  ARCHITECTURE.md  DESIGN.md
+├── docs/
+│   ├── README.md           # topic index
+│   ├── conventions/        # golden-rules · sharp-edges · definition-of-done · kb-maintenance
+│   ├── design/             # tokens · layout · components · motion-accessibility
+│   ├── features/           # one file per app feature (connection … worksheet-encodings, workbook)
+│   ├── reference/          # api · clickhouse-integration · data-model · frontend-modules · decisions · glossary
+│   ├── operations/         # development · deployment (+ git-ignored credentials.local.md)
+│   └── proposals/          # roadmap (open phases) · roadmap-bi-parity · competitive-analysis
+├── archive/                # frozen P0–P20 build plan — not maintained
+└── .claude/                # kb-verify hook enforcing kb-maintenance.md
+```
 
-5. **Toggle visibility with the `hidden` attribute, not `style.display`.** The stylesheet
-   sets `[hidden] { display: none !important }` precisely so one switch works everywhere
-   (empty states, inline errors, dropzone hints). Setting inline `display` fights it. See
-   [DESIGN.md](DESIGN.md#layout-rules).
+## Golden rules (summary)
 
-6. **Use the design tokens — never hardcode a hex.** All color/space/type values are CSS
-   custom properties in `site.css` `:root`. `--brand-soft` and `--danger-soft` are the same
-   red; **never** use `--brand-soft` for a success cue. See [DESIGN.md](DESIGN.md).
+Full text: [docs/conventions/golden-rules.md](docs/conventions/golden-rules.md).
 
-7. **Keep the shell fixed; scroll inside panels.** `html, body { height:100%; overflow:hidden }`.
-   The sidebar, the table list, and each entity card scroll internally — the page itself
-   never scrolls.
+1. **Read-only against ClickHouse** — `SELECT`/`SHOW`/`DESCRIBE` only; no DDL/DML endpoint, ever, in v1.
+2. **Validate + quote every identifier** against the live catalog, in `ClickHouse/Identifier.cs` only.
+3. **Bind every value; bound every result** — whitelisted aggs/ops, typed values, validated `LIMIT`s;
+   out-of-range input is rejected (400), never silently clamped. Charts cap at 5000 groups, tables page, CSV ≤ 100k (D24).
+4. **Credentials live in the session only** — never returned, logged, or put in a URL.
+5. **Relationships are logical declarations**, not database facts.
+6. **Toggle visibility with `hidden`**, never `style.display`.
+7. **Design tokens only** — no hardcoded hex; red means danger, nothing else.
+8. **Fixed shell** — the page never scrolls; panels scroll inside.
+9. **Never colour alone** — icon + text + colour; legends; shape-coded cardinality.
+10. **Self-hosted, framework-free frontend** — vanilla JS/CSS, no build step, no CDN.
 
-## Common tasks (where things will live)
+## Where things live
 
-| Task | Touch |
-|---|---|
-| Add/adjust a ClickHouse query | `src/DashboardBuilder/ClickHouse/ClickHouseGateway.cs` + [clickhouse-integration.md](docs/clickhouse-integration.md) |
-| Add an API endpoint | `src/DashboardBuilder/Endpoints/` + the API table in [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Change the connection flow | `ConnectionRegistry.cs`, sidebar JS + [modules.md](docs/app/modules.md) |
-| Work on drag/drop or entity cards | `wwwroot/js/canvas.js` + [drag-and-drop.md](docs/drag-and-drop.md) |
-| Work on relationships/cardinality | `wwwroot/js/relations.js` + [data-model.md](docs/data-model.md) |
-| Add a subtab/dashboard feature | `wwwroot/js/tabs.js` + [modules.md](docs/app/modules.md) |
-| Change any color/spacing/typography | `wwwroot/css/site.css` `:root` + [DESIGN.md](DESIGN.md) |
-
-## Sharp edges / gotchas
-
-- **ClickHouse has no foreign keys.** (Rule 4.) Don't reach for `system` FK metadata — it
-  doesn't exist. Relationship keys are user-picked columns.
-- **Identifiers aren't parameterizable.** (Rule 2.) `SHOW TABLES FROM {db}` and
-  `DESCRIBE {db}.{table}` require string interpolation; only *values* (e.g. a `LIMIT` bound,
-  a filter value) can use bound parameters.
-- **`DESCRIBE` type strings are ClickHouse types, not SQL-92.** Expect `Nullable(...)`,
-  `LowCardinality(...)`, `Array(...)`, `Enum8(...)`, `DateTime64(3)`, etc. Map for display;
-  don't assume `int/varchar`. See the type-mapping section in
-  [clickhouse-integration.md](docs/clickhouse-integration.md).
-- **Big tables:** always `LIMIT` previews and never `SELECT *` without a bound — a preview
-  must never try to stream a billion-row table into the browser.
-- **Two connections, same server, different databases** is normal; scope every query to the
-  connection + database the request names, not a global default.
-- **Status is icon + text + color, never color alone** (accessibility). Applies to the
-  connection state pill and any dashboard status. See [DESIGN.md](DESIGN.md#accessibility-posture).
-
-## Definition of done for a change
-
-- Read-only invariant intact; no credential leak; identifiers validated + quoted.
-- Visibility via `hidden`; colors via tokens; shell doesn't scroll.
-- The KB doc that describes the touched area is updated in the same change.
-- If you changed a decision, record it in [docs/project/decisions.md](docs/project/decisions.md).
+| Task | Code | Doc |
+|---|---|---|
+| Add/adjust a ClickHouse query | `ClickHouse/ClickHouseGateway.cs` | [clickhouse-integration.md](docs/reference/clickhouse-integration.md) |
+| Add an API endpoint | `Features/*/…Controller.cs` (subclass `ApiControllerBase`) | [api.md](docs/reference/api.md) |
+| Validate an input / add a limit | `ClickHouse/RequestValidation.cs` + `Features/Core/validate.js` (keep in step) | [api.md § Limits](docs/reference/api.md#limits) |
+| Connection flow | `ClickHouse/ConnectionRegistry.cs`, `Features/Connection/` | [connection.md](docs/features/connection.md) |
+| Drag/drop, entity cards | `Features/Canvas/canvas.js` | [canvas.md](docs/features/canvas.md) |
+| Relationships / cardinality | `Features/Relations/relations.js` | [relationships.md](docs/features/relationships.md) |
+| Tabs | `Features/Tabs/tabs.js`, `Core/store.js` | [tabs.md](docs/features/tabs.md) |
+| Worksheet shelves / plan / crosstab | `Features/Dashboard/dashboards.js` | [worksheet.md](docs/features/worksheet.md) |
+| Chart types / rendering / export | `Features/Dashboard/chart.js` | [worksheet-charts.md](docs/features/worksheet-charts.md) |
+| Marks, filters, drill, pages | `Features/Dashboard/dashboards.js` | [worksheet-encodings.md](docs/features/worksheet-encodings.md) |
+| Query caching / latest-wins / truncation notice | `Features/Dashboard/query-runner.js` | [worksheet.md § Query lifecycle](docs/features/worksheet.md#query-lifecycle) |
+| Save / restore / export / import | `Features/Workbook/` | [workbook.md](docs/features/workbook.md) |
+| Colour / spacing / type | `Features/Core/core.css` `:root` | [tokens.md](docs/design/tokens.md) |
+| Motion / transitions | `Features/Core/motion.js` + `core.css` motion tokens | [motion-accessibility.md](docs/design/motion-accessibility.md#motion) |
+| Gotchas before editing | — | [sharp-edges.md](docs/conventions/sharp-edges.md) |
+| Definition of done | — | [definition-of-done.md](docs/conventions/definition-of-done.md) |

@@ -1,0 +1,214 @@
+# Dashboard worksheet — shelves, crosstab, sort, format, joins
+
+Each dashboard tab **is one Tableau-style worksheet**: a field pane beside shelves you drag fields onto,
+and a view that renders the result. Code: `Features/Dashboard/` (`dashboards.js`, `filter-rules.js`,
+`toolbar-rules.js`, `query-runner.js`, `chart.js`, `contrast.js`, `_Dashboard.cshtml`, `dashboard.css`,
+`QueryController.cs`). Companion docs: chart types and export in
+[worksheet-charts.md](worksheet-charts.md); Marks, Filters, Date range & comparison, click-to-filter, Drill and Pages in
+[worksheet-encodings.md](worksheet-encodings.md). Sheet state shape:
+[data-model.md](../reference/data-model.md#worksheet-sheet).
+
+## Layout
+
+Data on top, view controls on the chart ([design/layout.md](../design/layout.md#worksheet--data-header-and-chart-card)):
+
+1. **Data header** — **Columns** and **Rows** shelves (full-width lanes, always visible), then the
+   **Marks** lane: a visible row of encodings plus a **More** menu — Color, Size, Label, Detail,
+   Tooltip, Shape, Path, Angle, Filters, Drill, Pages ([worksheet-encodings.md](worksheet-encodings.md#encodings-toolbar)).
+2. **Chart card** — its head is the **view bar**: chart-type picker (`chartTypePicker`) · sort picker ·
+   Format · Export · Refresh · **Full screen** (icon buttons with tooltips and `aria-label`s); then the
+   Format card, the result notice and the chart. Full screen, print and the phone layout:
+   [layout.md](../design/layout.md#phone-layout--640px).
+
+**Worksheet chrome** (P23):
+
+- **Undo / Redo** — buttons beside the chart-type picker and `Ctrl/⌘+Z`, `Ctrl/⌘+Shift+Z` / `Ctrl+Y`
+  (not while typing in a field). Every committed edit records the sheet as it was (50 steps per
+  dashboard, this session only); Pages autoplay doesn't record (`Dashboard/history.js`).
+- **Sheet actions** (⋯ in the view bar): **Swap Rows and Columns**, **Clear sheet…** (confirm; keeps the
+  chart type; Undo restores), **Fit** — Standard (a slot per category, the pane scrolls), Fit width, Fit
+  height, Entire view (the fitted axis shares the pane; its labels thin out) — and **Show title and
+  caption**.
+- **Title and caption** under the view bar: click to edit, `Enter` saves, `Esc` cancels; empty = the
+  automatic one (the tab name; "sum amount by customers.name · 2 filters", in italics). Printed too.
+- **Status bar** at the foot of the chart card: marks · rows × columns (Table / Text) · measures · the
+  selection.
+
+Beside them, the **field pane** (drag its right edge, or `←`/`→` on the handle, to resize it) lists each model table as a collapsible group (`<details>`, open by
+default) with small **Dimensions** / **Measures** labels inside; each field shows a type icon (text,
+number, date, bool) rather than a coloured letter.
+
+**Field pane basics** (P28): a **search** box at the top filters fields by column or display name
+(non-matches get `hidden`); each field's **⋯** menu offers **Rename…** (inline, 1–60 characters — a
+*display name* shown on the field, pills, axes, legends, table headers and the sort picker; the query always
+uses the real, catalog-validated column; renamed fields read in italics), **Default aggregation** (numeric
+fields: the aggregation a new measure pill starts with) and **Hide from the field list** (with a **Show
+hidden (n)** toggle). Settings are per workbook (`fields` in the file; store `fieldMeta`).
+
+Drag a field onto a shelf or tool, or press its **`＋`** (keyboard path: measures go to Rows, dimensions
+to Columns).
+
+## Shelves & pills
+
+- **Columns** and **Rows** each hold **any number** of pills. The shelf sets the crosstab axis: Rows
+  dimensions are the **left stub**, Columns dimensions the **top header**.
+- **Quick table calculations** (P27): a measure pill's **fx** button opens its editor — **Running total,
+  % of total, Difference, % difference, Rank** (competition style, highest first) or **Moving average**
+  (window 2–30) — **Along** Columns or Rows (Auto = Columns when it has dimensions). Computed in the
+  browser over the returned rows in sort order, restarting for each member of the other shelf's
+  dimensions; no new query. The measure is renamed ("sum amount · running total"); percentages read "23.4%"
+  in the table and charts. Over a cut-off result the info line says "Table calculations use only the rows
+  shown — more exist." (`Dashboard/table-calc.js`; saved on the pill as `tableCalc`).
+- **Date parts** (P26): a date dimension pill has a part picker — **Auto** (the chart-wide Format →
+  Group dates), **Exact**, **Year / Quarter / Month / Week / Day / Hour** (truncated, continuous), or
+  **Quarter of year / Month of year / Day of week / Hour of day** (discrete) — with **−** / **+** stepping
+  coarser / finer through year → quarter → month → day → hour (a `Date` column stops at day and offers
+  no hour parts). Keys read as "2024", "2024 Q3", "Mar 2024", "Week of 2024-03-04", "Mon", "Q2", "09:00"
+  (`Dashboard/date-parts.js`). A part-grouped axis isn't click-filterable. A new date pill stays on
+  **Auto** (not Tableau's Year default, which would collapse a month of data to one point). Saved on the
+  pill (`datePart`); the server maps it to one whitelisted function.
+- **Field choices** (P40): a pill's **⇄** button opens a *Choices* editor — drop up to 8 fields there
+  (the shown one included). The chart card then shows a **"Columns: show" / "Rows: show"** switcher per
+  such slot, under the view bar; picking a field swaps it into the slot (same role; a measure keeps its
+  aggregation when the new field supports it, else takes the first it does). Every choice is an
+  ordinary field, validated by the server like any pill. Removing the shown choice shows the next; one
+  choice left = an ordinary pill. Saved on the pill (`choices`). The ⇄ turns accent-coloured when set.
+- **Reorder** by dragging a pill's grip (⠿) within a shelf or across to the other one; dropping onto a
+  pill inserts before it, onto empty space appends. Dimension order sets nesting/category order;
+  measure order sets series order.
+- **Invariant: measures always sit behind dimensions** on a shelf — `normaliseShelf` re-sorts after
+  every drop, role change or add, keeping relative order within each group.
+- **Role** defaults from type (numeric → measure, else dimension) and is convertible per pill: `Σ`
+  turns a dimension into a measure, `#` a measure into a dimension. `roleOf(f)` resolves it.
+- **Aggregation** dropdown on measure pills offers only what the column's type supports
+  (`aggsFor` in `filter-rules.js`): `sum/avg/min/max/count/countDistinct` for numbers;
+  `count/countDistinct/min/max` for text **and dates**; `count/countDistinct` otherwise (boolean,
+  compound). `countDistinct` maps to ClickHouse `uniqExact`. Changing a pill's role to a type that
+  doesn't support its aggregation resets it and says so. The server rejects `sum` / `avg` on a
+  non-numeric column with a 400.
+- Pill tints: dimension blue (`--dim-*`), measure teal (`--meas-*`), Marks encodings violet (`--enc-*`).
+  A pill whose settings can't be sent (a filter with an unparseable value, a column that is no longer
+  in the catalog) is **invalid**: dashed `--danger-line` border, warning icon and a tooltip with the
+  reason — and it is left out of the query, never silently altered.
+
+## Drop-time limits
+
+Adding a field that would push a view over a cap is **refused with a toast naming the cap** — never
+silently dropped (`checkAdd` in `filter-rules.js`; limits in `Core/validate.js` `LIMITS`):
+
+| Cap | Limit |
+|---|---|
+| Fields per shelf (Columns, Rows, Detail, Tooltip) | 20 |
+| Dimensions in one view (shelves + Detail + Shape + a categorical Colour + the drill level) | 12 |
+| Measures in one view (shelf measures + numeric Size / Colour / Label / Path / Tooltip) | 10 |
+| User filters | 8 |
+| Drill levels | 6 |
+
+The dimension and measure counts are conservative: they ignore the chart type, so a stale encoding the
+current chart doesn't use still counts and can make a drop at the cap refuse (remove it to free the
+slot). The server enforces the same view caps with 400s
+([api.md](../reference/api.md#limits)); it allows more filters (20) because the worksheet appends the
+shared filters (≤ 4), the drill path (≤ 5), the page, the selection and the date range to the user's 8.
+
+## Building the query
+
+`buildPlan()` turns the sheet into one `POST /api/query` request: Rows dimensions → `rowDimensions[]`,
+Columns dimensions → `columnDimensions[]`, numeric pills → `measures[]`, plus filters and a `limit`.
+Only **valid** filters are sent (`checkFilter`); each filter's `category` (kept on the pill, back-filled
+from the column catalog for older workbooks) decides how the value is parsed. No
+measures → the server adds an implicit `count()`. The canonical dimension/measure ordering comes from
+`planDims` / `planMeasures`, which the renderer re-derives so the two stay in lock-step. SQL shape:
+[clickhouse-integration.md](../reference/clickhouse-integration.md#worksheet-query-queryasync).
+
+## Query lifecycle
+
+Every shelf, encoding or format change calls `commit()` → `dashboard:changed` → `runChart()`. What
+happens next (`Dashboard/query-runner.js`, unit-tested in `tests/js/`):
+
+1. **Latest wins.** `runChart` takes a ticket from a gate; starting a new query **aborts** the previous
+   request (the server stops it too — [clickhouse-integration.md](../reference/clickhouse-integration.md#database-level-guards))
+   and any answer that arrives for a superseded ticket is dropped, so a slow old result can never
+   overwrite a newer chart. Leaving for the Data Model cancels the in-flight query.
+2. **Cache before query.** The request (endpoint + full plan) is the cache key. The last **16** results
+   per dashboard are kept, so presentation-only changes (legend, decimals, axis titles, data labels,
+   colour-by-category) and paging back through the Pages shelf re-render instantly with **no** ClickHouse
+   query. Anything that changes the plan (fields, filters, sort, Top-N, chart family) queries.
+3. **Refresh** (icon button) on the view bar drops the dashboard's cache and re-queries with `fresh`, so
+   the server's 60-second result cache is bypassed too ([D25](../reference/decisions.md#d25--a-short-lived-server-result-cache-and-approximate-mode)) —
+   use it when the data in ClickHouse has changed. A result from the server cache says so on the info line.
+   While a query runs, **Loading…** carries a **Cancel** button: it aborts the request (the server stops the
+   ClickHouse query) and leaves "Query cancelled — Refresh runs it again."
+4. **Truncation notice.** Top-N **All** (the default) asks for up to **5000** groups
+   ([D24](../reference/decisions.md#d24--showing-all-data-bounded-requests-paging-other-date-grouping)), so below that sorting only reorders. If the
+   server reports `truncated` (more groups than the limit) and no **Other** mark shows it, an info line at
+   the top of the chart card (`#ws-chart-notice`, a sibling of `#ws-chart` so re-renders never wipe it) says so: "Showing the first 50 in sort order — more
+   exist. Raise Top-N in Format, or add a filter." At the 5000 cap it drops the Top-N hint ("…Add a filter
+   to narrow it."); the Table view shows its own progress instead (below). Box plots get the same notice. A date-grouped
+   axis adds "Dates grouped by month — set Group dates in Format to change."
+5. **Errors** show in the chart pane — a render error is caught and shown there too, never a blank
+   view. The server's `{ error }` sentence is shown as-is. A query stopped by the server's time limit says so ("ran longer
+   than 12 seconds … add a filter, lower Top-N, or use fewer fields").
+
+## Cross-table joins
+
+Fields may come from **different tables**. The client finds a **join path** (BFS over the drawn
+relationship graph) and the server builds aliased `INNER JOIN`s along it. Tables with no connecting
+relationship → a "draw a relationship" warning, never a malformed query.
+
+## Table view — a true Rows × Columns crosstab
+
+`crosstabTable()` pivots the flat grouped rows client-side (ClickHouse has no `PIVOT`):
+
+- Row-shelf dimensions form the nested **left stub** (rowSpan-merged repeats); Column-shelf dimensions
+  the nested **top header** (colSpan); measures are the **cell values**.
+- The **measure-name band sits on whichever shelf holds the measures** — on Columns it runs across the
+  top, on Rows down the left (transposing the grid). Measures on both → a note, falling back to the top
+  band.
+- A Colour dimension adds a free extra top-header level.
+- **Conditional formatting** (P37, Format → Conditional formatting, Table and Text views). Per measure
+  (keyed by column + aggregation, so it survives shelf reorders): **Cells** = None, **Colour scale**
+  (Low → high: surface → `--chart-cat-1`; or **Diverging**: `--chart-cat-6` ← surface → `--chart-cat-1`
+  around a **Midpoint** — auto = 0 when values straddle it, else the middle) or **Data bars** (from zero;
+  negatives extend left in `--chart-cat-6`); plus up to **5 rules** "value op threshold → Good / Bad /
+  Warning / Note", first match wins and overrides the scale or bar for that cell. Rules wear the status
+  tokens **and an icon** (✓ / error / warning / info); scale tints top out at 85% and each cell's ink is
+  picked for ≥ 4.5:1 (`contrast.js`). A key above the table shows each scale's low / high (and centre) and
+  each rule; while pages are still loading it says "Scales and bars use the N rows loaded so far."
+  Rules: `Dashboard/conditional-model.js` (unit-tested).
+- **Every row, a page at a time.** The table asks for 500 rows plus the total (`withTotal`); as the pane
+  scrolls within 400px of its end the next 500 load (`offset`), and the crosstab redraws from all loaded
+  rows. The notice line reads "Rows 1–500 of 12,345 — scroll to load more", then "12,345 rows". Loaded
+  pages are kept while only presentation changes; Refresh or any plan change starts over
+  (`runTable` in `dashboards.js`; rules in `scale-model.js`).
+
+## Sort
+
+The view bar's **sort picker** (`sortControl`) shows the current order (`↑ customers.name`); its menu
+lists the in-play fields ("Sort by") and **Ascending / Descending** — default ascending by the first
+field (`sortSummary` in `viewbar-model.js`). With nothing on the shelves it is disabled. It sets the query `ORDER BY` on the field's generated alias
+(`k{n}` / `v{n}`); the server then appends the remaining dimension keys ascending so the crosstab
+layout stays stable.
+
+## Format
+
+A collapsible **Format** card (`formatPanel`, state on `sheet.format`) changes presentation without
+touching the query, except Top-N:
+
+| Setting | Effect |
+|---|---|
+| Number format | auto / compact / currency / percent + decimals (0–3 in the UI; a workbook may carry up to 10) |
+| Date format | for date-like dimension labels |
+| Top-N | caps the chart query's `LIMIT` (All, 5, 10, 20, 50, 100, or **= a number parameter** — P32, clamped to 1–5000). **All** (the default) asks for up to 5000 groups; a set value keeps that many in sort order, so ascending and descending then show different groups when there are more — a one-dimension bar / pie / donut / treemap adds an **Other (N more)** mark (muted ink, not clickable) aggregating the rest. The server rejects a limit outside 1..5000. Also the histogram bin count |
+| Target | KPI: a goal for the first measure — progress bar + "% of target" ([worksheet-encodings.md](worksheet-encodings.md#date-range--comparison)); Gauge: the arc's maximum; Bullet: the target tick and bands ([worksheet-charts.md](worksheet-charts.md#chart-types)) |
+| A fall is good | with a Date range comparison: a fall shows as good (`--up`), a rise as bad |
+| Conditional formatting | Table / Text: colour scale, data bars and rules per measure ([Table view](#table-view--a-true-rows--columns-crosstab)) |
+| Approximate (faster) | `uniq` distinct counts and, on a table with a sampling key, a 10% sample scaled up — labelled on the info line ([D25](../reference/decisions.md#d25--a-short-lived-server-result-cache-and-approximate-mode)) |
+| Fit | Standard / Fit width / Fit height / Entire view (also in the ⋯ sheet actions) |
+| Group dates | charts: group the first date/time dimension by Auto (default — exact when ≤ 400 values, else the finest grain with ≤ 400 buckets), Exact, Hour, Day, Week, Month, Quarter or Year. A grouped axis isn't click-filterable |
+| Legend | show / position |
+| Data labels | on / off |
+| Colour-by-category | single-measure bar: colour each bar by its category |
+| X / Y axis titles | name the **physical** axes (X = bottom, Y = left); ≤ 80 characters |
+
+Number and date formats also drive the crosstab and KPI tiles through the shared
+`Core/format.js` (`makeValueFormatter` / `makeCategoryFormatter`), so every view reads identically.

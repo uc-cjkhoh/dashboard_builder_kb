@@ -1,10 +1,20 @@
+> **ARCHIVED — frozen record of the P0–P20 build, not maintained.** Paths and links below predate the
+> KB restructure and the feature-folder migration and may be stale. Current state: [README](../README.md);
+> what's left to build: [docs/proposals/roadmap.md](../docs/proposals/roadmap.md).
+
 # Build plan
 
 The path from this knowledge base to a running drag-and-drop dashboard builder. Phases
 are ordered so each ends in something demonstrable and the **read-only + credential-safe**
 invariants exist from the first ClickHouse call — not bolted on later.
 
-> **Status: P0–P7 done (Tableau-style worksheet + cross-table joins + **colour marks / Color shelf** [D14](docs/project/decisions.md) shipped; click-to-filter is tracked as P15); P8 ✅ (security re-audit clean, TLS validation safe-by-default [D11](docs/project/decisions.md), a11y pass, test pass; deployed live 2026-08-17 — see [deployment.md](docs/deployment.md)). P9 ✅ (charting-library foundation, [D13](docs/project/decisions.md)); P10 ✅ (chart formatting & encodings); P11 ✅ (chart-type expansion — area/stacked/pie/donut/scatter/combo/KPI+sparkline; **histogram deferred to P12** as it needs a bucketing query shape); P12 ✅ (statistical charts — heatmap/treemap/histogram/box plot), P13 ✅ (export — PNG/SVG + bounded CSV), P14 ✅ (dashboard filters — `in`/`between` + distinct-values controls, worksheet-scoped; [D15](docs/project/decisions.md)); P15 ✅ (click-to-filter — Keep only / Exclude on the worksheet; [D16](docs/project/decisions.md)); P16 = the last *competitive uplift* quick win (#8, drill-down). P17 ✅ = worksheet controls layout (usability — two-tier header). **P18–P25 = [Tableau worksheet parity](#tableau-worksheet-parity--gap-analysis-p18p25)** — gaps from auditing against Tableau's worksheet workspace (Marks card, Pages shelf, Analytics pane, Show Me, worksheet chrome/toolbar, multi-worksheet dashboards, Data-pane authoring).**
+> **Status: P0–P7 done (Tableau-style worksheet + cross-table joins + **colour marks / Color shelf** [D14](docs/project/decisions.md) shipped; click-to-filter is tracked as P15); P8 ✅ (security re-audit clean, TLS validation safe-by-default [D11](docs/project/decisions.md), a11y pass, test pass; deployed live 2026-08-17 — see [deployment.md](docs/deployment.md)). P9 ✅ (charting-library foundation, [D13](docs/project/decisions.md)); P10 ✅ (chart formatting & encodings); P11 ✅ (chart-type expansion — area/stacked/pie/donut/scatter/combo/KPI+sparkline; **histogram deferred to P12** as it needs a bucketing query shape); P12 ✅ (statistical charts — heatmap/treemap/histogram/box plot), P13 ✅ (export — PNG/SVG + bounded CSV), P14 ✅ (dashboard filters — `in`/`between` + distinct-values controls, worksheet-scoped; [D15](docs/project/decisions.md)); P15 ✅ (click-to-filter — Keep only / Exclude on the worksheet; [D16](docs/project/decisions.md)); P16 ✅ (hierarchical drill-down — single-table hierarchy on the bound-param path, breadcrumb + drill-up; [D17](docs/project/decisions.md)) — the last *competitive uplift* quick win (#8). P17 ✅ = worksheet controls layout (usability — two-tier header). **[Tableau worksheet parity](#tableau-worksheet-parity--gap-analysis-p18p25): P18 ✅ (Marks card I — Size/Label/Detail/Tooltip + continuous Colour), P19 ✅ (Marks card II — Shape/Path/Angle + Square/Circle/Text marks; [D18](docs/project/decisions.md)), P20 ✅ (Pages shelf — step/animate through a dimension). Remaining: P21 Analytics pane, P22 Show Me, P23 worksheet chrome/toolbar, P24 multi-worksheet dashboards, P25 Data-pane authoring.**
+> **Structure (2026-08-20):** migrated to **ASP.NET Core MVC in feature folders** — each feature owns its
+> controller/view/CSS/JS under `src/DashboardBuilder/Features/<Feature>/`; behaviour unchanged, 100 tests
+> green ([D19](docs/project/decisions.md)). File paths named in the per-phase notes below are historical
+> (`wwwroot/js/x.js` → `Features/<Feature>/x.js`, `wwwroot/css/site.css` → `Features/Core/core.css` +
+> per-feature CSS); see [ARCHITECTURE.md](ARCHITECTURE.md) for the current map.
+>
 > The app lives on the build host at
 > `10.168.49.20:/unified/user/cj/web_development/prototype/dashboard_builder/`
 > ([D9](docs/project/decisions.md)) — .NET 10 SDK, `src/DashboardBuilder` + `tests/DashboardBuilder.Tests`.
@@ -54,12 +64,12 @@ invariants exist from the first ClickHouse call — not bolted on later.
 | P13 ✅ | **Export** (#5) — chart PNG/SVG + bounded CSV of the rows | P9 |
 | P14 ✅ | **Dashboard filters & parameters** (#6) — `in`/`between` + distinct-values controls (worksheet-scoped) | P7 |
 | P15 ✅ | **Cross-filtering / click-to-filter** (#7) — click a mark → Keep only / Exclude (worksheet-scoped) | P14 |
-| P16 | **Hierarchical drill-down** (#8) | P14 |
+| P16 ✅ | **Hierarchical drill-down** (#8) | P14 |
 | — | *Usability — keeps the worksheet manageable as feature phases pile controls onto it.* | |
 | P17 ✅ | **Worksheet controls layout** — two-tier header: slim **view bar** (chart/sort/format) + **stacked shelf lanes** (Columns/Rows/Filters); deployed live | P7, P10, P11 |
 | — | *[Tableau worksheet parity](#tableau-worksheet-parity--gap-analysis-p18p25) — gaps found by auditing against Tableau's worksheet workspace anatomy.* | |
-| P18–P19 | **Marks card** — Size/Label/Detail/Tooltip/continuous-Colour, then Shape/Path/Angle + mark types | P7 |
-| P20 | **Pages shelf** — page/animate the view through a dimension | P7 |
+| P18 ✅ / P19 ✅ | **Marks card** — Size/Label/Detail/Tooltip/continuous-Colour, then Shape/Path/Angle + mark types | P7 |
+| P20 ✅ | **Pages shelf** — page/animate the view through a dimension | P7 |
 | P21 | **Analytics pane** — reference/trend/average lines, forecast, totals/subtotals | P7 |
 | P22 | **Show Me** — recommend valid viz types + auto-place fields | P11, P18 |
 | P23 | **Worksheet chrome & toolbar** — title/caption, field labels, status bar, undo/redo, swap, clear, fit | P7 |
@@ -365,6 +375,20 @@ existing Bar/Line/Table visually intact.
 - **Depends on:** P14 (bound filter injection).
 - **Doc:** [data-model.md](docs/data-model.md) (hierarchy metadata),
   [modules.md](docs/app/modules.md).
+- **✅ Shipped 2026-08-18 (worksheet-scoped, single-table hierarchy):** a new **Drill-down shelf lane**
+  takes ≥2 dimension fields **from one table** as ordered levels, stored on `sheet.drill`
+  (`{ levels, depth, path }` — [store.js](../src/DashboardBuilder/wwwroot/js/store.js)). The **current
+  level leads the group-by** — `buildPlan` prepends it as the first row dimension (`k0`), so it drives
+  the category axis and is the sheet's `primaryDim`. Clicking a mark **drills one level finer**
+  (`selectHandler` → `drillDown`), pinning the clicked value; each pinned ancestor rides along as a
+  **bound-parameter `=`** filter on the drill table — same table, so it **never forces a join** (reuses
+  the P14/[D16](docs/project/decisions.md) filter path). A **breadcrumb chip** (`drillChip`, amber
+  `.ws-drill`) shows `All › 2023 › Q2` with each crumb clickable to jump up and a **▲ Up** control;
+  finest-level clicks are a no-op, editing the levels resets the descent, and a hierarchy alone renders
+  an implicit-count chart of the level. **Pure client — no new server query surface** ([D17](docs/project/decisions.md)),
+  so the read-only invariant is untouched; build clean + **100 tests** green. **Deployed live 2026-08-18**
+  (verified `200` + drill assets at `https://10.168.49.20/dashboardbuilder/`). *(In-browser click-drill
+  check pending — no headless browser on the host, per P9's note.)*
 
 ---
 
@@ -412,16 +436,16 @@ uplift track: **read-only, bounded, identifier-safe** ([D1](docs/project/decisio
 | **Data pane** — fields split Dimensions/Measures | field pane per model table ✓ | **Have** (authoring extras missing → P25) |
 | **Columns / Rows shelves** | ✓ multi-pill, role-convert, agg picker | **Have** |
 | **Filters shelf** | op + typed value pill | **Partial** — no range / relative-date / top-N / multi-select **list** filter; interactive **filter cards** = **P14** |
-| **Marks card — Color** | Color shelf (P7, discrete) + colour-by-category (P10) | **Have (discrete)**; continuous colour (measure→gradient), opacity/border → **P18** |
-| **Marks card — Size** | — | **Missing → P18** |
-| **Marks card — Label / Text** | data-labels *toggle* (format) | **Partial** — no field-on-Label, no Text mark → **P18** |
-| **Marks card — Detail** | — | **Missing → P18** |
-| **Marks card — Tooltip** | ECharts default tooltip | **Partial** — no custom / field-driven tooltip → **P18** |
-| **Marks card — Shape** | — | **Missing → P19** |
-| **Marks card — Path** | — | **Missing → P19** |
-| **Marks card — Angle** | pie maps measure→slice implicitly | **Covered (pie)** |
-| **Mark-type dropdown** | chart-type dropdown (bar/stacked/line/area/pie/donut/scatter/combo/KPI/table) | **Partial** — no Square/Circle/Text/Gantt/Density mark types → **P19**; Map **out of scope** (no geo in v1) |
-| **Pages shelf** | — | **Missing → P20** |
+| **Marks card — Color** | Colour shelf (discrete series) + continuous gradient on scatter (P18) + colour-by-category (P10) | **Have** (bar-gradient deferred, [D18](docs/project/decisions.md)) |
+| **Marks card — Size** | Size lane → scatter bubbles (P18) | **Have (scatter)** |
+| **Marks card — Label / Text** | field-on-Label (P18) + Text mark → crosstab (P19) | **Have** |
+| **Marks card — Detail** | Detail lane → group-by granularity (P18) | **Have** |
+| **Marks card — Tooltip** | custom field-driven tooltip lines (P18) | **Have** |
+| **Marks card — Shape** | Shape lane → per-value symbols + legend on scatter (P19) | **Have (scatter)** |
+| **Marks card — Path** | Path lane → orders line/area vertices (P19) | **Have** |
+| **Marks card — Angle** | pie maps measure→slice implicitly; Angle lane acknowledges it (P19) | **Covered (pie)** |
+| **Mark-type dropdown** | bar/stacked/line/area/pie/donut/scatter/combo/**square/circle/text**/heatmap/treemap/histogram/boxplot/KPI/table | **Have** — Gantt/Density **deferred**, Map **out of scope** ([D18](docs/project/decisions.md)) |
+| **Pages shelf** | Pages lane + step/animate control (P20) | **Have** |
 | **Analytics pane** — reference/constant/average lines & bands, trend line, forecast, totals/subtotals | — | **Missing → P21** (box plot / statistical marks already = **P12**) |
 | **Show Me** | chart-type dropdown + invalid-mapping hints | **Partial** — no recommend-and-auto-place panel → **P22** |
 | **Legends** (colour/size/shape) | ECharts colour legend + position toggle | **Partial** — display-only; size/shape legends need P18/P19; interactive **highlight/​filter on legend** = **P15** |
@@ -430,7 +454,7 @@ uplift track: **read-only, bounded, identifier-safe** ([D1](docs/project/decisio
 | **Toolbar** — undo/redo, swap rows↔cols, clear sheet, fit, highlight | scattered inline controls only | **Missing → P23** |
 | **Status bar** — marks count, rows×cols, aggregate of selection | — | **Missing → P23** |
 | **Sheet tabs** — worksheet **/ dashboard / story** | Data-Model tab + subtabs, **each = one worksheet** | **Partial** — no multi-worksheet **dashboard** composition, no **story** → **P24** |
-| **Drill-down / hierarchies** | — | **= P16** |
+| **Drill-down / hierarchies** | Drill-down lane (single-table hierarchy) + breadcrumb ✓ (P16) | **Have (single-table)**; Data-pane-authored reusable hierarchies → P25 |
 | Side bar / Data Source / Start page | connection sidebar + schema browser | **Have (equivalent)** |
 
 > **Biggest architectural gap:** in Tableau a **dashboard** *composes several worksheets* on one canvas;
@@ -441,9 +465,9 @@ uplift track: **read-only, bounded, identifier-safe** ([D1](docs/project/decisio
 
 | Phase | Outcome | Depends on |
 |---|---|---|
-| P18 | **Marks card I** — Size, Label/Text, Detail, Tooltip; continuous Color (generalises the P7 Color shelf) | P7 |
-| P19 | **Marks card II** — Shape, Path, Angle + mark-type expansion (square/circle/text/gantt/density) | P18 |
-| P20 | **Pages shelf** — page/animate the view through a dimension | P7 |
+| P18 ✅ | **Marks card I** — Size, Label/Text, Detail, Tooltip; continuous Color (generalises the P7 Color shelf) | P7 |
+| P19 ✅ | **Marks card II** — Shape, Path, Angle + mark-type expansion (square/circle/text; gantt/density deferred, map out of scope) | P18 |
+| P20 ✅ | **Pages shelf** — page/animate the view through a dimension | P7 |
 | P21 | **Analytics pane** — reference/average/constant lines & bands, trend line, forecast, totals/subtotals | P7 |
 | P22 | **Show Me** — recommend valid viz types for the current fields & auto-place | P11, P18 |
 | P23 | **Worksheet chrome & toolbar** — Title, Caption, field labels, status bar; undo/redo, swap rows↔cols, clear, fit, highlight | P7 |
@@ -471,6 +495,17 @@ map a field onto a mark property, all on the **existing bounded aggregate/join q
   Color ([D14](docs/project/decisions.md)); no new query shape beyond an extra dimension/measure.
 - **Doc:** [modules.md](docs/app/modules.md) §7 (Marks card), [data-model.md](docs/data-model.md)
   (encoding model), [frontend-patterns.md](docs/frontend-patterns.md) (chart adapter).
+- **✅ Shipped 2026-08-18:** the P7 Colour shelf became a **Marks card** (`marksCard` in `dashboards.js`,
+  `sheet.marks`) grouping **Color / Size / Label / Detail / Tooltip** lanes. The canonical query shape
+  moved into shared `planDims`/`planMeasures` (buildPlan sends them, `renderChart` re-derives the same
+  ordering), so marks-only measures never become spurious series and **a sheet with no marks emits a
+  byte-identical plan** (no regression). **Size** → scatter bubbles (`sizeScaler`); **continuous Colour**
+  (a numeric Colour field) → a token gradient `visualMap` on scatter; **Detail** → extra group-by
+  granularity; **Label** → a field's value on each mark (numeric rides along as an aux measure,
+  categorical reads its group-by key); **Tooltip** → custom field lines (`extraTooltip`). Every unmet
+  mapping is a **hint, not an error** ([D18](docs/project/decisions.md)). Pure client — build clean,
+  **100 tests**, JS syntax-checked; deployed live. *(In-browser render check pending — no headless
+  browser on the host, per P9's note.)*
 
 ## P19 — Marks card II: Shape · Path · Angle + mark types
 **Goal:** the remaining Marks-card encodings and mark vocabulary.
@@ -486,6 +521,15 @@ map a field onto a mark property, all on the **existing bounded aggregate/join q
   render; each unmet mapping shows a hint.
 - **Doc:** [modules.md](docs/app/modules.md) §7, [DESIGN.md](DESIGN.md) (shape vocabulary / a11y —
   never colour-alone).
+- **✅ Shipped 2026-08-18:** **Shape** (`addShape`) → on the scatter family, splits points into one
+  series per value with a distinct symbol + legend (`renderScatterShapes`/`buildScatterShapes`; identity
+  survives greyscale). **Path** (`pathOrderedRows`) → orders a line/area's vertices by the Path field's
+  value (a group-by key or numeric measure). **Angle** → acknowledged for pie/donut (which already map
+  the measure to slice angle), a hint elsewhere. **Mark types:** the dropdown gained **Square** and
+  **Circle** (scatter builder + symbol override) and **Text** (→ the crosstab text grid). **Gantt Bar /
+  Density deferred; Map out of scope** ([D18](docs/project/decisions.md)). Unmet mappings show hints.
+  Pure client — build clean, **100 tests**, JS syntax-checked; deployed live. *(In-browser render check
+  pending.)*
 
 ## P20 — Pages shelf
 **Goal:** Tableau's **Pages** — step or animate the view through the members of a dimension.
@@ -496,6 +540,14 @@ map a field onto a mark property, all on the **existing bounded aggregate/join q
 - **Guards:** each page is one **bound** filter value ([D6](docs/project/decisions.md)); members list
   comes from a **bounded distinct-values** query (shared with P14).
 - **Doc:** [modules.md](docs/app/modules.md) §7, [clickhouse-integration.md](docs/clickhouse-integration.md).
+- **✅ Shipped 2026-08-18:** a **Pages lane** (`addPages`, `sheet.pages`) takes one dimension; a **page
+  control** below the shelves (`pagesControl`) shows the current member + count with **◀ ▶** stepping
+  (wrapping) and **▶ Play / ❚❚ Pause** autoplay (a 1.5s timer). Each page applies the current member as a
+  **bound-parameter `=` filter** (`pagesFilter`, appended in `buildPlan`), only when its table is already
+  in the query — never forcing a join. Members come from the **bounded distinct-values** query (shared
+  with the P14 `in` filter). **Autoplay is omitted under `prefers-reduced-motion`** (done-when); the timer
+  is transient and cleared on view switch. Pure client — build clean, **100 tests**, JS syntax-checked;
+  deployed live. *(In-browser animation check pending.)*
 
 ## P21 — Analytics pane
 **Goal:** the second side-bar tab — drop-on analytics that overlay the view.

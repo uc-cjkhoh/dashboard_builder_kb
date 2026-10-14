@@ -1,5 +1,5 @@
-# Local secrets — never commit. See docs/project/credentials.local.md
-docs/project/credentials.local.md
+# Local secrets — never commit. See docs/operations/credentials.local.md
+docs/operations/credentials.local.md
 *.local.md
 
 # .NET build output (once the app is scaffolded under the prototype folder)

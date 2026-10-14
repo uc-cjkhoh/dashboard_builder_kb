@@ -1,77 +1,73 @@
-# Drag-and-Drop Dashboard Builder with ClickHouse
+# Drag-and-Drop Dashboard Builder for ClickHouse
 
-An ASP.NET Core web app for **visually exploring a ClickHouse server**: connect to
-a server, browse its databases and tables, **drag tables onto a canvas** to inspect
-them as entities, **draw logical relationships** between them (one-to-one,
-one-to-many, …), and organize the result into **dashboard subtabs**.
+An ASP.NET Core web app for **visually exploring a ClickHouse server**: connect, browse databases and
+tables, **drag tables onto a shared data model**, **draw logical relationships** between them, and
+build **Tableau-style worksheets** — one per dashboard tab — that chart data across the related tables.
 
-> **Status: design / specification only — no code exists yet.**
-> This directory is currently a *knowledge base*, not an implementation. Every doc
-> here describes the **intended** system so that the build starts from a shared,
-> deliberate design. See [BUILD_PLAN.md](BUILD_PLAN.md) for the phased path from
-> here to a running app.
+**Status:** built and running at `https://10.168.49.20:8443/dashboardbuilder`. This directory is the
+knowledge base; the source lives at `/unified/user/cj/web_development/prototype/dashboard_builder/`
+([development.md](docs/operations/development.md)). Unbuilt work: [roadmap.md](docs/proposals/roadmap.md).
 
 ## Project statement
 
-Build a single-page, drag-and-drop dashboard builder for ASP.NET Core that connects
-to ClickHouse:
-
 1. One-page web app with a **left-side panel** to add a connection to a ClickHouse server.
-2. When a connection is established, show a **dropdown of the available databases**.
+2. When connected, show a **dropdown of the available databases**.
 3. After a database is selected, list its **tables**.
-4. The user can **drag a table** onto the right-hand panel and drop it to display the
-   table in an **entity view**.
-5. The user can create **new subtabs** and build a dashboard from the dragged tables.
-6. Every dragged table must have **one or more columns selected** to define
-   relationships between tables (one-to-one, one-to-many, …).
+4. **Drag a table** onto the right-hand panel to display it in an **entity view**.
+5. Create **new subtabs** and build a dashboard from the dragged tables.
+6. Every dragged table must have **one or more columns selected** to define relationships between
+   tables (one-to-one, one-to-many, …).
+
+## What you can do
+
+| Area | Capability | Doc |
+|---|---|---|
+| Connect | validated form (host/port/user), TLS with an explicit self-signed-cert opt-in under Advanced; credentials stay in the server session | [connection.md](docs/features/connection.md) |
+| Browse | database picker → searchable, draggable table chips | [schema-browser.md](docs/features/schema-browser.md) |
+| Model | entity cards with type badges and join keys | [canvas.md](docs/features/canvas.md) |
+| Relate | click-to-click links with 1:1 / 1:N / N:1 / N:M cardinality | [relationships.md](docs/features/relationships.md) |
+| Dashboards | Data Model tab + any number of dashboard tabs | [tabs.md](docs/features/tabs.md) |
+| Worksheet | Columns/Rows shelves, automatic cross-table joins, crosstab, sort, format | [worksheet.md](docs/features/worksheet.md) |
+| Charts | 23 types incl. heatmap, treemap, histogram, box plot, waterfall, funnel, gauge, bullet, Sankey, small multiples, KPI; PNG/SVG/CSV export | [worksheet-charts.md](docs/features/worksheet-charts.md) |
+| Encodings | Marks (Color, Size, Label, Detail, Tooltip, Shape, Path, Angle), Filters, click-to-filter, Drill, Pages | [worksheet-encodings.md](docs/features/worksheet-encodings.md) |
+| Workbook | auto-saved in the browser, restored on reconnect, Export/Import as a validated file | [workbook.md](docs/features/workbook.md) |
 
 ## Start here
 
 | If you want to… | Read |
 |---|---|
-| Understand the whole system & how a request flows | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Know the rules/conventions before writing code | [CLAUDE.md](CLAUDE.md) |
-| See the visual language (tokens, components) | [DESIGN.md](DESIGN.md) |
-| Follow the plan from zero to running app | [BUILD_PLAN.md](BUILD_PLAN.md) |
-| Browse every topic doc | [docs/README.md](docs/README.md) |
-| Understand the screens/panels | [docs/app/modules.md](docs/app/modules.md) |
-| Talk to ClickHouse from .NET | [docs/clickhouse-integration.md](docs/clickhouse-integration.md) |
-| Model connections, entities, relationships | [docs/data-model.md](docs/data-model.md) |
-| Understand the drag/drop & relationship UX | [docs/drag-and-drop.md](docs/drag-and-drop.md) |
-| Know why a decision was made | [docs/project/decisions.md](docs/project/decisions.md) |
+| Understand the system and request flow | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Know the rules before changing anything | [CLAUDE.md](CLAUDE.md) → [golden-rules.md](docs/conventions/golden-rules.md) |
+| See the visual language | [DESIGN.md](DESIGN.md) |
+| Know what the API accepts and returns | [api.md](docs/reference/api.md) (errors, limits) |
+| Browse every topic | [docs/README.md](docs/README.md) |
+| Build, run, test | [development.md](docs/operations/development.md) |
+| Deploy or operate it | [deployment.md](docs/operations/deployment.md) |
+| Know why a decision was made | [decisions.md](docs/reference/decisions.md) |
 
-## Tech stack (intended)
+## Tech stack
 
-| Layer | Choice | Notes |
-|---|---|---|
-| Runtime | **.NET 10 LTS** | AlmaLinux 9 appstream / Microsoft feed |
-| Web framework | **ASP.NET Core**, Razor Pages + minimal API endpoints | single served page + JSON API |
-| Language | **C#** (backend), **vanilla JS + plain CSS** (frontend) | no SPA framework — see [decisions](docs/project/decisions.md) |
-| ClickHouse driver | **`ClickHouse.Client`** (ADO.NET, HTTP interface) | **TLS-only: HTTPS `8443`** (native TLS `9440` unused); plaintext `8123`/`9000` not available |
-| Host OS | **AlmaLinux 9** | Kestrel behind a reverse proxy (Apache httpd, TLS on 443) + systemd; served under a path prefix. See [O5](docs/project/decisions.md) / [development.md](docs/development.md) |
+| Layer | Choice |
+|---|---|
+| Runtime | .NET 10 LTS on AlmaLinux 9 |
+| Web | ASP.NET Core MVC in **feature folders** — one Shell page + attribute-routed JSON API controllers |
+| Frontend | vanilla JS ES modules + hand-written CSS with design tokens (Flat 2.0 + glass chrome, crimson accent, light/dark by OS); no framework, no build step |
+| Charts | Apache ECharts, self-hosted (SVG renderer) |
+| ClickHouse driver | `ClickHouse.Client` (ADO.NET over HTTPS, port `8443`) |
+| Hosting | Kestrel under systemd, behind Apache httpd TLS at path `/dashboardbuilder` |
+| Persistence | browser only — the workbook auto-saves to `localStorage`; no server database |
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full rationale and the alternatives
-that were considered.
+## What this is not
 
-## What this is NOT (kills false assumptions)
-
-- **Not implemented.** There is no `.csproj`, no `wwwroot/`, no C# yet. Docs describe intent.
-- **Not a BI/reporting product.** No scheduled reports, no export pipeline, no alerting.
-  It is an *interactive explorer + dashboard canvas*.
-- **Not a ClickHouse admin tool.** It reads schema and samples data; it does not
-  create/alter/drop tables or manage users, quotas, or clusters.
-- **Relationships are logical, not enforced.** ClickHouse has **no foreign keys**;
-  the one-to-one / one-to-many links the user draws are *declarations the app uses*
-  for joins and dashboards — the database neither creates nor validates them. This is
-  central; see [data-model.md](docs/data-model.md).
-- **Multi-tenant / auth is out of scope for v1.** Connection credentials live in the
-  user's session; there is no user database. See [decisions](docs/project/decisions.md).
-
-## Environment
-
-- **AlmaLinux 9.** Install the .NET SDK from the AlmaLinux appstream or Microsoft's
-  package feed; run under Kestrel. See [docs/development.md](docs/development.md).
-- **Build host & location (required):** the project must be built on
-  **`10.168.49.20`**, under **`/unified/user/cj/web_development/prototype/dashboard_builder/`** — this is
-  where `src/DashboardBuilder` and the app are created/compiled. See
-  [docs/development.md](docs/development.md).
+- **Not a ClickHouse admin tool.** It reads schema and runs bounded `SELECT`s; it never creates,
+  alters, drops or writes anything — and ClickHouse itself enforces that on every query
+  ([golden rule 1](docs/conventions/golden-rules.md#1-the-server-is-read-only-against-clickhouse)).
+- **Relationships are logical, not enforced.** ClickHouse has no foreign keys; the links you draw are
+  declarations the app uses for joins — the database neither creates nor validates them.
+- **Not stored on a server.** No application database: your workbook lives in your browser (and in
+  files you export), not shared with other users or browsers.
+- **Not multi-user.** No accounts, auth, sharing or saved connections; one connection per browser
+  session.
+- **Not a full BI suite.** No scheduled reports, alerting, multi-worksheet dashboards or calculated
+  fields yet — see [roadmap.md](docs/proposals/roadmap.md) and
+  [competitive-analysis.md](docs/proposals/competitive-analysis.md).

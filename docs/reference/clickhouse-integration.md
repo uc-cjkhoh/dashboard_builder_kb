@@ -1,0 +1,212 @@
+# ClickHouse integration
+
+How the server talks to ClickHouse: driver and connection, the exact SQL, the identifier-injection
+defence, and type mapping. Code: `src/DashboardBuilder/ClickHouse/` — `ClickHouseGateway.cs` (all SQL),
+`Identifier.cs`, `ClickHouseType.cs`, `CsvUtil.cs`, `ConnectionRegistry.cs`, the `*Models.cs` records.
+
+## Driver & connection
+
+- **Driver:** `ClickHouse.Client` 7.x (ADO.NET) over the **HTTP interface**
+  ([D3](decisions.md#d3--clickhouseclient-over-the-http-interface)); TLS via `Protocol=https` on
+  `ClickHouseConnectionStringBuilder`.
+- **Ports:** the target server exposes only TLS ports — **`8443`** (HTTPS, used) and `9440` (native
+  TLS, unused). Plaintext `8123`/`9000` are unavailable, so a real connection is always `secure` on
+  `8443` ([D10](decisions.md#d10--connect-over-tls-only-https-port-8443)). A local throwaway container
+  may expose plain `8123` for testing.
+- **Connection string** is assembled server-side from the session's `ClickHouseConnectionInfo`; the
+  password comes from the session store and is never logged or returned.
+- **Validate on connect:** open and run `SELECT 1` before reporting "connected".
+- **The `HttpClient`** handed to the driver:
+  - accepts an untrusted cert **only** when `allowInvalidCert && secure`
+    (`BypassesCertificateValidation`) — [D11](decisions.md#d11--tls-certificate-validation-safe-by-default-explicit-per-connection-opt-in);
+  - **must** set `AutomaticDecompression` — ClickHouse.Client asks for compressed responses and throws
+    otherwise;
+  - has a **15s `Timeout`** so an unresponsive host fails cleanly.
+
+## Database-level guards
+
+`BuildConnectionString` appends ClickHouse settings (`set_` keys) that ride on **every** query:
+
+| Setting | Value | Why |
+|---|---|---|
+| `readonly` | `2` | the server itself refuses DDL/DML — read-only no longer rests on our builders alone ([D1](decisions.md#d1--read-only-against-clickhouse)) |
+| `max_execution_time` | `12` s (`MaxExecutionSeconds`) | a runaway query stops server-side, before the 15s HTTP timeout (`HttpTimeoutSeconds`) |
+| `cancel_http_readonly_queries_on_client_close` | `1` | when the browser aborts a superseded query, the request is cancelled and ClickHouse kills the query |
+
+- **Cancellation path:** browser `AbortController` → ASP.NET `RequestAborted` (the controllers'
+  `CancellationToken`) → the driver's HTTP request is cancelled → ClickHouse stops the query.
+- **Timeout message:** ClickHouse code **159** maps to **504** "The query ran longer than 12 seconds and
+  was stopped. Add a filter, lower Top-N, or use fewer fields." (`ApiControllerBase.DescribeFailure`).
+  On a connection without the time limit the 15s HTTP timeout stops the query instead, and gets the
+  same 504 (with "15 seconds"). A client abort (`IsClientAbort`) is left to the framework; every other
+  failure stays a generic 502.
+
+### Step-down when the server refuses a setting
+
+The guard level (`QueryGuards` on `ClickHouseConnectionInfo`) is settled once, in `ValidateAsync`, and
+every later query uses it. On a refusal `NextGuards` picks the next level and `SELECT 1` is retried:
+
+| Level | Settings sent | Reached when |
+|---|---|---|
+| `Full` | all three | default |
+| `NoTimeLimit` | `readonly=2`, cancel-on-disconnect | code **452** (SETTING_CONSTRAINT_VIOLATION) — a profile constraint, almost always on `max_execution_time` |
+| `None` | nothing | code **164** (READONLY — the account is already read-only), or 164/452 again at `NoTimeLimit` |
+
+- Any other error ends the retries with the usual "Could not connect" message. At most three attempts.
+- At `None` via 164 the server's own read-only still guards; at `None` via a `readonly` constraint,
+  read-only rests on the SQL builders alone.
+- The step-down is logged at Information (`ClickHouse refused guard settings Full; retrying with …`) —
+  levels only, never the connection string.
+- Unit-tested in `QueryGuardTests`.
+
+### A wrong password can be a network restriction
+
+ClickHouse users can be scoped by **source IP** (`<networks>` in `users.d/*.xml`, or `HOST IP`). From a
+disallowed IP the server answers like a bad credential: `Code: 194 … password is incorrect, or there is
+no user with such name … (REQUIRED_PASSWORD)`, HTTP **401** — even with the right password. The
+ClickHouse on `10.168.49.13` limits `default` to `127.0.0.1`, so from the app host it always 401s.
+
+- **Fix:** connect with a network-enabled account. Don't chase the password or change server access
+  control (out of scope — [golden rule 1](../conventions/golden-rules.md#1-the-server-is-read-only-against-clickhouse)).
+- **To tell them apart:** run `SELECT 1` over HTTPS from the app host and from the DB host with the same
+  password; local success + remote 401 = allowed-networks, not the password.
+
+## The queries (all read-only)
+
+| Purpose | Gateway method | SQL |
+|---|---|---|
+| Validate connection | `ValidateAsync` | `SELECT 1` |
+| List databases | `ListDatabasesAsync` | `SHOW DATABASES` |
+| List tables | `ListTablesAsync` | `SHOW TABLES FROM {db}` |
+| Describe columns | `DescribeColumnsAsync` | `DESCRIBE TABLE {db}.{table}` |
+| Distinct values | `DistinctValuesAsync` | `SELECT DISTINCT {col} AS v FROM … WHERE v IS NOT NULL ORDER BY v LIMIT n` (1..1000, rejected outside) |
+| Worksheet query | `QueryAsync` | see below |
+| Histogram | `HistogramAsync` | `WITH (SELECT min…) AS lo, (SELECT max…) AS hi, if(hi>lo,(hi-lo)/{bins},1) AS width SELECT least(toUInt32(floor(({c}-lo)/width)),{bins-1}) AS bin, … count() … GROUP BY bin … ORDER BY bin` |
+| Box plot | `BoxPlotAsync` | `SELECT [{dim} AS label,] min, quantile(0.25), quantile(0.5), quantile(0.75), max … [GROUP BY label] LIMIT n` |
+| CSV export | `QueryAsync` | the worksheet query, serialised by `CsvUtil` |
+
+`{db}`, `{table}`, `{col}` are **interpolated identifiers** (see below); every other variable part is a
+bound parameter or a validated integer (out-of-range limits are rejected before the builder runs —
+[api.md § Limits](api.md#limits)).
+
+### Worksheet query (`QueryAsync`)
+
+`SELECT {rowDims} AS k0…, {colDims} AS kR…, {agg}({m0}) AS v0, … FROM t0 [INNER JOIN tN ON …] [WHERE …]
+[GROUP BY k0, …] ORDER BY … LIMIT n [OFFSET m]`
+
+- **Joins:** the base table is `t0`; each join edge attaches a table aliased `tN` in order, so any
+  dimension, measure or filter can live on any included table. An edge is `INNER JOIN`, or `LEFT JOIN`
+  when its `type` is `left` (P31) — then every query of that request ends `SETTINGS join_use_nulls = 1`
+  (unless the server refuses settings). Tests: `JoinTypeTests`.
+- **Dimensions** arrive split by shelf — `rowDimensions[]` then `columnDimensions[]` — and group in that
+  order, so each row's keys are `[rowDim…, colDim…]`. `measures[]` aggregate as `v0, v1, …`. No measures
+  → an implicit `count()`.
+- **Ordering:** `sort:{column, desc}` names a generated alias (`k{n}`/`v{n}`), validated against the
+  request's counts; the remaining dimension keys follow ascending. Default: ascending by the first
+  dimension (or first measure).
+- **Limit:** default 50; 1..5000 (else 400; CSV export 1..100,000 —
+  [D24](decisions.md#d24--showing-all-data-bounded-requests-paging-other-date-grouping)); sent as limit **+ 1** (`ProbeLimit(n, max)`). If the probe row comes
+  back, it is dropped and the result is flagged `truncated` (`TrimProbeRow`) — the client shows a
+  notice. The box plot does the same. Unit-tested in `TruncationTests`.
+- **Paging:** `offset` adds `OFFSET m` to the same ordered query (the Table view's pages). The order ends
+  with every group key, so pages never overlap or skip.
+- **Total** (`withTotal`): `SELECT count() FROM (<grouped query>)` on its own connection, alongside the page.
+- **Other** (`otherBucket`, one dimension, a truncated first page): `SELECT uniqExact(k) AS n, <measures>
+  FROM … WHERE … AND k NOT IN (SELECT k0 FROM (<ordered query> LIMIT n)) SETTINGS transform_null_in = 1`
+  — the same filters, the shown keys excluded exactly (a shown NULL group isn't recounted). If the server
+  refuses the setting the result comes back without `other` (logged), never an error.
+- **Date parts** (P26, `datePart` on a dimension): `toStartOfYear` / `toStartOfQuarter` / `toStartOfMonth`
+  / `toMonday` / `toDate` / `toStartOfHour` (truncations) or `toQuarter` / `toMonth` / `toDayOfWeek` /
+  `toHour` (discrete) via `DatePartExpression` — a whitelist, `hour` on a `Date` column becomes `day`,
+  `hourOfDay` needs a time; a part on a non-date column is a 400. A dimension with its own part is left
+  out of the chart-wide `dateBucket`. Tests: `DatePartTests`.
+- **Date grouping** (`dateBucket`): the first temporal dimension is wrapped in one whitelisted function —
+  `toStartOfHour` / `toDate` / `toMonday` / `toStartOfMonth` / `toStartOfQuarter` / `toStartOfYear`
+  (`BucketExpression`; a Date column never goes finer than day). `auto` first reads `uniq`, `min`, `max`
+  under the view's filters: ≤ 400 distinct values stays exact, else the finest grain with ≤ 400 buckets
+  (`PickGrain`). The response says which key and grain (`bucket`). Tests: `ScaleTests`.
+- **Richer filters** (P30): text match via `positionCaseInsensitiveUTF8` / `startsWith` / `endsWith` on
+  `lowerUTF8`, the text bound as a `String`; **top-N** is built after the other conditions as
+  `col IN (SELECT col FROM <same joins> WHERE <other filters> GROUP BY col ORDER BY <agg> DESC|ASC LIMIT n)`.
+  Tests: `RicherFilterTests`.
+- **Result cache** (P33): `QueryAsync` answers a repeat of the same request on the same server + user from
+  `IMemoryCache` for 60 s (logged; `cached: true`); `fresh` skips and replaces it (`CacheKey`, tested: no
+  password, `fresh` ignored). **Approximate** (`approximate`): `uniq` instead of `uniqExact`; when
+  `system.tables.sampling_key` is set for the base table, `FROM … AS t0 SAMPLE 0.1` with `count()` →
+  `sum(t0._sample_factor)` and `sum(x)` → `sum(x * t0._sample_factor)`; a refused sampled query re-runs
+  unsampled. The response's `approx` says what was done. Not yet exercised against a live server.
+- **Compression:** API responses are Brotli/gzip-compressed (fastest level, `Program.cs`).
+- **Response:** `QueryResult { rowDimensions, columnDimensions, measures, rows:[{keys, values}], truncated, total?, other?, bucket? }`;
+  `values` are numbers, strings (`min` / `max` of a text or date column — read by the measure's
+  category, not `Convert.ToDouble`) or `null` (NULL, or `NaN` / `∞` from an aggregate over no rows); the
+  client pivots it ([worksheet.md](../features/worksheet.md#table-view--a-true-rows--columns-crosstab)).
+- **Errors:** invalid identifier, table-not-in-query, `sum` / `avg` on a non-numeric column, or a value
+  that doesn't fit its column → 400 ([api.md](api.md#errors)).
+
+### Shared defences in the builders
+
+- **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct` (`countDistinct` → `uniqExact`);
+  operators `= != > >= < <= in between`.
+- **Typed bound values** (`FilterValues.Coerce`, `ClickHouse/RequestValidation.cs`): the value is
+  converted to the column's category from the same `DESCRIBE` before binding — number → `{p0:Float64}`
+  (plain decimal only), date / datetime → ISO text bound as `String` (a `Date` / `Date32` column rejects a
+  time part), boolean → `UInt8`, text → `String`; compound / other types can't be filtered. Binding is via
+  ClickHouse.Client's `AddParameter` (`using ClickHouse.Client.Utility`). `in` binds `Array(Float64)` /
+  `Array(String)` / `Array(UInt8)`, ≤ 500 values; `between` binds two bounds and requires From ≤ To. A value
+  that doesn't fit is a 400, never a ClickHouse 502.
+- **Rejected, not no-op'd, on the server:** an empty `in`, a half or inverted range, an unknown operator.
+  (The client never sends a blank filter, so the user-visible behaviour of an empty filter is still
+  "ignored".)
+- **Pure, unit-tested helpers** (reached via `InternalsVisibleTo`): `BuildCondition`,
+  `BuildSingleTableFilters`, `FilterValues`, `RequestRules`, `ClampBuckets`, `ClampDistinct`, `CsvUtil`.
+  The `Clamp*` helpers are defence in depth: `RequestRules` rejects out-of-range input first.
+- **Histogram / box plot** are single-table: the column must be `DESCRIBE`-validated and **numeric**;
+  the max value is clamped into the last bin. Their `filters` (`StatFilter`) go through the same typed
+  `BuildSingleTableFilters` — `in` and `between` included.
+
+## Identifier injection
+
+ClickHouse binds **values**, not **identifiers** — `SHOW TABLES FROM ?` is not a thing. Client-supplied
+names written into SQL text are an injection vector (`; DROP …`, cross-database reads). Before any
+identifier reaches a query
+([golden rule 2](../conventions/golden-rules.md#2-never-interpolate-an-identifier-you-havent-validated),
+[D6](decisions.md#d6--identifiers-validated-against-the-live-catalog--backtick-quoted)):
+
+1. **Validate against the live catalog** for the current connection — `db` ∈ `SHOW DATABASES`, `table`
+   ∈ `SHOW TABLES FROM db`, column ∈ that table's `DESCRIBE` (ordinal match). Anything else →
+   `UnknownIdentifierException`. This alone defeats injection: only real names pass.
+2. **Backtick-quote** with internal backticks doubled (`Identifier.Quote`) — defence in depth.
+
+Both steps live in `ClickHouse/Identifier.cs`; never hand-format an identifier at a call site. A
+`LIMIT` is a value — validate it as an integer; a table name is not — validate then quote.
+
+Richer metadata, if ever needed, comes from `system.databases` / `system.tables` / `system.columns`
+(`is_in_primary_key`, comment, …) — remember a primary key is a sparse index, not a constraint.
+
+## Type mapping
+
+`DESCRIBE` returns ClickHouse type strings. `ClickHouseType.Categorize(type)` unwraps `Nullable(...)` /
+`LowCardinality(...)`, takes the base name before `(`, and returns a display category used for the
+entity-card badge, field role default and grid alignment:
+
+| Example types | Category |
+|---|---|
+| `UInt64`, `Int32`, `Float64`, `Decimal(18,4)` | `numeric` (right-aligned, monospace) |
+| `String`, `FixedString(n)`, `Enum8(...)`, `UUID`, `IPv4` | `text` |
+| `Date`, `Date32`, `DateTime`, `DateTime64(3)` | `temporal` |
+| `Bool` / `Boolean` | `boolean` |
+| `Array(T)`, `Map(K,V)`, `Tuple(...)`, `Nested` | `compound` |
+| anything else | `other` |
+
+`FormatCell` stringifies non-numeric values (keys, distinct values, text measures): invariant-culture
+numbers, `[a, b]` for arrays/tuples, hex for byte blobs, `true` / `false`, and **ISO dates** — a
+`DateTime` at exactly midnight renders date-only (`2024-01-31`), otherwise `yyyy-MM-dd HH:mm:ss`.
+NULLs stay JSON `null`.
+
+## Safety & performance
+
+- **Always bound** — every statement carries a validated `LIMIT`; there is no `SELECT *` path.
+- **No FK metadata exists** — relationships are user-defined ([data-model.md](data-model.md#relationship)).
+- **Scope every query** to the connection + database the request names; sessions never bleed.
+- **Errors** are mapped to clean messages (502, or 504 for a server time-out, via `SafeError`) — never
+  the connection string or password.

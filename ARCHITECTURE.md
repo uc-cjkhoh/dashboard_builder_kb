@@ -1,128 +1,98 @@
 # Architecture
 
-How the drag-and-drop dashboard builder is put together — the intended tech stack,
-the request/data flow, the API surface, and the directory map. This is a **planned**
-architecture (nothing is built yet); it is the contract the [build plan](BUILD_PLAN.md)
-implements.
+How the Dashboard Builder is put together — the shape, the request/data flow, and where each piece of
+code lives. High level only: SQL, endpoints and state shapes are in the [`docs/reference/`](docs/README.md)
+files linked below.
 
 ## Shape in one paragraph
 
-A single ASP.NET Core app serves **one HTML page** plus a small **JSON API**. The
-browser holds all *builder* state (which tables are on the canvas, the relationships
-drawn, the open subtabs). The server is a **thin, stateless-per-request proxy to
-ClickHouse**: it holds the active connection for the session, runs read-only
-introspection and preview queries, and returns JSON. There is **no application
-database** in v1 — ClickHouse is the only external system, and dashboards persist
-(if at all) as JSON. See [decisions](docs/project/decisions.md) for why.
+A single ASP.NET Core MVC app serves **one HTML page** plus a small **read-only JSON API**. The
+**browser holds all builder state**: the one shared data model (tables dragged onto the canvas + the
+relationships drawn between them) and one worksheet per dashboard tab. The **server is a thin,
+session-scoped proxy to ClickHouse**: it keeps the session's connection, validates every identifier
+against the live catalog, runs introspection and bounded aggregate/join queries, and returns JSON.
+**There is no application database** — ClickHouse is the only external system
+([D2](docs/reference/decisions.md#d2--thin-session-scoped-proxy-no-application-database)); the builder
+state auto-saves as a **workbook** in the browser
+([D21](docs/reference/decisions.md#d21--workbooks-persist-in-the-browser-not-on-the-server)).
 
 ```
-Browser (one page, vanilla JS)                 ASP.NET Core (Kestrel)              ClickHouse
-┌───────────────────────────┐   fetch JSON   ┌──────────────────────────┐  ADO.NET  ┌──────────┐
-│ Sidebar: connection form  │ ─────────────▶ │ /api/connection  (POST)  │ ────────▶ │  HTTPS    │
-│  db dropdown, table list  │                │ /api/databases   (GET)   │  SHOW/    │  8443 TLS │
-│ Canvas: entity cards,     │ ◀───────────── │ /api/.../tables  (GET)   │  DESCRIBE │ (secure   │
-│  relationship links, tabs │    JSON        │ /api/.../columns (GET)   │  SELECT   │  only)    │
-└───────────────────────────┘                │ /api/.../preview (GET)   │ ◀──────── └──────────┘
-      builder state lives here               │ ConnectionRegistry (session-scoped)  │
-                                             └──────────────────────────┘
+Browser — one page, vanilla JS ES modules          ASP.NET Core MVC (Kestrel)               ClickHouse
+┌──────────────────────────────────────┐  JSON   ┌───────────────────────────────┐  HTTPS  ┌──────────┐
+│ Sidebar: connection · db · tables    │ ──────▶ │ Connection / Schema / Query   │ ──────▶ │ 8443 TLS │
+│ Data Model: entities + relationships │         │   API controllers             │  SHOW   │ read-only│
+│ Dashboards: one worksheet each       │ ◀────── │ ClickHouseGateway + Identifier│ DESCRIBE│          │
+│   (field pane · shelves · chart)     │         │ ConnectionRegistry (session)  │ SELECT  │          │
+└──────────────────────────────────────┘         └───────────────────────────────┘ ◀────── └──────────┘
+   all builder state lives here                    holds only the session connection
 ```
 
-## Tech stack & why
-
-| Concern | Choice | Rationale (short) |
-|---|---|---|
-| Runtime | .NET 10 LTS | Current LTS (released Nov 2025), on AlmaLinux 9 appstream / Microsoft feed. |
-| Web | ASP.NET Core, Razor Pages for the shell + minimal-API endpoints for JSON | One served page; the API is a handful of read endpoints — minimal API keeps it terse. |
-| Frontend | Vanilla JS (ES modules) + hand-written CSS with design tokens | The UI is bespoke (drag/drop canvas, relationship links); an SPA framework adds weight without clear payoff for one page. See [decisions](docs/project/decisions.md). |
-| ClickHouse | `ClickHouse.Client` (ADO.NET provider over the HTTP interface) | Mainstream, actively maintained .NET driver; `DbConnection`/`DbCommand` semantics. Target server is **TLS-only: HTTPS on `8443`** (native TLS `9440` unused; plaintext `8123`/`9000` unavailable). |
-| Drag & drop | Native HTML5 Drag and Drop API | No dependency; table chips are `draggable`, the canvas is the drop target. See [drag-and-drop.md](docs/drag-and-drop.md). |
-| Persistence | None in v1 (session + browser memory); optional JSON file/store later | No user DB needed to satisfy the statement; keeps the security surface tiny. |
-
-Considered-and-rejected (Blazor Server, a React/TS SPA, EF Core + app DB, native TCP
-protocol) are recorded with reasons in [docs/project/decisions.md](docs/project/decisions.md).
+In production Apache httpd terminates TLS and proxies `/dashboardbuilder` to Kestrel
+([deployment.md](docs/operations/deployment.md)).
 
 ## Request / data flow
 
-1. **Connect.** Sidebar form → `POST /api/connection` with host, port (`8443`), user,
-   password, `secure` flag (on — the server is TLS-only, HTTPS `8443` / native TLS `9440`).
-   The server builds a `ClickHouse.Client` connection string, opens a
-   connection to validate it (`SELECT 1`), and stores it in a **session-scoped
-   `ConnectionRegistry`**. Credentials are never returned to the client and never logged.
-2. **Browse databases.** `GET /api/databases` → `SHOW DATABASES` → JSON array → dropdown.
-3. **Browse tables.** `GET /api/databases/{db}/tables` → `SHOW TABLES FROM {db}` → list of
-   draggable table chips.
-4. **Inspect columns.** On drop (or on demand) `GET /api/databases/{db}/tables/{table}/columns`
-   → `DESCRIBE TABLE {db}.{table}` (or `system.columns`) → column name + type list, used to
-   render the entity card and to offer join-key checkboxes.
-5. **Preview rows.** `GET /api/databases/{db}/tables/{table}/preview?limit=50` →
-   `SELECT * FROM {db}.{table} LIMIT {n}` → sample rows for the entity view's data grid.
-6. **Build relationships & tabs.** Entirely client-side: the user checks join columns on
-   two entity cards and picks a cardinality; the app draws a link. Subtabs are DOM the
-   client manages. No server round-trip unless/until dashboards are persisted.
+1. **Connect.** The sidebar form posts host, port, user, password, TLS and the cert opt-in. The server
+   builds a `ClickHouse.Client` connection, validates it with `SELECT 1`, and stores it in the
+   session's `ConnectionRegistry`. Credentials never return to the client and are never logged.
+   → [connection.md](docs/features/connection.md)
+2. **Browse.** List databases, then a database's tables (the database name is validated before it is
+   quoted into SQL); tables render as draggable chips. → [schema-browser.md](docs/features/schema-browser.md)
+3. **Model.** Dropping a chip fetches the table's columns (`DESCRIBE`, type-categorised) and renders an
+   entity card. Ticking join keys and linking them declares a relationship with a cardinality —
+   entirely client-side. → [canvas.md](docs/features/canvas.md), [relationships.md](docs/features/relationships.md)
+4. **Build a worksheet.** On a dashboard tab, fields dragged onto shelves and encodings become one plan:
+   dimensions, measures, filters, sort, limit. The client resolves a **join path** over the drawn
+   relationships. → [worksheet.md](docs/features/worksheet.md)
+5. **Query.** Unless the result is already cached for this dashboard, the client sends the plan
+   (aborting any query it supersedes). The server first validates the request's shape and limits
+   (rejecting, never clamping), then every table and column against the catalog, quotes them, converts
+   and binds every value by its column's type, applies the limit (+1 probe row to detect truncation), builds the
+   `JOIN`s, and runs one bounded `GROUP BY` under ClickHouse's `readonly=2` and a 12 s time limit.
+   Histogram and box plot use their own single-table endpoints.
+   → [worksheet.md § Query lifecycle](docs/features/worksheet.md#query-lifecycle),
+   [clickhouse-integration.md](docs/reference/clickhouse-integration.md)
+6. **Render.** The client pivots the flat result into a crosstab or hands it to the ECharts adapter;
+   clicks feed back into the plan as bound filters (click-to-filter, drill, pages).
+7. **Persist.** Every change auto-saves the workbook to the browser; reconnecting restores it.
+   → [workbook.md](docs/features/workbook.md)
+   → [worksheet-charts.md](docs/features/worksheet-charts.md), [worksheet-encodings.md](docs/features/worksheet-encodings.md)
 
-See [docs/clickhouse-integration.md](docs/clickhouse-integration.md) for the exact SQL,
-type mapping, and the **identifier-injection** rules that govern steps 3–5 (db/table/column
-names are interpolated, not parameterizable — they must be validated against the live
-catalog and backtick-quoted).
+Every endpoint and status code: [api.md](docs/reference/api.md). State shapes:
+[data-model.md](docs/reference/data-model.md).
 
-## API surface (intended)
+## Code map
 
-| Method & path | Purpose | ClickHouse it runs |
-|---|---|---|
-| `POST /api/connection` | Establish/validate & store the session connection | `SELECT 1` |
-| `GET /api/connection` | Current session connection status (password-free) | — |
-| `DELETE /api/connection` | Drop the session connection | — |
-| `GET /api/databases` | List databases | `SHOW DATABASES` |
-| `GET /api/databases/{db}/tables` | List tables in a database | `SHOW TABLES FROM {db}` |
-| `GET /api/databases/{db}/tables/{table}/columns` | Column names + types | `DESCRIBE TABLE {db}.{table}` |
-| `GET /api/databases/{db}/tables/{table}/preview?limit=` | Sample rows for entity view / grid widget | `SELECT * … LIMIT n` |
-| `GET /api/databases/{db}/tables/{table}/count` | Row count for a KPI widget | `SELECT count() …` |
-| `POST /api/databases/{db}/tables/{table}/aggregate` | Single-table chart data | `SELECT dim, agg(m) … [WHERE …] GROUP BY … LIMIT n` |
-| `POST /api/query` | Worksheet chart data across **joined** tables | `SELECT dim, agg(m) FROM t0 [JOIN t1 ON …] [WHERE …] GROUP BY … LIMIT n` |
+The app is **MVC in feature folders** ([D19](docs/reference/decisions.md#d19--mvc-in-feature-folders)):
+each feature owns its controller, view partial, CSS and JS in one folder. Source root:
+`/unified/user/cj/web_development/prototype/dashboard_builder/src/DashboardBuilder/`.
 
-All endpoints are **read-only** against ClickHouse. There are deliberately no
-write/DDL endpoints (see [what-it-is-NOT](README.md#what-this-is-not-kills-false-assumptions)).
+| Path | Role |
+|---|---|
+| `Program.cs` | host, session (in-memory, 2h idle), persisted Data Protection keys, `PathBase`, `no-cache` static files, the `/features` asset provider, controllers |
+| `ClickHouse/ClickHouseGateway.cs` | every SQL statement; the pure query builders |
+| `ClickHouse/RequestValidation.cs` | `ApiLimits`, `RequestRules` (every input rule), `FilterValues` (typed filter values) |
+| `ClickHouse/Identifier.cs` | validate-against-catalog + backtick-quote |
+| `ClickHouse/ClickHouseType.cs`, `CsvUtil.cs` | type → display category; safe CSV |
+| `ClickHouse/ConnectionRegistry.cs`, `*Models.cs` | session connection store; request/response records |
+| `Features/ApiControllerBase.cs`, `ApiErrors.cs` | shared `[ApiController]` base — `RunAsync` maps 409 / 400 / 502 / 504 / 500; the one `{ error, field? }` body, body-size limit, exception handler |
+| `Features/Shell/` | `ShellController` (`GET /`), `Index.cshtml` composing the partials, `app.js` bootstrap, `sidebar.js` |
+| `Features/Core/` | `core.css` (tokens + shared components), `api.js`, `ui.js`, `validate.js`, `icons.js`, `menu.js`, `store.js`, `format.js`, `sheet-schema.js`, vendored ECharts |
+| `Features/Connection/`, `Schema/` | sidebar features, each with its API controller |
+| `Features/Canvas/`, `Relations/`, `Tabs/` | client-only features (no controller); pure rule modules `empty-state.js`, `relation-rules.js` |
+| `Features/Dashboard/` | the worksheet (`dashboards.js`), pure rules (`filter-rules.js`, `toolbar-rules.js`, `contrast.js`), query gate + cache (`query-runner.js`), ECharts adapter (`chart.js`), `QueryController` |
+| `Features/Workbook/` | auto-save, restore, Export/Import (`workbook.js`) + the file format and its validation (`workbook-model.js`) |
+| `tests/DashboardBuilder.Tests/`, `tests/js/` | xUnit suite; `node --test` suite for the pure JS modules |
 
-## Directory map (target, once scaffolded)
-
-> Nothing below exists yet — this is the layout the build plan will create so docs and
-> code agree from day one.
-
-```
-dashboard_builder/
-├── src/
-│   └── DashboardBuilder/                 # the ASP.NET Core project
-│       ├── DashboardBuilder.csproj
-│       ├── Program.cs                    # host + minimal-API endpoint mapping
-│       ├── Endpoints/                    # connection / schema / preview handlers
-│       ├── ClickHouse/
-│       │   ├── ConnectionRegistry.cs     # session-scoped connection store
-│       │   ├── ClickHouseGateway.cs      # runs the introspection/preview queries
-│       │   └── Identifier.cs             # validate + backtick-quote identifiers
-│       ├── Pages/                        # Razor: Index.cshtml (the one page)
-│       └── wwwroot/
-│           ├── css/site.css              # design tokens + components (see DESIGN.md)
-│           └── js/                       # ES modules: api, ui, store, sidebar, connection, schema, canvas, relations, tabs, dashboards
-├── README.md  CLAUDE.md  ARCHITECTURE.md  DESIGN.md  BUILD_PLAN.md
-└── docs/…                                # this knowledge base
-```
-
-The `wwwroot/css/site.css` `:root` token block referenced throughout [DESIGN.md](DESIGN.md)
-is created in the design-system phase of the [build plan](BUILD_PLAN.md).
+Feature CSS/JS are served at `/features/<Feature>/<file>`; only `.css` and `.js` are mapped, so the
+co-located `.cs`/`.cshtml` return 404. Module responsibilities and wiring:
+[frontend-modules.md](docs/reference/frontend-modules.md).
 
 ## Cross-cutting concerns
 
-- **Security** — credential handling, identifier injection, read-only posture, TLS to
-  ClickHouse: see [CLAUDE.md](CLAUDE.md) golden rules and
-  [clickhouse-integration.md](docs/clickhouse-integration.md).
-- **State & persistence** — where builder state lives and the persistence decision:
-  [data-model.md](docs/data-model.md).
-- **Design system** — tokens, layout rules, component vocabulary: [DESIGN.md](DESIGN.md).
-- **Running it** — SDK install, `dotnet run`, a throwaway ClickHouse for testing:
-  [docs/development.md](docs/development.md).
-- **Hosting / deployment** — Kestrel behind a reverse proxy (Apache httpd, TLS on `443`),
-  served either at the site root or under a **path prefix**. The app is `PathBase`-aware
-  (config key `PathBase`) and the client derives the same prefix from its module URL, so the
-  API keeps working under a subpath. As deployed on `10.168.49.20`: Apache proxies
-  `/dashboardbuilder` → `127.0.0.1:5006`. See [O5](docs/project/decisions.md) and
-  [docs/development.md](docs/development.md#as-deployed-on-the-build-host-101684920).
+- **Security** — read-only posture, identifier validation, bound values, credential handling, TLS to
+  ClickHouse: [golden-rules.md](docs/conventions/golden-rules.md).
+- **State & persistence** — all in the browser, reset on reload: [data-model.md](docs/reference/data-model.md).
+- **Design system** — tokens, layout, components: [DESIGN.md](DESIGN.md).
+- **Hosting** — `PathBase`-aware app behind Apache + systemd: [deployment.md](docs/operations/deployment.md).
+- **Why** each choice was made, and what was rejected: [decisions.md](docs/reference/decisions.md).

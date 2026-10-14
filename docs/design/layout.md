@@ -1,0 +1,139 @@
+# Layout rules
+
+How the one page is laid out and what scrolls where. Regions and their behaviour are in
+[features/](../features/worksheet.md); tokens in [tokens.md](tokens.md).
+
+## The fixed shell
+
+- `html, body { height: 100%; overflow: hidden }` — **the page never scrolls**
+  ([golden rule 8](../conventions/golden-rules.md#8-keep-the-shell-fixed-scroll-inside-panels)).
+- The shell is a full-screen grid: **glass sidebar** (`var(--sidebar-w)`) + **content area**, both over
+  the body's fixed `--wash` background so the glass has something to blur. Chrome is glass; data
+  surfaces (entity cards, chart area, crosstab, field list) are solid `--surface`.
+- Scrolling happens **inside regions** — the sidebar's table list, each entity card's column list, the
+  worksheet field pane and chart area. Scrollbars are thin and themed (muted ink thumb, accent on hover).
+
+## Alignment grid
+
+Related items share one edge, measured on what the eye sees (glyphs and text), not on hit boxes.
+
+- **One 20px gutter (`--s5`) everywhere:** sidebar brand row and sections, `.canvas__bar`, `.view`
+  padding, the worksheet field pane (`--ws-fields-w`, default 236px; `--s3 --s5` padding), `.ws-shelves` and the
+  `.ws-chart-card` margin. So the tabs' left edge = first entity card = field-pane rows, and the
+  Workbook `···` = shelves = chart card on the right. `+`-placed entity cards start on the gutter
+  ([canvas.md](../features/canvas.md#dragging-a-table-onto-the-canvas)).
+- **Full-width lists align with their siblings:** `.table-list` keeps 2px shadow room with a matching
+  `-2px` inline margin, so table chips share the search box's edges.
+- **Ghost icon buttons at a row's end overhang by their 8px glyph slack** (`margin-inline: -8px`), so
+  the glyph meets the edge: `#sidebar-toggle`, the Workbook menu, the view bar's chart picker and last
+  icon button, the tool-panel ✕, and both `.entity__head` buttons (chevron over the row checkboxes, ✕ flush with the
+  type badges). Reset the overhang wherever the button is centred (collapsed rail).
+- **Checkboxes carry no UA margin** (`.form-check input`, `.col-row__key`: 14px, `margin: 0`); a
+  sub-option (`.form-check--sub`, `.form-warn`) indents by checkbox + gap, i.e. to its parent's label text.
+  `.entity__title` is padded so it starts at the column-name x.
+- **Buttons centre their label** (`.btn { justify-content: center }`), including stretched ones.
+
+## Sidebar
+
+- **Resizable:** a right-edge handle (`.sidebar__resizer`, `Shell/sidebar.js`) drags `--sidebar-w`
+  between a minimum and **30% of the viewport**.
+- **Collapsible:** the toggle at the right of the brand row (`#sidebar-toggle`, `sidebar` icon) collapses the
+  sidebar to a **rail `--topbar-h` wide** holding only that button (`.app.is-sidebar-collapsed`); the
+  Connection/Schema body (`#sidebar-body`) and the resizer get `hidden`. `aria-expanded` and the label
+  ("Collapse sidebar" / "Expand sidebar") follow the state. The chosen width survives a collapse, and the
+  state is remembered in this browser (`localStorage` `dashboardbuilder.sidebar.collapsed`, read/write
+  wrapped in `try`). Anything that focuses a sidebar control first calls `expandSidebar()`
+  (the canvas empty-state button does).
+- The brand name and subtitle are one line each (ellipsis), so the toggle never makes the brand row taller
+  than `--topbar-h`.
+- Glass rail in the active theme (light or dark). Section titles are sentence case, `--fs-sm` 600.
+- Contents: **Connection** (form or one-row summary — [connection.md](../features/connection.md)), the
+  **Database** picker, then **Tables** with a search box ([schema-browser.md](../features/schema-browser.md)).
+- The empty Data Model shows one centred sentence + one button that focuses the control for the next
+  step ([canvas.md](../features/canvas.md#empty-state)).
+
+## Tab bar
+
+A glass bar across the top of the content area (`.canvas__bar`): frosted-pill tabs (the active one with an accent
+fill, edge and underline), then — at the right — the quiet autosave text and the **Workbook** overflow menu
+([tabs.md](../features/tabs.md), [workbook.md](../features/workbook.md)). Its contents are vertically centred and it
+shares `--topbar-h` with the sidebar brand block, so the two bottom borders line up across the shell; if the
+tabs wrap, the bar grows taller than the brand.
+
+## Entity cards
+
+**Uniform height** — a head (table name in 600 weight, the database muted before it) over an
+internally-scrolling column list: flat solid card, 1px stroke, `--elev-2`. No data preview: data lives in
+the dashboard worksheet. A caret in the head collapses the card to its title bar; key columns show the
+key icon.
+
+## Worksheet — data header and chart card
+
+Data controls sit in the glass header; view controls sit on the chart card they act on
+([features/worksheet.md](../features/worksheet.md#layout)):
+
+1. **Data header** (`.ws-shelves`, glass) — **Columns**, **Rows** and **Marks** lanes, each a fixed
+   label column + zone (`72px 1fr`) so every lane starts at the same x. Pills are 22px (18px inner
+   controls), so a filled lane stays as tall as an empty one. The Marks lane holds the encodings
+   toolbar (`.ws-toolbar`: a visible row of icon+text tools plus **More** —
+   [which tools show where](../features/worksheet-encodings.md#encodings-toolbar)); a tool's box starts
+   on the zones' edge. One editor panel (`.ws-toolpanel`) opens under the lanes at a time.
+2. **Chart card** (`.ws-chart-card`, solid) — a head (`.ws-chart-head`) with the **view bar**
+   (`.ws-viewbar`): the chart-type picker and undo / redo on the left; the sort picker and a tight icon group
+   (**Format** · **Analytics** · **Export** · **Refresh** · **⋯ sheet actions** · **Full screen**, 4px apart) on the right. Then the Format card when open, the
+   result notice, and the chart pane. The card isn't overflow-clipped, so its menus can extend past it.
+
+**Pickers** (`.ws-pick`) are ghost buttons whose label *is* the current value — no field captions:
+chart type shows its icon + name (`▮ Bar ⌄`) and opens a two-column grid of every type; sort shows
+direction + field (`↑ customers.name ⌄`) and opens "Sort by" (fields) + Ascending/Descending. Choices are
+`menuitemradio` items, the chosen one bold and ticked. New view controls extend the view bar or the
+Format card; new data channels become Marks tools. Every control is `--ctl-h` tall.
+
+**Resizable field pane:** a handle on its right edge (`#ws-fields-resizer`, the shared `.resizer` look)
+sets `.worksheet`'s `--ws-fields-w` (default 236px) between 180px and 40% of the worksheet — drag, or
+`←`/`→` in 16px steps; remembered in this browser (`dashboardbuilder.fields.width`).
+
+## Phone layout (≤ 640px)
+
+The shell keeps its fixed frame; the sidebar starts on its rail (not remembered — a wide screen keeps the
+user's choice) and opens over the content. The worksheet becomes one column: the data header (a **Fields**
+button, then Columns / Rows / Marks with 68px labels, tools wrapping), then the chart card at ≥ 380px tall;
+`.ws-main` scrolls inside itself. The field pane opens as an overlay from **Fields** (`.is-fields-open`)
+and closes on a tap outside it or `Esc`. The view bar wraps: chart type, then sort and the icon group.
+These are responsive CSS rules (`dashboard.css`), not visibility toggles — `hidden` stays the only
+show/hide switch for state.
+
+## Full screen & print
+
+- **Full screen** (view bar, last icon): the chart card alone, edge to edge, through the Fullscreen API
+  (a fixed overlay with an `Esc` handler where the API is refused); `Esc` or the button leaves; switching
+  views leaves it.
+- **Print / PDF** (Export menu → **Print / PDF…**, or the browser's print): landscape, only the active
+  chart card, under a print header — the dashboard name, the Date range and applied filters, the notice
+  line and the print time (`.ws-print-head`, added on `beforeprint`, removed on `afterprint`). The chart is
+  drawn at 1000 × 560 for the page (`sizeChart`); a crosstab repeats its header on each page. Black on
+  white (`--print-paper` / `--print-ink`) whatever the scheme.
+
+## The `hidden` attribute
+
+`[hidden] { display: none !important }` — interactive regions carry an author `display` (flex/grid)
+that would otherwise beat the UA `[hidden]` rule. The `!important` makes the `hidden` attribute the
+single show/hide switch app-wide: empty states, inline errors, the dropzone hint, the connect-first
+gate, the cert warning. **Toggle via `hidden`, never `style.display`**
+([golden rule 6](../conventions/golden-rules.md#6-toggle-visibility-with-the-hidden-attribute-not-styledisplay)).
+
+## Dialogs
+
+Native `<dialog>` for modals (focus trap, `Esc` closes): a solid `--surface` panel with `--elev-28` over a plain `--scrim` (no blur). A styled confirm
+`<dialog>` replaces `window.confirm` (removing an entity that has relationships, closing a non-empty
+dashboard).
+
+`listDialog(title, items)` (`Core/ui.js`) shows a titled list with one OK button — used for workbook
+import / restore issue reports.
+
+## Menus
+
+`Core/menu.js` `wireMenu(button, list)` turns a button plus a `[role=menu]` solid list (`.menu`,
+`.menu__list`, `.menu__item`) into a keyboard-operable popover: click toggles it, arrow keys move focus,
+`Esc` / outside click / focus leaving / choosing an item close it, and opening one menu closes the
+others. Visibility is the `hidden` attribute.
