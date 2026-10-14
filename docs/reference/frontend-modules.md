@@ -24,6 +24,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/chart.js` | the only ECharts adapter — [worksheet-charts.md](../features/worksheet-charts.md#rendering--the-echarts-adapter) |
 | `Dashboard/contrast.js` | pure: WCAG `luminance`, `contrastRatio`, `pickInk` (treemap label ink) |
 | `Dashboard/filter-rules.js` | pure: `aggsFor`, `checkFilter`, `statFilters`, `withCategories`, `viewCounts`, `checkAdd` (drop-time caps) — [worksheet.md](../features/worksheet.md#drop-time-limits) |
+| `Dashboard/show-me-rules.js` | pure: chart-type field rules (`CHART_NEEDS`, `chartIssue`, the shared hint texts, `roleOf`) and Show Me — `issueFor`, `bestType`, `showMeOptions`, `placeFor`, `samePlacement` — [worksheet-charts.md](../features/worksheet-charts.md#show-me) |
 | `Dashboard/toolbar-rules.js` | pure: `visibleTools(chartType, tools)` — visible row vs More — [worksheet-encodings.md](../features/worksheet-encodings.md#encodings-toolbar) |
 | `Core/parameters-model.js` | pure (P32): `checkValue` (type + allowed values), `withParamValue`, `effectiveTopN`, `paramTypeFor`, `cleanParameter` |
 | `Workbook/parameters-dialog.js` | P32: the Parameters dialog (Workbook menu) |
@@ -64,7 +65,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 - **Cross-feature calls:** the Workbook feature rebuilds the model through `canvas.addEntity` /
   `canvas.clearModel` and `relations.restoreRelationship` — exported functions, not DOM reach-ins.
 - **Pure modules** (`query-runner.js`, `workbook-model.js`, `validate.js`, `sheet-schema.js`,
-  `filter-rules.js`, `toolbar-rules.js`, `contrast.js`, `relation-rules.js`, `table-filter.js`,
+  `filter-rules.js`, `show-me-rules.js`, `toolbar-rules.js`, `contrast.js`, `relation-rules.js`, `table-filter.js`,
   `connection-rules.js`, `empty-state.js`, `api.js`'s `basePathFrom`) hold the testable logic and never
   touch the DOM; they run under `node --test` ([development.md](../operations/development.md#test)).
 - **Document events:** `connection:changed` (connection.js → schema.js, workbook.js), `table:add` `{db, table}`

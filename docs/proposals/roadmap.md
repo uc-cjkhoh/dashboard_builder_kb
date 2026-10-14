@@ -15,14 +15,13 @@ M = 1–2 weeks, L = 3+ weeks.
 
 | # | Phase | Effort | Why this position |
 |---|---|---|---|
-| 1 | [P22 Show Me](#p22--show-me) | M | recommend-and-place |
-| 2 | [P24 Multi-worksheet dashboards](#p24--multi-worksheet-dashboards--stories) | L | the biggest structural gap |
-| 3 | [P25 Data-pane authoring](#p25--data-pane-authoring) | L | calculated fields — needs a safe expression whitelist |
-| 4 | [P39 Parameter & set actions](roadmap-bi-parity.md#p39--parameter--set-actions) | S | the rest of P39 — parameters exist (P32); set actions wait for P25 sets |
-| 5 | [P43 Many-to-many & two-way relationships](roadmap-bi-parity.md#p43--many-to-many--two-way-relationships) | M | after P31 |
-| 6 | [P38 Drill-through & report tooltips](roadmap-bi-parity.md#p38--drill-through--report-tooltips) | M | needs P24's pages |
-| 7 | [P42 AI assist](roadmap-bi-parity.md#p42--ai-assist) | L | explain a point, key influencers, ask in plain language |
-| 8 | [P45 Report lifecycle](roadmap-bi-parity.md#p45--report-lifecycle) | L | versioned workbooks, test → production — needs server-side saving |
+| 1 | [P24 Multi-worksheet dashboards](#p24--multi-worksheet-dashboards--stories) | L | the biggest structural gap |
+| 2 | [P25 Data-pane authoring](#p25--data-pane-authoring) | L | calculated fields — needs a safe expression whitelist |
+| 3 | [P39 Parameter & set actions](roadmap-bi-parity.md#p39--parameter--set-actions) | S | the rest of P39 — parameters exist (P32); set actions wait for P25 sets |
+| 4 | [P43 Many-to-many & two-way relationships](roadmap-bi-parity.md#p43--many-to-many--two-way-relationships) | M | after P31 |
+| 5 | [P38 Drill-through & report tooltips](roadmap-bi-parity.md#p38--drill-through--report-tooltips) | M | needs P24's pages |
+| 6 | [P42 AI assist](roadmap-bi-parity.md#p42--ai-assist) | L | explain a point, key influencers, ask in plain language |
+| 7 | [P45 Report lifecycle](roadmap-bi-parity.md#p45--report-lifecycle) | L | versioned workbooks, test → production — needs server-side saving |
 | — | [P44 Custom visuals](roadmap-bi-parity.md#p44--custom-visuals) | — | **not recommended** as specified: conflicts with golden rule 10 |
 
 ## Guards for every phase
@@ -51,7 +50,7 @@ Audited against Tableau Desktop's [workspace anatomy](https://help.tableau.com/c
 | Pages shelf | step + autoplay | — |
 | Drill-down / hierarchies | single-table Drill tool + breadcrumb | reusable Data-pane hierarchies → **P25** |
 | Analytics pane | reference line / band, trend + forecast, totals / subtotals (P21) | clustering; trend on more chart types |
-| Show Me | chart-type dropdown + hints | recommend-and-place → **P22** |
+| Show Me | Show Me card (P22) — [worksheet-charts.md](../features/worksheet-charts.md#show-me) | — |
 | Legends | colour / shape legend + position; click to highlight, select a member, Keep only / Exclude (P29) | — |
 | Title / caption / field labels / toolbar / status bar | editable title + caption, status bar, undo / redo, swap, clear, fit (P23) | highlight mode (click-to-select covers it) |
 | Sheet tabs — worksheet / dashboard / story | Data Model + one worksheet per tab | multi-worksheet dashboards, stories → **P24** |
@@ -75,17 +74,6 @@ Audited against Tableau Desktop's [workspace anatomy](https://help.tableau.com/c
 > **Biggest architectural gap:** in Tableau a dashboard *composes several worksheets*; here a dashboard
 > tab **is** one worksheet (one `sheet`, one chart host). P24 closes it; the others enrich the single
 > worksheet.
-
-## P22 — Show Me
-
-Recommend the view types that fit the fields in play and build one in a click.
-Spec: [p22-show-me.md](p22-show-me.md).
-
-- A panel lists chart types with the valid ones enabled for the current selection (reusing
-  `chartIssue()`), and on pick **auto-places** fields on shelves/encodings.
-- **Done when:** with fields selected, applicable types highlight, one click yields the chart with
-  sensible placement, and inapplicable types are greyed with the reason.
-- Depends on P11-era chart types and the Marks toolbar (both built).
 
 ## P24 — Multi-worksheet dashboards & stories
 
