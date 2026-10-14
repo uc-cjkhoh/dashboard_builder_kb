@@ -66,12 +66,12 @@ A type is valid when `issueFor(id, counts)` returns `null`. `counts` is computed
 | Field of `counts` | Source in `dashboards.js` |
 |---|---|
 | `dims` | `planDims({ ...sheet, chartType: id }).keyOrder.length` (drill, shelf, Detail, Shape, discrete Colour) |
+| `shelfDims` | dimensions on Columns / Rows, plus an active drill level — the same for every type |
 | `measures` | shelf measures from `planMeasures` (role `"shelf"`) |
 | `hasDate` | a `temporal` dimension on Columns / Rows |
 | `textValue` | a shelf measure with `min` / `max` on a non-`numeric` field |
 | `discreteColor` | `colorMode(sheet) === "discrete"` |
 | `numericField` | a `numeric` field on Columns / Rows |
-| `singleTable` | every Columns / Rows field from one `db.table` |
 
 Rules, checked in this order (first hit is the reason):
 
@@ -80,8 +80,8 @@ Rules, checked in this order (first hit is the reason):
 2. `discreteColor`, type ∈ {bar, stacked, line, area}, `measures ≠ 1` → "Colour splits a single measure
    across series — use exactly one measure, or remove the Colour field."
 3. histogram / boxplot without `numericField` → "A histogram needs a numeric field — add one to Columns
-   or Rows." (box plot: "A box plot needs …"); without `singleTable` → "Histogram and box plot read one
-   table — keep Columns and Rows to fields from one table."
+   or Rows." (box plot: "A box plot needs …") — the hint `runStatChart` shows today. Fields from other
+   tables don't block it: the stat endpoints read the first numeric field's table and ignore the rest.
 4. The `CHART_NEEDS` table (today's `chartIssue` `switch`, unchanged):
 
 | Type | dims | measures |
@@ -105,6 +105,8 @@ already hints for the target.
 ## Recommendation — `bestType(counts)`
 
 First matching row wins; the result is outlined only if it is itself valid, else nothing is outlined.
+Here **dims** means `shelfDims` — encodings (Colour, Detail, Shape) don't steer the recommendation, so a
+colour-split bar keeps recommending Bar.
 
 | Fields in play | Recommended |
 |---|---|
@@ -133,8 +135,8 @@ already use. Pills are moved as-is (role, agg, date part, table calc kept). Retu
 | Two dimensions | heatmap, sankey, multiples | D[1…], then M | D[0] |
 | Text table | table, text | M | D |
 
-Invariants (tested): the multiset of pills on Columns + Rows is unchanged; the relative order of D and of
-M is unchanged; the result passes `normaliseShelf` unchanged (dimensions ahead of measures). Each
+Invariants (tested): the multiset of pills on Columns + Rows is unchanged; the relative order of M is unchanged, and of D too
+except the temporal-first move on line / area / combo; the result passes `normaliseShelf` unchanged (dimensions ahead of measures). Each
 family's layout is confirmed against its renderer while planning, so a click on a valid tile always
 draws.
 
@@ -142,7 +144,7 @@ draws.
 
 | File | Change |
 |---|---|
-| `Features/Dashboard/show-me-rules.js` | **new**, pure, no imports: `CHART_NEEDS`, `issueFor(type, counts)`, `chartIssue(type, dims, measures)` (the table rule only, for the existing hint), `showMeOptions(types, countsFor)` → `[{ id, issue, recommended }]`, `bestType(counts)`, `placeFor(type, columns, rows)` |
+| `Features/Dashboard/show-me-rules.js` | **new**, pure (imports only the pure `filter-rules.js`): `roleOf`, `COLOR_SPLIT_TYPES`, `STAT_SINGLE_TABLE` and the three hint texts move here from `dashboards.js`; `CHART_NEEDS`, `issueFor(type, counts)`, `chartIssue(type, dims, measures)` (the table rule only, for the existing hint), `showMeOptions(types, countsFor)` → `[{ id, issue, recommended }]`, `bestType(counts)`, `placeFor(type, columns, rows)`, `samePlacement(a, b)` (a re-pick of the current layout commits nothing) |
 | `Features/Dashboard/dashboards.js` | delete the local `chartIssue`; import it; add `countsFor(sheet)`, the Show Me button + card (`showMeToggle` / `showMePanel`, beside `formatToggle` / `formatPanel`), one-open-card wiring |
 | `Features/Dashboard/dashboard.css` | the card grid, tile states (muted, recommended outline + badge, pressed) — tokens only, `--ctl-h` |
 | `Features/Core/icons.js` | a Show Me icon if no existing one fits (inline SVG, covered by `icons.test.mjs`) |
@@ -151,7 +153,7 @@ draws.
 ## Testing
 
 - `show-me-rules.test.mjs`: every `CHART_NEEDS` row at, below and above its bounds with today's hint
-  text (regression for the moved `chartIssue`); rules 1–3 and their precedence; every `bestType` row;
+  text (regression for the moved `chartIssue`); rules 1–3 and their precedence (a stat type with fields from two tables stays valid); every `bestType` row;
   `placeFor` for each family incl. horizontal bars kept horizontal, temporal-first on line, D[0] on Rows
   for the two-dimension types, and the three invariants over generated shelves.
 - Both suites stay green; `node --check` on changed modules.
