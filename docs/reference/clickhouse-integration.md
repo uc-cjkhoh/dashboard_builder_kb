@@ -214,7 +214,7 @@ script, results checked against hand-written `SELECT`s or hand-computed values):
 | `COUNT` → `countNonNull` | `count(x)` | `sum(if(isNotNull(x), t0._sample_factor, 0))` | `count(x)` |
 | `AVG`, `MIN`, `MAX` → `avg`, `min`, `max` | as written | unscaled | as written |
 | `COUNTD` → `countDistinct` | `uniqExact(x)` | `uniq(x)` | `uniq(x)` |
-| `MEDIAN`, `PERCENTILE` → `median`, `percentile` | `quantileExact(0.5)(x)`, `quantileExact({p:Float64})(x)` | unscaled | as exact |
+| `MEDIAN`, `PERCENTILE` → `median`, `percentile` | `quantileExactInclusive(0.5)(x)`, `quantileExactInclusive({p:Float64})(x)` (interpolating) | unscaled | as exact |
 | `STDDEV`, `VARIANCE` → `stddev`, `variance` | `if(count(x) < 2, NULL, stddevSamp(x))` (`varSamp`) | unscaled | as exact |
 | `ATTR` → `attr` | `if(uniqExact(x) = 1, min(x), NULL)` | unscaled | as exact |
 

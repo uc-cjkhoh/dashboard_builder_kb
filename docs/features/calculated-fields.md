@@ -22,8 +22,8 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
 - Operators `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`,
   `COUNTD`, `MEDIAN`, `STDDEV`, `VARIANCE`, `PERCENTILE`, `ATTR` (function names are case-insensitive). The
   function table lives in `calc-types.js`.
-- **Statistics:** `MEDIAN([f])` is the exact middle value of the non-NULL values (for an even count, the upper
-  of the two middle values — no interpolation); `PERCENTILE([f], p)` is the exact order statistic at fraction `p`
+- **Statistics:** `MEDIAN([f])` is the exact median of the non-NULL values (linear interpolation between the two
+  middle values, like Excel `PERCENTILE.INC`: 1, 2, 3, 4 gives 2.5); `PERCENTILE([f], p)` is the same interpolation at fraction `p` (p25 of 1..4 is 1.75)
   (a **literal** number 0..1, not a field or a formula; `PERCENTILE([f], 0.5)` equals `MEDIAN`, 0 the minimum, 1
   the maximum); `STDDEV` and `VARIANCE` are the **sample** statistics (n − 1). `STDDEV`/`VARIANCE` of fewer than
   two values, and `MEDIAN`/`PERCENTILE` of no value, are empty (NULL, shown as a dash), never 0 or NaN.

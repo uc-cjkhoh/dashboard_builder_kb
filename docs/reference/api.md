@@ -139,7 +139,7 @@ rows). Consumers must not assume numbers — [worksheet-charts.md](../features/w
 `sum`, `avg`, `median`, `stddev` and `variance` on a non-numeric column are a 400 (`count` / `countDistinct` /
 `countNonNull` / `min` / `max` are fine on any column; `attr` on any but a compound column). Aggregations:
 `count` (rows), `sum`, `avg`, `min`, `max`, `countDistinct`, `countNonNull` (non-NULL values of the column,
-`count(col)`), `median` (exact middle value), `stddev` / `variance` (sample; NULL for fewer than two values),
+`count(col)`), `median` (linear interpolation between the two middle values, like Excel `PERCENTILE.INC`), `stddev` / `variance` (sample; NULL for fewer than two values),
 `attr` (the one distinct non-NULL value of the group, else NULL). The result column is named
 `<agg> <column>` (`median amount`, `attr status`).
 

@@ -112,8 +112,8 @@ import reports it as an issue. Dropping it would silently change a user's charts
 
 ### D48 — More aggregations: exact, bound, NULL for "no answer"
 `median`, `stddev`, `variance`, `attr` are plain-measure aggregations and `MEDIAN`, `STDDEV`, `VARIANCE`,
-`ATTR`, `PERCENTILE` calculated-field functions, all through `AggregateSql`. Quantiles are `quantileExact` (exact,
-not the reservoir `quantile`) and are never scaled on a sample; `stddev` / `variance` are sample statistics and
+`ATTR`, `PERCENTILE` calculated-field functions, all through `AggregateSql`. Quantiles are `quantileExactInclusive` (exact, linearly
+interpolating like Excel `PERCENTILE.INC` and Tableau; not the reservoir `quantile`) and are never scaled on a sample; `stddev` / `variance` are sample statistics and
 NULL for fewer than two values (not NaN, which JSON cannot carry); `ATTR` is `if(uniqExact(x) = 1, min(x), NULL)`
 and so returns NULL where Tableau shows `*`, ignoring NULL rows. The percentile fraction is a literal in the
 formula and a `p` on the `agg` node, bound as a parameter and checked 0..1 on both sides; a plain measure has no
