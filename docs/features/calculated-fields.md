@@ -71,10 +71,10 @@ in the formula**, never a field or a computed value.
 | Function | Result | Meaning |
 |---|---|---|
 | `LOWER(t)` / `UPPER(t)` | text | change case, accents and non-Latin letters included (`UPPER('straße')` is `STRASSE`) |
-| `TRIM(t)` | text | remove leading and trailing spaces |
+| `TRIM(t)` | text | remove leading and trailing spaces (the space character only; tabs and line breaks stay) |
 | `LEN(t)` | number | length in **characters**, not bytes (`LEN('日本語')` is 3) |
 | `LEFT(t, n)` / `RIGHT(t, n)` | text | the first / last `n` characters; `n` is a whole number 0 to 1000; longer than the text gives the whole text, 0 gives an empty text |
-| `REPLACE(t, from, to)` | text | every occurrence of `from` replaced by `to`; case-sensitive; an empty `from` changes nothing |
+| `REPLACE(t, from, to)` | text | every occurrence of `from` replaced by `to`; case-sensitive; an empty `from` changes nothing; `from` and `to` may be fields (pinned live) |
 | `CONCAT(a, b, …)` | text | two to ten texts joined; empty if any is empty (wrap a part in `IFNULL(x, '')` to keep the rest) |
 | `CONTAINS(t, s)` / `STARTSWITH(t, s)` / `ENDSWITH(t, s)` | boolean | **case-sensitive** match (`LOWER` both sides for a case-insensitive one); an empty `s` is always true |
 | `SPLIT(t, sep, k)` | text | the `k`-th piece (1 is the first) of `t` cut at `sep`; `sep` is text of 1 to 20 characters, `k` a whole number 1 to 1000; empty when there is no `k`-th piece; an empty text has one empty piece; two neighbouring separators leave an empty piece |
