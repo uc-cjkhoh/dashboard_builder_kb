@@ -45,6 +45,25 @@ Sidebar, below the connection panel. Code: `Features/Schema/` (`SchemaController
 - The same dialog serves the worksheet's *View data* ([worksheet.md](worksheet.md#view-data)). Canvas entity cards
   still show no rows ([canvas.md](canvas.md)).
 
+## Column profile / field details
+
+- Each field row on a canvas entity card has a **Profile button** (`.col-row__profile`, analytics icon, `aria-label`
+  "Profile <column>"; shown on hover / focus, always on touch; it does not toggle the join key). It opens the **profile
+  dialog** (`Schema/column-profile-dialog.js`, rules in `column-profile-model.js`): `POST /api/databases/{db}/tables/{table}/profile`
+  ([api.md](../reference/api.md)), read-only.
+- **Field details:** Name, Type (raw ClickHouse type), Kind (the display category) and Role (*measure* for numeric,
+  else *dimension* — the worksheet's rule). **Tiles:** Rows, Distinct (approx.), Null share (percent and "n of N rows"),
+  and Min / Max for numeric and date columns. **Most frequent values:** up to 10, each a text label, an in-cell bar,
+  the count and its share of the rows read; NULL reads *NULL* and an empty string *(empty)* (italic), a value over 100
+  characters is cut with an ellipsis. Bars are neutral (red means danger); the text carries every figure.
+- Honesty: only the **first 1,000,000 rows** are read; when the table has at least that many a warning band says the
+  figures describe those rows, not the table. Distinct is an estimate. A share never rounds a partial share up to 100%
+  and tiny ones read "<0.1%".
+- **Copy name** copies the column name; **Copy values** copies the plain top values, one per line (NULL, empty and cut
+  values left out). Both use `navigator.clipboard` and say so in a toast, or report that the browser blocked it.
+- States: "Profiling…" while loading (closing cancels the request); a failure (404 / 502 / 504) shows icon + message
+  in the dialog and a toast. **Esc**, X or Close close it. Not yet: sort order and semantic-role editing (see the backlog).
+
 ## Safety
 
 `{db}` is validated against `SHOW DATABASES` (ordinal match) before it is quoted into `SHOW TABLES

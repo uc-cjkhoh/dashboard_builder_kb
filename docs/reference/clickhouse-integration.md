@@ -76,14 +76,14 @@ ClickHouse on `10.168.49.13` limits `default` to `127.0.0.1`, so from the app ho
 | Purpose | Gateway method | SQL |
 |---|---|---|
 | Validate connection | `ValidateAsync` | `SELECT 1` |
-| List databases | `ListDatabasesAsync` | `SHOW DATABASES` |
-| List tables | `ListTablesAsync` | `SHOW TABLES FROM {db}` |
+| List databases / tables | `ListDatabasesAsync` / `ListTablesAsync` | `SHOW DATABASES` / `SHOW TABLES FROM {db}` |
 | Describe columns | `DescribeColumnsAsync` | `DESCRIBE TABLE {db}.{table}` |
 | Distinct values | `DistinctValuesAsync` | `SELECT DISTINCT {col} AS v FROM … WHERE v IS NOT NULL ORDER BY v LIMIT n` (1..1000, rejected outside) |
+| Column profile | `ProfileColumnAsync` (`ClickHouseGateway.Profile.cs`) | two statements over `(SELECT {col} AS v FROM {db}.{table} LIMIT 1000000)` (a compound / unclassified type is read as `toString`): `SELECT count(), countIf(isNull(v)), uniq(v)[, toString(min(v)), toString(max(v))]` (min/max for numeric and date columns, hidden when empty or all-NULL) and `SELECT if(isNull(v), NULL, left(toString(v), 101)), count() … GROUP BY v ORDER BY count() DESC, v ASC LIMIT n` (top `n` 1..50, default 10). `uniq` is approximate; `sampled` is true when the table has ≥ 1,000,000 rows |
 | Worksheet query | `QueryAsync` | see below |
 | Histogram | `HistogramAsync` | `WITH (SELECT min…) AS lo, (SELECT max…) AS hi, if(hi>lo,(hi-lo)/{bins},1) AS width SELECT least(toUInt32(floor(({c}-lo)/width)),{bins-1}) AS bin, … count() … GROUP BY bin … ORDER BY bin` |
 | Box plot | `BoxPlotAsync` | `SELECT [{dim} AS label,] min, quantile(0.25), quantile(0.5), quantile(0.75), max … [GROUP BY label] LIMIT n` |
-| Raw rows | `RowsAsync` | `SELECT {col}, … FROM {db}.{table} [WHERE …bound…] LIMIT n+1` — the columns are catalog-checked (default: the first 200), the filters go through `BuildSingleTableFilters`, there is **no ORDER BY**, `n` is 1..1000 (rejected outside) and the extra probe row sets `truncated`; each column is selected as `if(isNull(c), NULL, left(toString(c), 1001))` so a cell is cut to 1000 characters (+ `…`) inside ClickHouse; rows × columns ≤ 50,000 |
+| Raw rows | `RowsAsync` | `SELECT {col}, … FROM {db}.{table} [WHERE …bound…] LIMIT n+1` — the columns are catalog-checked (default: the first 200), filters use `BuildSingleTableFilters`, **no ORDER BY**, `n` 1..1000 (rejected outside), an extra probe row sets `truncated`; each column is selected as `if(isNull(c), NULL, left(toString(c), 1001))` so a cell is cut to 1000 characters (+ `…`) inside ClickHouse; rows × columns ≤ 50,000 |
 | CSV export | `QueryAsync` | the worksheet query, serialised by `CsvUtil` |
 
 `{db}`, `{table}`, `{col}` are **interpolated identifiers** (see below); every other variable part is a
