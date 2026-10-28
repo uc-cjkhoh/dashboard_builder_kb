@@ -13,7 +13,6 @@ Format: [README.md](README.md#how-to-read-an-entry). Chart types are in [workshe
 - **Per-member colour and palettes** (IDs: T01-20, T03-24, T03-33; priority P0–P1) — Partial: three workbook palettes, legend position and highlight; no per-member colour assignment, no palette reverse, diverging only in table scales. Needs: none.
 - **Marker size and mark borders** (IDs: T01-22, T03-34; priority P1–P2) — Partial: size and shape by field and data labels exist; no fixed marker size or border setting (the heatmap border is fixed). Needs: none.
 - **Filter on an aggregated measure** (IDs: T03-27; priority P1) — partial: row-level between/compare only; no filter on an aggregated measure (HAVING) and no range slider. Needs: a whitelisted bounded HAVING in the server builder.
-- **Exclude** (IDs: T03-28; priority P0) — partial: multi-select `in` works; Exclude applies to one clicked value only, with no NOT IN. Needs: a validated NOT IN op.
 
 ## Authoring gaps
 

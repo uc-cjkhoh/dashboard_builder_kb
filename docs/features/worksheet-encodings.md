@@ -60,6 +60,7 @@ Each Filters pill is a column + operator + value; every value is a **bound typed
 |---|---|---|
 | `= != > >= < <=` | single value, ≤ 1000 characters | bound as the **column's type** (below) |
 | `in` | multi-select from a **bounded distinct-values** query (`GET …/columns/{col}/distinct`; the editor asks for 201 and shows 200) | `Array(Float64)` / `Array(String)` / `Array(UInt8)` by type; ≤ 500 values |
+| `not in` (Exclude) | the same multi-select as `in` | `(col NOT IN {p:Array(…)} OR isNull(col))` — same arrays and ≤ 500 limit. **Rows where the column is NULL are kept** (a bare `NOT IN` would drop them, three-valued logic); single-value `!=` still drops NULLs |
 | `between` | two bounds, From ≤ To | two typed parameters |
 | `contains` / `starts with` / `ends with` (P30, text fields) | text, ≤ 1000 characters | bound `String`: `positionCaseInsensitiveUTF8(col, p) > 0` / `startsWith(lowerUTF8(col), lowerUTF8(p))` / `endsWith(…)` — case-insensitive, no LIKE pattern, nothing to escape |
 | `in the` — relative date (P30, date fields) | a period preset (last 7 / 28 / 30 / 90 days, this / last month, quarter, year) | resolved in the browser to a bound `between` over whole days (`serverFilter`) |
@@ -79,7 +80,7 @@ by the server's `FilterValues.Coerce`):
 A value that doesn't fit makes the pill **invalid** (dashed border, warning icon, tooltip) with the
 reason inline in the filter editor ("'abc' is not a number for column amount."); an inverted range says
 "From must be less than or equal to To". An invalid filter is **not applied** — it is never sent.
-An empty `in` or a blank filter is a no-op (never `IN ()`); a half-filled range is invalid. When the
+An empty `in` / `not in` or a blank filter is a no-op (never `IN ()`); a half-filled range is invalid. When the
 distinct list has more than 200 values the editor says "Showing the first 200 values — more exist."
 Filters are worksheet-scoped unless **shared**. At most **8** user filters; the server accepts up to 20 per query.
 
@@ -92,7 +93,7 @@ a control above the filter cards: a select for a list, a slider + box for a numb
 input; a value outside the allowed ones is refused with the reason, and a change re-runs the view.
 
 **Filter cards** (P30). Under the title, each of the sheet's filters — and the shared ones — shows as a
-card: a **checkbox list** for `in` (the bounded distinct values), the filter's own editor otherwise. Cards
+card: a **checkbox list** for `in` / `not in` (the bounded distinct values; a `not in` card is labelled "not in"), the filter's own editor otherwise. Cards
 and the Filters tool edit the same objects, so they always agree; ⋯ → **Show filter cards** hides them
 (`sheet.showFilterCards`). The operator list follows the field type (`opsFor`).
 
@@ -127,7 +128,7 @@ Clicking a chart mark **selects** its primary-dimension value (`chart.js` forwar
   (unit-tested). One link action per sheet (`sheet.urlAction`).
 
 The action is a bound-parameter filter appended in `buildPlan` **only when the column's table is
-already in the query** — a click never forces a join. Clicking the same mark again clears it. Works on
+already in the query** — a click never forces a join. Exclude is a single-value `!=`; to exclude several members use a `not in` filter. Clicking the same mark again clears it. Works on
 bar, stacked, line, area, combo, pie, donut and scatter (incl. colour-split); other types and null
 values are no-ops. Why select-then-act:
 [D16](../reference/decisions.md#d16--click-to-filter-is-a-select-then-act-worksheet-selection).

@@ -215,15 +215,15 @@ aligned on purpose. Likewise `approx.distinct` in the response ignores a `COUNTD
 - **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct/countNonNull` (`countDistinct` →
   `uniqExact`, `countNonNull` → `count(col)`); calculation node kinds, operators and functions
   (`CalcValidator`, `CalcCatalog`);
-  operators `= != > >= < <= in between`.
+  operators `= != > >= < <= in notin between` (plus text match and top-N).
 - **Typed bound values** (`FilterValues.Coerce`, `ClickHouse/RequestValidation.cs`): the value is
   converted to the column's category from the same `DESCRIBE` before binding — number → `{p0:Float64}`
   (plain decimal only), date / datetime → ISO text bound as `String` (a `Date` / `Date32` column rejects a
   time part), boolean → `UInt8`, text → `String`; compound / other types can't be filtered. Binding is via
-  ClickHouse.Client's `AddParameter` (`using ClickHouse.Client.Utility`). `in` binds `Array(Float64)` /
+  ClickHouse.Client's `AddParameter` (`using ClickHouse.Client.Utility`). `in` and `notin` bind `Array(Float64)` /
   `Array(String)` / `Array(UInt8)`, ≤ 500 values; `between` binds two bounds and requires From ≤ To. A value
   that doesn't fit is a 400, never a ClickHouse 502.
-- **Rejected, not no-op'd, on the server:** an empty `in`, a half or inverted range, an unknown operator.
+- **Rejected, not no-op'd, on the server:** an empty `in` / `notin`, a half or inverted range, an unknown operator.
   (The client never sends a blank filter, so the user-visible behaviour of an empty filter is still
   "ignored".)
 - **Pure, unit-tested helpers** (reached via `InternalsVisibleTo`): `BuildCondition`,

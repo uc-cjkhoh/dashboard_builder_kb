@@ -51,7 +51,7 @@ the client mirrors them in `Core/validate.js` `LIMITS` and checks first, so a va
 | Measures | ≤ 10 (calculated measures count toward it, as calculated dimensions count toward the 12) |
 | Joins | ≤ 10 |
 | Filters per query | **≤ 20** (`MaxFilters`). The client allows 8 user filters, and the worksheet appends the shared filters (≤ 4), the drill path (≤ 5), the page, the selection and the date range |
-| `in` values | ≤ 500; a filter value ≤ 1000 characters |
+| `in` / `notin` values | ≤ 500; a filter value ≤ 1000 characters |
 | `limit` (query, box plot, distinct) | 1–5000 (default 50; [D24](decisions.md#d24--showing-all-data-bounded-requests-paging-other-date-grouping)) · CSV export 1–100,000 · distinct 1–1000 (default 200) |
 | `offset` (query) | 0–10,000,000 |
 | Filter `op` | also `contains`, `startsWith`, `endsWith` (text columns, value required) and `top` (value 1–1000 + `topBy` measure, optional `bottom`; worksheet query only — histogram / box plot reject it) |
@@ -74,7 +74,7 @@ ClickHouse 502:
   `Date` / `Date32` column **rejects a time component**.
 - **boolean** → `true` / `false` / `1` / `0`; bound `UInt8`.
 - **text** → any; **compound / other** → 400 ("can't be compared").
-- `between` needs both bounds and From ≤ To (number, date); `in` needs ≥ 1 value.
+- `between` needs both bounds and From ≤ To (number, date); `in` and `notin` (Exclude; keeps NULL rows) need ≥ 1 value.
 
 Temporal values are **ISO everywhere** — keys, distinct values and box-plot labels use `YYYY-MM-DD` (a
 midnight `DateTime` also renders date-only) or `YYYY-MM-DD HH:MM:SS`, so what the app shows round-trips as
