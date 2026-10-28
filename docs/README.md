@@ -65,7 +65,7 @@ Overview: [../DESIGN.md](../DESIGN.md).
 | [backlog/README.md](backlog/README.md) | the only to-do list: how to read it, recommended order, spikes, guards, known unknowns |
 | [backlog/dashboards.md](backlog/dashboards.md) | P24a–d, layout, actions, navigation, P38, P39 remainder |
 | [backlog/calculations.md](backlog/calculations.md) | functions, parameters in formulas, LOD, table-calculation polish, P25 |
-| [backlog/data-model.md](backlog/data-model.md) | joins, union, groups, split, cast, row preview, hierarchies, P43 |
+| [backlog/data-model.md](backlog/data-model.md) | joins, union, groups, split, cast, hierarchies, P43 |
 | [backlog/charts-and-formatting.md](backlog/charts-and-formatting.md) | chart, authoring, formatting and export gaps |
 | [backlog/analytics-and-maps.md](backlog/analytics-and-maps.md) | statistics, forecasting, clustering, P42, maps |
 | [backlog/platform.md](backlog/platform.md) | persistence, P45, P44, risks, workbook additions, decisions to settle |

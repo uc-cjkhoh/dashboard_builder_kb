@@ -49,8 +49,8 @@ first — `expandSidebar()`, [layout.md](../design/layout.md#sidebar)):
   (`.col-row__type`, from the type category), and a **join-key checkbox** (`.col-row__key`); ticked key
   columns show the key icon.
 - Flat solid card: 1px stroke, `--elev-2` (`--elev-16` while dragging).
-- **No row preview.** Cards are uniform height with an internally-scrolling column list; data lives
-  in the dashboard worksheet.
+- **No rows on the card.** Cards are uniform height with an internally-scrolling column list; a table's rows are
+  previewed from its chip in the schema browser ([schema-browser.md](schema-browser.md#row-preview)).
 - The caret toggles `.entity--collapsed`, leaving only the title bar.
 
 ## Moving & removing

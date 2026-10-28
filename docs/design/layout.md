@@ -66,8 +66,8 @@ tabs wrap, the bar grows taller than the brand.
 ## Entity cards
 
 **Uniform height** — a head (table name in 600 weight, the database muted before it) over an
-internally-scrolling column list: flat solid card, 1px stroke, `--elev-2`. No data preview: data lives in
-the dashboard worksheet. A caret in the head collapses the card to its title bar; key columns show the
+internally-scrolling column list: flat solid card, 1px stroke, `--elev-2`. No rows on the card: a table's rows
+open in a dialog from its schema-browser chip. A caret in the head collapses the card to its title bar; key columns show the
 key icon.
 
 ## Worksheet — data header and chart card

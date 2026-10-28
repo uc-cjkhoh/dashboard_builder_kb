@@ -18,7 +18,7 @@ What "done" means for the undone work. A release exits when its journeys pass wi
 
 | Release | Contents | Exit |
 |---|---|---|
-| R0 | Remaining **P0** items: multi-worksheet dashboards (P24a, P24b), cross-widget filtering (P24c), type cast, row preview, duplicate sheet, tooltip editor, per-member colour, exclude | Journey A passes with exact fixture values. |
+| R0 | Remaining **P0** items: multi-worksheet dashboards (P24a, P24b), cross-widget filtering (P24c), type cast, duplicate sheet, tooltip editor, per-member colour, exclude | Journey A passes with exact fixture values. |
 | R1a | Text, date and logic functions, parameters in formulas, remaining P1 chart types, PDF export | Common book examples reproduce without code. |
 | R1b | Joins and unions breadth, table-calculation polish, linked actions, floating layout, phone preview | Journeys B and C pass. |
 | R2 | LOD, maps, regression, forecast, k-means, stories, chart-in-tooltip | Journeys D and E pass. |
