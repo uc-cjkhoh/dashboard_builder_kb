@@ -78,7 +78,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Calc/calc-resolve.js` | pure: `catalogFromEntities`, `makeResolve`, `compileCalculation(calc, calcs, catalog, params)` (parse → expand → substitute parameters → check), `calcTables` |
 | `Calc/calc-workbook.js` | pure: `checkName`, `mapRefs` (rewrite refs outside text literals), `renameInFormulas`, `usedBy`, `cleanCalculation(s)` — the workbook list rules |
 | `Calc/calc-pill.js` | pure: the calc-pill shape (`makeCalcPill`, `isCalcPill`, `pillName`), `refusal` (E12 entry points), `pillSlots`, `syncCalcPills`, `usesCalc`, `clearCalcPills` |
-| `Calc/calc-plan.js` | pure: the worksheet plan seam — `wireDim`, `wireMeasure`, `planTables`, `calcProblem`, `measureLabel`, `topByRef` / `wireTopBy`, `resolveSortTarget` |
+| `Calc/calc-plan.js` | pure: the worksheet plan seam — `wireDim`, `wireMeasure`, `planTables`, `calcProblem`, `measureLabel`, `aggWord(agg, p)` (`p90`), `topByRef` / `wireTopBy` (both carry `p` for a percentile), `resolveSortTarget` |
 | `Calc/calc-dialog-model.js` | pure: `evaluateDraft` (validation), `chipFor` (role chip), `suggest` (`[` field, `[@` parameter and function-name autocomplete) |
 | `Calc/function-help.js` | pure: the function glossary `FUNCTION_HELP` (derived from `calc-types.js` + the logic keywords), `searchHelp`, `groupHelp`, `functionItems` — the dialog's Functions panel and name autocomplete |
 | `Calc/calc-pane-model.js` | pure: `paneState` (group items), `deleteCalcPlan`, `showUseAs` / session Use-as choice, `normaliseFormula` |
@@ -92,7 +92,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Workbook/workbook-model.js` | pure: workbook serialize (v2) / `parseWorkbook` (full validation + issue list; v1 files via `migrateV1`) / `sanitizeSheet` / storage keys (`storageKey`, `legacyStorageKey`) — [workbook.md](../features/workbook.md#validation-parseworkbook) |
 | `Core/api.js` | `fetch` helpers (JSON, errors, path base, optional `AbortSignal`) |
 | `Core/ui.js` | toast, pill, `show`/`hide`/`toggle`, `fieldError` / `clearFieldError` / `checkField`, `listDialog`, `confirmDialog`, `openDialog`/`closeDialog` |
-| `Core/validate.js` | pure input parsers (`host`, `port`, `text`, `number`, `dateTime`, `filterValue`, `range`) returning `{ ok, value }` or `{ ok:false, error }`, plus `LIMITS` and `HOST_MESSAGES` — mirror of the server's `ApiLimits` / `RequestRules` |
+| `Core/validate.js` | pure input parsers (`host`, `port`, `text`, `number`, `dateTime`, `filterValue`, `range`, `percent`, with `isFraction` / `percentLabel` for the percentile fraction) returning `{ ok, value }` or `{ ok:false, error }`, plus `LIMITS` and `HOST_MESSAGES` — mirror of the server's `ApiLimits` / `RequestRules` |
 | `Core/sheet-schema.js` | pure: the allowed values for a saved sheet (chart types, categories, filter ops, formats, Top-N) |
 | `Core/icons.js` | the inline-SVG icon set — `icon(name, {size, label})`, `PATHS`, `ICON_NAMES` |
 | `Core/menu.js` | `wireMenu(button, list)` — keyboard-operable popover menu (`menuitem` / `menuitemradio` items); animated open/close via `motion.js` |

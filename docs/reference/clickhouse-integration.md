@@ -214,11 +214,11 @@ script, results checked against hand-written `SELECT`s or hand-computed values):
 | `COUNT` → `countNonNull` | `count(x)` | `sum(if(isNotNull(x), t0._sample_factor, 0))` | `count(x)` |
 | `AVG`, `MIN`, `MAX` → `avg`, `min`, `max` | as written | unscaled | as written |
 | `COUNTD` → `countDistinct` | `uniqExact(x)` | `uniq(x)` | `uniq(x)` |
-| `MEDIAN`, `PERCENTILE` → `median`, `percentile` | `quantileExactInclusive(0.5)(x)`, `quantileExactInclusive({p:Float64})(x)` (interpolating) | unscaled | as exact |
+| `MEDIAN`, `PERCENTILE` (also the plain `median` / `percentile` measure) | `quantileExactInclusive(0.5)(x)`, `quantileExactInclusive({p:Float64})(x)` (interpolating) | unscaled | as exact |
 | `STDDEV`, `VARIANCE` → `stddev`, `variance` | `if(count(x) < 2, NULL, stddevSamp(x))` (`varSamp`) | unscaled | as exact |
 | `ATTR` → `attr` | `if(uniqExact(x) = 1, min(x), NULL)` | unscaled | as exact |
 
-The last four are never scaled: on a sampled table they run over the sample (estimates). The percentile fraction is the only user value: bound (`AggNode.P`, `Float64`, validated 0..1;
+The last four are never scaled: on a sampled table they run over the sample (estimates). The percentile fraction is the only user value: bound (`AggNode.P` or a plain measure's `MeasureRef.P` as `mp{n}`, a Top-N's `topBy.P` as `tp{i}`; `Float64`, 0..1 checked again in `BindFraction`;
 ClickHouse accepts a query parameter as a parametric aggregate's argument); function names are fixed text.
 `count(x) < 2` keeps a one-value group NULL (bare `stddevSamp` is NaN, which JSON cannot carry); `min(x)`,
 not `any`, ignores NULL rows in `attr`. `PlainRankSql` (Top-N) uses the same writer.
@@ -231,9 +231,9 @@ aligned on purpose. Likewise `approx.distinct` in the response ignores a `COUNTD
 
 ### Shared defences in the builders
 
-- **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct/countNonNull/median/stddev/variance/attr`
-  (`countDistinct` → `uniqExact`, `countNonNull` → `count(col)`; `median`, `stddev`, `variance` need a numeric
-  column, `attr` any column but a compound one; no plain `percentile` — it needs a fraction); calculation node kinds,
+- **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct/countNonNull/median/percentile/stddev/variance/attr`
+  (`countDistinct` → `uniqExact`, `countNonNull` → `count(col)`; `median`, `percentile`, `stddev`, `variance` need a numeric
+  column, `attr` any column but a compound one; `percentile` also needs the bound `p`); calculation node kinds,
   operators and functions (`CalcValidator`, `CalcCatalog`); operators `= != > >= < <= in notin between` (plus text match and top-N).
 - **Typed bound values** (`FilterValues.Coerce`, `ClickHouse/RequestValidation.cs`): the value is
   converted to the column's category from the same `DESCRIBE` before binding — number → `{p0:Float64}`

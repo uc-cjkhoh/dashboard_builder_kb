@@ -154,12 +154,15 @@ Controller: `Features/Dashboard/QueryController.cs`. All `POST` with a JSON body
 **Measure values** (`QueryResultRow.Values`, `IReadOnlyList<object?>`) are a JSON number, a **string**
 (`min` / `max` of a text or date column), or `null` (SQL NULL, or `NaN` / `∞` from an aggregate over no
 rows). Consumers must not assume numbers — [worksheet-charts.md](../features/worksheet-charts.md#chart-types).
-`sum`, `avg`, `median`, `stddev` and `variance` on a non-numeric column are a 400 (`count` / `countDistinct` /
+`sum`, `avg`, `median`, `percentile`, `stddev` and `variance` on a non-numeric column are a 400 (`count` / `countDistinct` /
 `countNonNull` / `min` / `max` are fine on any column; `attr` on any but a compound column). Aggregations:
 `count` (rows), `sum`, `avg`, `min`, `max`, `countDistinct`, `countNonNull` (non-NULL values of the column,
 `count(col)`), `median` (linear interpolation between the two middle values, like Excel `PERCENTILE.INC`), `stddev` / `variance` (sample; NULL for fewer than two values),
-`attr` (the one distinct non-NULL value of the group, else NULL). The result column is named
-`<agg> <column>` (`median amount`, `attr status`).
+`attr` (the one distinct non-NULL value of the group, else NULL), `percentile`. The result column is named
+`<agg> <column>` (`median amount`, `attr status`); a percentile is `p<percent> <column>` (`p90 amount`, `p99.5 amount`).
+A **`percentile`** measure carries **`p`**, a finite number 0..1 (JSON `0.9`), required exactly when `agg` is `percentile` and refused
+on any other aggregation or on a calculated measure; a missing or out-of-range `p` is a 400 at `measures[i].p` (never clamped), and a Top-N
+`topBy` is checked the same at `filters[i].topBy.p`. `p` reaches SQL only as a bound `Float64` and is part of the cache key.
 
 ### Calculated fields (`calc`)
 

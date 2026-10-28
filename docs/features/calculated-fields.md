@@ -28,7 +28,8 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
   middle values, like Excel `PERCENTILE.INC`: 1, 2, 3, 4 gives 2.5); `PERCENTILE([f], p)` is the same interpolation at fraction `p` (p25 of 1..4 is 1.75)
   (a **literal** number 0..1, not a field or a formula; `PERCENTILE([f], 0.5)` equals `MEDIAN`, 0 the minimum, 1
   the maximum); `STDDEV` and `VARIANCE` are the **sample** statistics (n − 1). `STDDEV`/`VARIANCE` of fewer than
-  two values, and `MEDIAN`/`PERCENTILE` of no value, are empty (NULL, shown as a dash), never 0 or NaN.
+  two values, and `MEDIAN`/`PERCENTILE` of no value, are empty (NULL, shown as a dash), never 0 or NaN. A percentile of a plain
+  field needs no formula: the pill's `Percentile…` aggregation ([worksheet.md](worksheet.md#shelves--pills)) runs the same SQL; a calculated pill does not list it.
 - **`ATTR([f])`** (Tableau's attribute) is the value when the group has exactly one distinct non-NULL value,
   else empty (NULL — Tableau shows `*`; here a dash). NULLs are ignored, so a group of `p, p, NULL` is `p`.
   It keeps the field's type, so a text field stays a text measure (table, text and KPI views only).

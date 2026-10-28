@@ -116,8 +116,12 @@ import reports it as an issue. Dropping it would silently change a user's charts
 interpolating like Excel `PERCENTILE.INC` and Tableau; not the reservoir `quantile`) and are never scaled on a sample; `stddev` / `variance` are sample statistics and
 NULL for fewer than two values (not NaN, which JSON cannot carry); `ATTR` is `if(uniqExact(x) = 1, min(x), NULL)`
 and so returns NULL where Tableau shows `*`, ignoring NULL rows. The percentile fraction is a literal in the
-formula and a `p` on the `agg` node, bound as a parameter and checked 0..1 on both sides; a plain measure has no
-fraction field, so a plain percentile is not offered (write `PERCENTILE([t.c], 0.9)`).
+formula and a `p` on the `agg` node, bound as a parameter and checked 0..1 on both sides. A plain measure carries the same fraction as
+`MeasureRef.P` (the pill's `p`, stored 0..1, typed as a percent 0–100): required exactly when `agg` is `percentile`, 400 at
+`measures[i].p` / `filters[i].topBy.p` otherwise, bound as `mp{n}` / `tp{i}`. Its label is `p<percent> <column>` (`p90 amount`,
+percent to six decimals, no exponent; `PercentLabel` and `percentLabel` write the same text). Percentile stays out of a field's
+default-aggregation menu (it would need a default fraction) and out of a calculated pill's list; an invalid or missing `p` on an opened
+workbook resets the pill's aggregation with an import issue.
 
 ### D49 — Logic is new node kinds on the same wire; one `case` node for IF and CASE
 `str`, `cmp`, `logic` (`and`/`or`), `not`, `case`, `ifnull`, `isnull` join `field | num | un | bin | agg` under the

@@ -108,12 +108,19 @@ to Columns).
 - **Role** defaults from type (numeric → measure, else dimension) and is convertible per pill: `Σ`
   turns a dimension into a measure, `#` a measure into a dimension. `roleOf(f)` resolves it.
 - **Aggregation** dropdown on measure pills offers only what the column's type supports
-  (`aggsFor` in `filter-rules.js`): `sum/avg/min/max/median/stddev/variance/count/countDistinct/countNonNull/attr`
+  (`aggsFor` in `filter-rules.js`): `sum/avg/min/max/median/percentile/stddev/variance/count/countDistinct/countNonNull/attr`
   for numbers; `count/countDistinct/countNonNull/min/max/attr` for text **and dates**;
   `count/countDistinct/countNonNull` otherwise (boolean, compound). `countDistinct` maps to ClickHouse `uniqExact`;
   `median` interpolates between the two middle values (like Excel `PERCENTILE.INC`), `stddev` / `variance` the sample statistics (empty for one value), `attr`
-  the single value of a group or empty ([calculated-fields.md](calculated-fields.md#formulas)). A percentile
-  of a plain field is a calculated field, `PERCENTILE([t.c], 0.9)`. Changing a pill's role to a type that
+  the single value of a group or empty ([calculated-fields.md](calculated-fields.md#formulas)).
+  **Percentile** (numeric fields only; a text column cast to a number counts, uncast text is refused as for `median`): choosing
+  `Percentile…` in the pill's menu adds a percent box (labelled "Percentile for …, 0 to 100"; an integer or decimal with up to six
+  decimals, starts at 90). The pill keeps the fraction as `p` (0..1; 99.5 is `0.995`), is named `orders.amount · p90`, and the measure
+  is labelled `p90 amount` everywhere (chart, table, CSV, Top-N and sort choices; `p99.5 amount`). A value outside 0–100 shows the
+  message ("Percentile must be between 0 and 100 percent.", warning icon, `aria-invalid`) and is never stored or sent: the view keeps
+  the last good percentile. Two percentiles of one field (p25 and p75) are separate measures. Leaving percentile drops `p`.
+  Percentile is **not** in a field's default-aggregation menu (a default would need a default fraction). A calculated pill keeps
+  its own list (use `PERCENTILE([f], p)` in the formula). Changing a pill's role to a type that
   doesn't support its aggregation resets it and says so. The server rejects `sum` / `avg` on a
   non-numeric column with a 400.
 - Pill tints: dimension blue (`--dim-*`), measure teal (`--meas-*`), Marks encodings violet (`--enc-*`).
