@@ -1,11 +1,10 @@
 # Backlog: data model and data source
 
-Today relationships are logical, inner or left, one equality pair each ([relationships.md](../features/relationships.md)). Entries are in dependency order. A union compiles to `UNION ALL` with explicit column alignment; unpivot and split compile to ClickHouse array and string functions; source tables are never altered, and null, empty string, zero, invalid date and non-finite number stay distinct. Format: [README.md](README.md#how-to-read-an-entry).
+Today relationships are logical, inner/left/right/full, one equality pair each ([relationships.md](../features/relationships.md)). Entries are in dependency order. A union compiles to `UNION ALL` with explicit column alignment; unpivot and split compile to ClickHouse array and string functions; source tables are never altered, and null, empty string, zero, invalid date and non-finite number stay distinct. Format: [README.md](README.md#how-to-read-an-entry).
 
-- **Right and full joins** (IDs: T02-12, T02-13; priority P1) — Open: join type is validated to inner or left only. Needs: validation, SQL builder and dialog changes.
 - **Compound joins and key suggestion** (IDs: T02-14, T02-15; priority P2) — Open: manual single-pair equality only; no matching-name suggestion. Needs: none.
 - **Union** (IDs: T02-16; priority P1) — Open: no manual union of tables. Needs: a bounded server query shape.
-- **P43 Many-to-many and two-way relationships** (priority P1; effort M) — Open: cardinality is recorded but every link joins inner, one way. Aggregate each side to the shared key before joining so measures do not double-count; add a per-relationship filter direction. Needs: join types.
+- **P43 Many-to-many and two-way relationships** (priority P1; effort M) — Open: cardinality is recorded but every link joins inner, one way. Aggregate each side to the shared key before joining so measures do not double-count; add a per-relationship filter direction. Needs: none (join types are built).
 - **Member aliases** (IDs: T02-29; priority P1) — Open: only a field alias exists; no value-to-label mapping. Needs: none.
 - **Groups** (IDs: T02-30; priority P1) — Open: no dimension groups (members to a label). Needs: member aliases.
 - **Split and unpivot** (IDs: T02-31, T02-32; priority P1) — Open: no string split, no unpivot of wide columns. Needs: none.

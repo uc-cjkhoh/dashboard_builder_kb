@@ -19,7 +19,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Canvas/canvas.js` | drop handling, entity cards, card movement, empty state — [canvas.md](../features/canvas.md) |
 | `Canvas/empty-state.js` | pure: `emptyState({connected, databaseSelected})` → the sentence, button and control to focus |
 | `Relations/relations.js` | join-key connectors, links, cardinality — [relationships.md](../features/relationships.md) |
-| `Relations/relation-rules.js` | pure: `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked |
+| `Relations/relation-rules.js` | pure: `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked; `JOIN_TYPES`, `normalizeJoinType`, `joinChoices`, `planJoinType`, `joinBadge` — join types |
 | `Tabs/tabs.js` | Data Model tab + dashboard tabs — [tabs.md](../features/tabs.md) |
 | `Tabs/duplicate-model.js` | pure: duplicate-worksheet naming, limit check, sheet copy (node-tested) |
 | `Dashboard/dashboards.js` | the worksheet: field pane, shelves, toolbar, plan, render — [worksheet.md](../features/worksheet.md) |

@@ -28,7 +28,7 @@ types, and no cardinality dialog — when:
   invisible hit path (`.rel-link__hit`) for clicking.
 - **Shape-coded endpoints** (`.rel-end`) — a tick for "one", a crow's foot for "many" — so cardinality
   reads without colour.
-- A **cardinality badge** (`.rel-badge`) sits at the midpoint — "1:N", or "1:N · left" for a left join.
+- A **cardinality badge** (`.rel-badge`) sits at the midpoint — "1:N", or "1:N · left" / "· right" / "· full" for an outer join.
 - Resting links use `--ink-2`; a link is `--accent` blue only while **selected or being drawn**.
 
 ## Editing & cleanup
@@ -38,15 +38,25 @@ types, and no cardinality dialog — when:
 - Removing an entity, or unticking a join key a link depends on, prunes those links; `rel:changed`
   fires.
 
-## Join type (P31)
+## Join type (P31, T02-12, T02-13)
 
-The cardinality dialog's **Join** choice: **Inner** (the default — only rows that match on both sides)
-or **Left** (keep the rows of the tables already in the view even when the other side has no match;
-their fields read as empty / "—"). A left link's worksheet joins are sent as `type: "left"` and emitted
-as `LEFT JOIN` (a whitelisted keyword) with `join_use_nulls = 1`, so unmatched values are NULL, not
-ClickHouse's zero / "" defaults (on a server that refuses settings the defaults show). The direction is
-the query's: rows of whichever table the view reached first are kept. Saved per relationship
-(`joinType`).
+The dialog's **Join** choice, worded with the two tables (the link runs first-clicked key → second, so the
+first is the **left** side): **Inner — only rows that match**, **Keep all rows of {first table}** (`left`),
+**Keep all rows of {second table}** (`right`), **Keep all rows of both** (`full`). Unmatched rows have NULL
+for the other side's fields (they read "—"). The badge says it in words ("1:N · left", "· right", "· full").
+Saved per relationship (`joinType`); a workbook without one, or with an unknown one, reads as inner.
+
+**Preserved-side rule.** The relationship fixes the preserved table, not the query's base: the plan walks
+from the view's base table outward, and a link crossed second-to-first swaps `left`/`right`
+(`planJoinType`), so "keep all rows of customers" keeps customers whichever table the view starts from.
+(Before right/full, a left link kept the base side; now it always keeps its first table.)
+
+**Behaviours chosen** (see [clickhouse-integration.md](../reference/clickhouse-integration.md#worksheet-query-queryasync)):
+a filter on a table whose rows were NULL-extended drops those rows (the outer join then acts inner for that
+filter); `count()` counts NULL-extended rows; a NULL join key never matches, so such rows appear unmatched
+on both sides of a full join. **Refused (400):** a top-N filter on a view with a right or full join, and
+right/full joins on a connection whose server refuses settings (`join_use_nulls` is required). Approximate
+mode reads such a view exactly (no sample).
 
 ## What cardinality means
 

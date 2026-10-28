@@ -72,7 +72,7 @@ A **logical** link — the database neither creates nor validates it
 | `from` | `{ entityId, column }` — a checked join key on entity A |
 | `to` | `{ entityId, column }` — a checked join key on entity B |
 | `cardinality` | `1:1` · `1:N` · `N:1` · `N:M` — intent, not a data guarantee |
-| `joinType` | `inner` (default) / `left` (P31) — how the worksheet joins across it |
+| `joinType` | `inner` (default) / `left` / `right` / `full` (P31, T02-12/13) — which side keeps its unmatched rows (FROM = left, TO = right) |
 
 The project statement requires every dragged-in table to select ≥1 join key; the UI enforces it by
 letting only checked keys be endpoints ([relationships.md](../features/relationships.md)).

@@ -96,9 +96,10 @@ bound parameter or a validated integer (out-of-range limits are rejected before 
 [GROUP BY k0, …] ORDER BY … LIMIT n [OFFSET m]`
 
 - **Joins:** the base table is `t0`; each join edge attaches a table aliased `tN` in order, so any
-  dimension, measure or filter can live on any included table. An edge is `INNER JOIN`, or `LEFT JOIN`
-  when its `type` is `left` (P31) — then every query of that request ends `SETTINGS join_use_nulls = 1`
-  (unless the server refuses settings). Tests: `JoinTypeTests`.
+  dimension, measure or filter can live on any included table. An edge is `INNER JOIN`, or `LEFT`/`RIGHT`/`FULL JOIN`
+  for `type` `left`/`right`/`full` (`JoinKeyword`) — the request then ends `SETTINGS join_use_nulls = 1` (right/full
+  without it: 400). Filters are `WHERE`: one on a NULL-extended side drops those rows. Right/full reject `top` (400),
+  skip `SAMPLE`. Tests: `JoinTypeTests`.
 - **Dimensions** arrive split by shelf — `rowDimensions[]` then `columnDimensions[]` — and group in that
   order, so each row's keys are `[rowDim…, colDim…]`. `measures[]` aggregate as `v0, v1, …`. No measures
   → an implicit `count()`.
