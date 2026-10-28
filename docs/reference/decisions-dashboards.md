@@ -69,4 +69,4 @@ A hierarchy is `{ id, name, levels }` on the workbook; applying it writes a fres
 machine, bookmarks, undo and the query path are untouched and a sheet keeps working when the hierarchy is renamed, edited or deleted. A live reference would need
 a missing-hierarchy state on every sheet and bookmark. The cost: editing a hierarchy doesn't update sheets that already used it (re-apply it). Levels are plain
 columns of one table (a calculated or cast field is refused — a cast or formula could change under a stored level), the limits are client-side only, and the optional
-workbook field needs no version bump because the reader ignores unknown fields and an absent one means none. A dropped hierarchy replaces the drill rather than appending.
+workbook field needs no version bump because the reader ignores unknown fields and an absent one means none. A dropped hierarchy replaces the drill rather than appending (and clears the sheet's mark selection, as drilling does). No next-id counter is saved: sheets copy levels, not ids, so a reused id binds to nothing.
