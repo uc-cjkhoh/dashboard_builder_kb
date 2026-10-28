@@ -175,16 +175,16 @@ becomes SQL in four steps; no formula text and no literal is ever written into S
    tree with a `CalcException` (a plain sentence plus the node path, `measures[0].calc.l.arg`) that the
    gateway reports as a 400. The gateway re-checks the role and
    the `sum` / `avg`-needs-a-number rule against the derived type (`CalcMeasureSql`, `CalcDimensionSql`).
-4. **Compile** (`ClickHouse/Calc/CalcCompiler.cs`): numeric columns widened with `toFloat64(...)` (no
-   unsigned wrap, no integer or `Decimal` rounding); `a / b` → `(a / nullIf(b, 0))` (division by zero is
-   NULL, never `inf`); each number literal bound as `{c{n}p{m}:Float64}` and each text literal as `{c{n}p{m}:String}` — `c{n}` unique per compiled
-   calculation in the request; aggregates through the shared `AggregateSql` (table below), so a calculated
-   `SUM` is scaled and a `COUNTD` estimated exactly as a plain measure is. A row-level measure is then
-   wrapped by its pill aggregation; an aggregate tree is used as is; a dimension groups by its row-level
-   expression. Logic nodes: `(a = b)` (also `!= < <= > >=`), `and(a, b)`, `or(a, b)`, `not(a)`, `if(c, a, b)` (IF/IIF),
-   `multiIf(c1, a1, …, else)` (CASE; `NULL` last without an ELSE), `ifNull(a, b)`, `isNull(a)`; a NULL condition is
-   not true (IF takes its else, CASE the next WHEN — pinned by the live smoke). Text functions (`fn` nodes, every argument compiled once in source order): `lowerUTF8`, `upperUTF8`, `trimBoth`, `toFloat64(lengthUTF8(…))`, `leftUTF8`/`rightUTF8(t, {UInt32})`, `replaceAll`, `concat`, `(position(t, s) > 0)`, `startsWith`, `endsWith`, `if(isNull(t), NULL, arrayElementOrNull(splitByString({sep:String}, assumeNotNull(t)), {k:UInt32}))`. Date functions: `toFloat64(dateDiff({unit:String}, a, b))`, `addYears`/`addQuarters`/`addMonths`/`addWeeks`/`addDays`/`addHours`/`addMinutes`/`addSeconds(d, {n:Int32})` (fixed name per unit, unit never in SQL), `toFloat64(toYear|toMonth|toDayOfMonth|toQuarter|toISOWeek|toDayOfWeek(d))`, and `DATE(t)` = `TypeCast.ParseDate`: the cast's digit guard, then `toDate` of `parseDateTime64BestEffortOrNull(t, 0)` kept only between 1970-01-02 and 2149-01-01 (else NULL). `dateDiff` on a `Date` with a time unit reads midnight to midnight (24 hours a day). A boolean-typed calculation is
-   wrapped in `toBool(...)`; as a dimension, `toString(...)` of it so keys read `true` / `false` (a plain Bool field keeps `True` / `False`).
+4. **Compile** (`ClickHouse/Calc/CalcCompiler.cs`): numeric columns widened with `toFloat64(...)` (no unsigned wrap, no integer or `Decimal` rounding); `a / b` → `(a / nullIf(b, 0))` (division by zero is NULL, never `inf`); each number literal bound
+   as `{c{n}p{m}:Float64}` and each text literal as `{c{n}p{m}:String}` — `c{n}` unique per compiled calculation in the request; aggregates through the shared `AggregateSql` (table below), so a calculated `SUM` is scaled and a `COUNTD` estimated
+   exactly as a plain measure is. A row-level measure is then wrapped by its pill aggregation; an aggregate tree is used as is; a dimension groups by its row-level expression. Logic nodes: `(a = b)` (also `!= < <= > >=`), `and(a, b)`, `or(a, b)`,
+   `not(a)`, `if(c, a, b)` (IF/IIF), `multiIf(c1, a1, …, else)` (CASE; `NULL` last without an ELSE), `ifNull(a, b)`, `isNull(a)`; a NULL condition is not true (IF takes its else, CASE the next WHEN — pinned by the live smoke).
+   Text functions (`fn` nodes, every argument compiled once in source order): `lowerUTF8`, `upperUTF8`, `trimBoth`, `toFloat64(lengthUTF8(…))`, `leftUTF8`/`rightUTF8(t, {UInt32})`, `replaceAll`, `concat`, `(position(t, s) > 0)`, `startsWith`,
+   `endsWith`, `if(isNull(t), NULL, arrayElementOrNull(splitByString({sep:String}, assumeNotNull(t)), {k:UInt32}))`.
+   Date functions: `toFloat64(dateDiff({unit:String}, a, b))`, `addYears`/`addQuarters`/`addMonths`/`addWeeks`/`addDays`/`addHours`/`addMinutes`/`addSeconds(d, {n:Int32})` (fixed name per unit, unit never in SQL) applied to `toDateTime64(d, 0)` and
+   kept only strictly between 1900-01-03 and 2299-12-29 UTC, else NULL (a plain `Date` would wrap and a `DateTime` clamp to 1970 on overflow), `toFloat64(toYear|toMonth|toDayOfMonth|toQuarter|toISOWeek|toDayOfWeek(d))`, and `DATE(t)` =
+   `TypeCast.ParseDate`: the cast's digit guard, then `toDate` of `parseDateTime64BestEffortOrNull(t, 0)` kept only between 1970-01-02 and 2149-01-01 (else NULL). `dateDiff` on a `Date` with a time unit reads midnight to midnight (24 hours a day).
+   A boolean-typed calculation is wrapped in `toBool(...)`; as a dimension, `toString(...)` of it so keys read `true` / `false` (a plain Bool field keeps `True` / `False`).
 
 **One compile, one parameter list.** Each calculation is compiled once; its SQL string is reused in the
 page, the total (`count()` over the grouped query), the Other statement and inline in the Top-N

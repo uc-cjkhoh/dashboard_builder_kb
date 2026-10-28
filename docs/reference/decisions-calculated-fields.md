@@ -178,11 +178,13 @@ A date argument that is text or a number is an error that points at `DATE()`, so
 text-to-date path and reuses the date cast's digit-only guard (`TypeCast`, one expression for both); it parses with the wide-range
 parser and returns NULL outside what a `Date` holds, because ClickHouse would otherwise clamp `1850-01-01` to `1970-01-01`
 silently. It returns a `Date`, dropping any time of day.
+`DATEADD` is computed on `toDateTime64(d, 0)` and is NULL outside 1900-01-03..2299-12-29: ClickHouse wraps a plain `Date` past 2149 and
+clamps a `DateTime` to 1970 (both pinned live), and a `Date32`/`DateTime64` result at its own edge is clamped, so the edges are excluded.
 
 ### D59 — `DATEDIFF` counts boundaries; `WEEK` is ISO; parts are numbers
-`dateDiff` counts calendar boundaries crossed (31 Jan to 1 Feb is one month), the ClickHouse and Tableau meaning, not elapsed
-time. `WEEK` is `toISOWeek` and `WEEKDAY` is Monday 1 to Sunday 7, while the existing week date part stays the Monday-truncated
-bucket (a different thing: a date, not a number). Parts return `toFloat64` like every calculation number. NULL in, NULL out.
+`dateDiff` counts calendar boundaries crossed (31 Jan to 1 Feb is one month), the ClickHouse meaning, not elapsed time (Tableau's `DATEDIFF` also counts boundaries, but its default week starts on Sunday and
+ClickHouse's on Monday, so only the boundary rule matches, not week results). `WEEK` is `toISOWeek` and `WEEKDAY` is Monday 1 to Sunday 7, while the existing week date part stays the Monday-truncated
+bucket (a different thing: a date, not a number). `WEEKDAY` is ISO (Sunday is 7), unlike Tableau's Sunday-is-1. Parts return `toFloat64` like every calculation number. NULL in, NULL out.
 
 ### D60 — No `TODAY()` / `NOW()`, no `MAKEDATE` yet
 A calculation is a function of the data: caching, saved workbooks and exports assume the same query gives the same answer. `TODAY`

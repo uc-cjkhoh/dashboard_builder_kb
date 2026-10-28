@@ -99,11 +99,11 @@ Use DATE() to turn text into a date.`); so is a number. A NULL date gives NULL f
 
 | Function | Result | Meaning |
 |---|---|---|
-| `DATEDIFF(unit, d1, d2)` | number | `d2` minus `d1`, in whole `unit`s, counted as **calendar boundaries crossed**: `DATEDIFF('month', 31 Jan, 1 Feb)` is 1 and `DATEDIFF('year', 31 Dec, 1 Jan)` is 1; negative when `d2` is earlier; weeks start on Monday |
-| `DATEADD(unit, n, d)` | date | `d` moved by `n` units; a month or year step past the end of a shorter month lands on its last day (31 Jan + 1 month is 29 Feb 2024; 29 Feb 2024 + 1 year is 28 Feb 2025) |
+| `DATEDIFF(unit, d1, d2)` | number | `d2` minus `d1`, in whole `unit`s, counted as **calendar boundaries crossed**: `DATEDIFF('month', 31 Jan, 1 Feb)` is 1 and `DATEDIFF('year', 31 Dec, 1 Jan)` is 1; negative when `d2` is earlier; weeks start on Monday (Tableau's default week starts on Sunday, so a `'week'` difference can differ from Tableau's by one around a Sunday) |
+| `DATEADD(unit, n, d)` | date | `d` moved by `n` units; a month or year step past the end of a shorter month lands on its last day (31 Jan + 1 month is 29 Feb 2024; 29 Feb 2024 + 1 year is 28 Feb 2025). The result may be later than a `Date` column's own 2149 limit; it is **NULL** when it falls outside 1900-01-03 to 2299-12-29 (never a wrapped or clamped date) |
 | `YEAR(d)` / `MONTH(d)` / `DAY(d)` / `QUARTER(d)` | number | the calendar year, month 1-12, day of the month 1-31, quarter 1-4 |
 | `WEEK(d)` | number | the **ISO 8601 week** 1-53 (weeks start Monday; week 1 holds the year's first Thursday, so 31 Dec 2020 and 1 Jan 2021 are week 53 and 30 Dec 2024 is week 1) |
-| `WEEKDAY(d)` | number | ISO day of the week: Monday 1 to Sunday 7 |
+| `WEEKDAY(d)` | number | ISO day of the week: **Monday 1 to Sunday 7** (Tableau's `DATEPART('weekday')` counts Sunday as 1, so `WEEKDAY(d) = 7` is a Sunday here) |
 | `DATE(t)` | date | the text `t` read as a calendar date (`2024-03-05`, `20240229`, `2024-03-05 10:30:00`); NULL when it is not one. The time of day is dropped |
 
 - **Unit and amount are literals written in the formula.** The unit is a **text literal** (`'day'`, any case) from `year`, `quarter`,
@@ -121,10 +121,12 @@ Use DATE() to turn text into a date.`); so is a number. A NULL date gives NULL f
 - **`WEEK` is not the week date part:** the date part and bucket "week" on a plain date field is the **Monday that starts the week**
   (a date); `WEEK(d)` is the ISO week *number*. Weeks 52/53 and 1 can belong to the neighbouring ISO year, and there is no `ISOYEAR`
   yet, so group by `YEAR` plus `WEEK` only away from the year turn.
+- **Bucketing a calculated date:** a calculated `DATEADD` / `DATE` dimension groups **per distinct value**; it is never date-bucketed or given a date part
+  (a calculated dimension takes no `datePart` or `dateBucket`, E12). To group by month or year, use `YEAR` / `MONTH` / `QUARTER` of it (a number dimension).
 - **Roles:** the number functions give a row-level number (a measure or dimension, `SUM(WEEK([o.placed]))` works); `DATEADD` and `DATE`
   give a date dimension (`MIN`/`MAX` take it); `IF(MONTH([o.placed]) = 12, …)` and `DATEDIFF(…) > 30` work.
 - Not built: `TODAY()` / `NOW()` (a result would change between runs, which breaks caching), `MAKEDATE`, fiscal calendars and fiscal year start,
-  `ISOYEAR`, `DATENAME` / `DATETRUNC`, a unit, amount or part that is a field or parameter, `DATEPARSE` with a format, time zones.
+  `ISOYEAR`, date-part bucketing of a calculated date, `DATENAME` / `DATETRUNC`, a unit, amount or part that is a field or parameter, `DATEPARSE` with a format, time zones.
 
 ### Roles and types
 
