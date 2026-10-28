@@ -46,15 +46,18 @@ first is the **left** side): **Inner — only rows that match**, **Keep all rows
 for the other side's fields (they read "—"). The badge says it in words ("1:N · left", "· right", "· full").
 Saved per relationship (`joinType`); a workbook without one, or with an unknown one, reads as inner.
 
-**Preserved-side rule.** The relationship fixes the preserved table, not the query's base: the plan walks
-from the view's base table outward, and a link crossed second-to-first swaps `left`/`right`
-(`planJoinType`), so "keep all rows of customers" keeps customers whichever table the view starts from.
-(Before right/full, a left link kept the base side; now it always keeps its first table.)
+**Preserved-side rule.** A link saved with the new dialog is *fixed* (`joinFixed`): it keeps the table it names
+whichever table the view starts from — the plan walks outward from the base, and a fixed link crossed
+second-to-first swaps `left`/`right` (`planJoinType`). **Older links** (a workbook saved before this, `joinFixed`
+absent, type `left`) keep the old rule: `LEFT JOIN`, keeping the base-side table in either direction. The edit
+dialog shows such a link as "Keep rows of the base table (older link)"; saving the dialog with any choice
+(including re-saving that one) is what fixes it: picking "Keep all rows of {table}" converts it, and picking the
+older-link choice leaves it legacy. Right and full are always fixed.
 
 **Behaviours chosen** (see [clickhouse-integration.md](../reference/clickhouse-integration.md#worksheet-query-queryasync)):
 a filter on a table whose rows were NULL-extended drops those rows (the outer join then acts inner for that
 filter); `count()` counts NULL-extended rows; a NULL join key never matches, so such rows appear unmatched
-on both sides of a full join. **Refused (400):** a top-N filter on a view with a right or full join, and
+on both sides of a full join. Grouping by the *non-preserved* table's key shows NULL for the unmatched rows. **Refused (400):** a top-N filter on a view with a right or full join, and
 right/full joins on a connection whose server refuses settings (`join_use_nulls` is required). Approximate
 mode reads such a view exactly (no sample).
 
