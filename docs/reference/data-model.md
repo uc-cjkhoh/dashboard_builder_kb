@@ -104,8 +104,8 @@ letting only checked keys be endpoints ([relationships.md](../features/relations
 
 - **Pill:** `{ db, table, column, category, role?, agg?, datePart?, tableCalc?, choices? }` — `datePart` (P26) on a date dimension, `tableCalc` (P27) `{ type, along, window? }` on a measure, `choices` (P40) the slot's alternative fields. `role` overrides the type default
   (`'dimension'` → `GROUP BY`; `'measure'` → aggregated with `agg` ∈ `aggsFor(category)`:
-  `sum/avg/min/max/count/countDistinct` for numbers, `count/countDistinct/min/max` for text and dates,
-  `count/countDistinct` otherwise). `roleOf(f)` in `dashboards.js` resolves it.
+  `sum/avg/min/max/median/stddev/variance/count/countDistinct/countNonNull/attr` for numbers,
+  `count/countDistinct/countNonNull/min/max/attr` for text and dates, `count/countDistinct/countNonNull` otherwise). `roleOf(f)` in `dashboards.js` resolves it.
 - **Filter:** `op` ∈ `= != > >= < <= in between`; `value` is a string for the scalar operators, `values`
   a string list for `in` (≤ 500) and a `[from, to]` pair for `between`. `category` decides how the value
   is parsed ([worksheet-encodings.md](../features/worksheet-encodings.md#filters)); it is back-filled from

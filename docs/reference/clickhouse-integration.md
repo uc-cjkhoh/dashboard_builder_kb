@@ -213,6 +213,14 @@ wrap (`toFloat64(UInt32 2) - toFloat64(Decimal 10.00)` is `-8`), and a NULL oper
 | `COUNT` → `countNonNull` | `count(x)` | `sum(if(isNotNull(x), t0._sample_factor, 0))` | `count(x)` |
 | `AVG`, `MIN`, `MAX` → `avg`, `min`, `max` | as written | unscaled | as written |
 | `COUNTD` → `countDistinct` | `uniqExact(x)` | `uniq(x)` | `uniq(x)` |
+| `MEDIAN`, `PERCENTILE` → `median`, `percentile` | `quantileExact(0.5)(x)`, `quantileExact({p:Float64})(x)` | unscaled | as exact |
+| `STDDEV`, `VARIANCE` → `stddev`, `variance` | `if(count(x) < 2, NULL, stddevSamp(x))` (`varSamp`) | unscaled | as exact |
+| `ATTR` → `attr` | `if(uniqExact(x) = 1, min(x), NULL)` | unscaled | as exact |
+
+The last four are never scaled: on a sampled table they run over the sample (estimates). The percentile fraction is the only user value: bound (`AggNode.P`, `Float64`, validated 0..1;
+ClickHouse accepts a query parameter as a parametric aggregate's argument); function names are fixed text.
+`count(x) < 2` keeps a one-value group NULL (bare `stddevSamp` is NaN, which JSON cannot carry); `min(x)`,
+not `any`, ignores NULL rows in `attr`. `PlainRankSql` (Top-N) uses the same writer.
 
 **Top-N rank, exact vs approximate.** A rank by a plain measure is always exact and unscaled
 (`PlainRankSql` — only the order matters). A rank by a calculation compiles through the table above, so in
@@ -222,8 +230,9 @@ aligned on purpose. Likewise `approx.distinct` in the response ignores a `COUNTD
 
 ### Shared defences in the builders
 
-- **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct/countNonNull` (`countDistinct` →
-  `uniqExact`, `countNonNull` → `count(col)`); calculation node kinds, operators and functions
+- **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct/countNonNull/median/stddev/variance/attr`
+  (`countDistinct` → `uniqExact`, `countNonNull` → `count(col)`; `median`, `stddev`, `variance` need a numeric
+  column, `attr` any column but a compound one; no plain `percentile` — it needs a fraction); calculation node kinds, operators and functions
   (`CalcValidator`, `CalcCatalog`);
   operators `= != > >= < <= in notin between` (plus text match and top-N).
 - **Typed bound values** (`FilterValues.Coerce`, `ClickHouse/RequestValidation.cs`): the value is

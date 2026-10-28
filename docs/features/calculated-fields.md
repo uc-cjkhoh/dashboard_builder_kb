@@ -11,13 +11,22 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
 ## Formulas
 
 - Grammar: `expr := term (("+"|"-") term)*`; `term := factor (("*"|"/") factor)*`;
-  `factor := "-" factor | number | "(" expr ")" | aggregate | ref`; `aggregate := FN "(" expr ")"`;
+  `factor := "-" factor | number | "(" expr ")" | aggregate | ref`; `aggregate := FN "(" expr ")" | "PERCENTILE" "(" expr "," number ")"`;
   `ref := "[" name "]"`. Numbers are decimals with an optional exponent (`12`, `1.5`, `.5`, `1.`, `1e3`; no
-  `1,000`; a non-finite `1e999` is an error). `SUM`/`AVG` take a number; `MIN`/`MAX` a number, date or text;
-  `COUNT`/`COUNTD` any type; arithmetic needs numbers; an aggregate inside an aggregate is refused. A field of
+  `1,000`; a non-finite `1e999` is an error). `SUM`/`AVG`/`MEDIAN`/`STDDEV`/`VARIANCE`/`PERCENTILE` take a number; `MIN`/`MAX` a number, date or text;
+  `COUNT`/`COUNTD`/`ATTR` any type; arithmetic needs numbers; an aggregate inside an aggregate is refused. A field of
   a category other than numeric, text, temporal or boolean can't be used.
 - Operators `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`,
-  `COUNTD` (function names are case-insensitive). The function table lives in `calc-types.js`.
+  `COUNTD`, `MEDIAN`, `STDDEV`, `VARIANCE`, `PERCENTILE`, `ATTR` (function names are case-insensitive). The
+  function table lives in `calc-types.js`.
+- **Statistics:** `MEDIAN([f])` is the exact middle value of the non-NULL values (for an even count, the upper
+  of the two middle values — no interpolation); `PERCENTILE([f], p)` is the exact order statistic at fraction `p`
+  (a **literal** number 0..1, not a field or a formula; `PERCENTILE([f], 0.5)` equals `MEDIAN`, 0 the minimum, 1
+  the maximum); `STDDEV` and `VARIANCE` are the **sample** statistics (n − 1). `STDDEV`/`VARIANCE` of fewer than
+  two values, and `MEDIAN`/`PERCENTILE` of no value, are empty (NULL, shown as a dash), never 0 or NaN.
+- **`ATTR([f])`** (Tableau's attribute) is the value when the group has exactly one distinct non-NULL value,
+  else empty (NULL — Tableau shows `*`; here a dash). NULLs are ignored, so a group of `p, p, NULL` is `p`.
+  It keeps the field's type, so a text field stays a text measure (table, text and KPI views only).
 - A **reference** is `[table.column]` (`[db.table.column]` when two databases hold the same table name) or
   `[Name]` for another calculation. Calculations can refer to calculations; the browser expands every
   reference into one tree before sending, so the server never sees a calculation name.

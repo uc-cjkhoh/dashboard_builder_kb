@@ -136,9 +136,12 @@ Controller: `Features/Dashboard/QueryController.cs`. All `POST` with a JSON body
 **Measure values** (`QueryResultRow.Values`, `IReadOnlyList<object?>`) are a JSON number, a **string**
 (`min` / `max` of a text or date column), or `null` (SQL NULL, or `NaN` / `∞` from an aggregate over no
 rows). Consumers must not assume numbers — [worksheet-charts.md](../features/worksheet-charts.md#chart-types).
-`sum` and `avg` on a non-numeric column are a 400 (`count` / `countDistinct` / `countNonNull` / `min` /
-`max` are fine on any column). Aggregations: `count` (rows), `sum`, `avg`, `min`, `max`, `countDistinct`,
-`countNonNull` (non-NULL values of the column, `count(col)`).
+`sum`, `avg`, `median`, `stddev` and `variance` on a non-numeric column are a 400 (`count` / `countDistinct` /
+`countNonNull` / `min` / `max` are fine on any column; `attr` on any but a compound column). Aggregations:
+`count` (rows), `sum`, `avg`, `min`, `max`, `countDistinct`, `countNonNull` (non-NULL values of the column,
+`count(col)`), `median` (exact middle value), `stddev` / `variance` (sample; NULL for fewer than two values),
+`attr` (the one distinct non-NULL value of the group, else NULL). The result column is named
+`<agg> <column>` (`median amount`, `attr status`).
 
 ### Calculated fields (`calc`)
 
@@ -154,8 +157,10 @@ reaches the server or SQL.
 ```
 
 - **Nodes** (discriminator `k`): `field` (`db`, `table`, `column`), `num` (`v`, finite), `un` (`op: "-"`),
-  `bin` (`op` ∈ `+ - * /`), `agg` (`fn` ∈ `sum avg min max count countd`, `arg`). `count` counts non-NULL
-  values (as `countNonNull`), `countd` distinct values. Every referenced table must already be in the
+  `bin` (`op` ∈ `+ - * /`), `agg` (`fn` ∈ `sum avg min max count countd median stddev variance percentile attr`, `arg`, and `p` for
+  `percentile`). `count` counts non-NULL values (as `countNonNull`), `countd` distinct values. `p` is a finite
+  number 0..1, required for `percentile` and refused on every other function (400 at `….calc.p`, "PERCENTILE
+  needs a fraction between 0 and 1." / "SUM takes no fraction."); it is bound as a `Float64` parameter. Every referenced table must already be in the
   query (`from` or a join) — else the usual 400 "Field references a table not in the query."
 - **With `calc` set**, `db` / `table` / `column` are not used in SQL, but they must still be present
   (an absent `column` is a binding 400, "'measures[0].column' is required.") — send empty strings when there
@@ -163,8 +168,9 @@ reaches the server or SQL.
   echoed in the result's `rowDimensions` / `measures`; an empty `column` falls back to `"calculation"`.
 - **Role rules** (400, field `….calc`): an **aggregate** tree (contains an `agg` node) is valid only as a
   measure or `topBy` with `agg` absent or `null`; a **row-level** tree as a measure / `topBy` needs `agg` ∈
-  `sum`, `avg`, `min`, `max`, `countDistinct`, `countNonNull` (`count` of rows is rejected — it would
-  ignore the calculation; `sum` / `avg` need a number); a row-level tree is valid as a dimension, an
+  `sum`, `avg`, `min`, `max`, `countDistinct`, `countNonNull`, `median`, `stddev`, `variance`, `attr` (`count` of
+  rows is rejected — it would ignore the calculation; `percentile` has no row-level form; `sum` / `avg` /
+  `median` / `stddev` / `variance` need a number); a row-level tree is valid as a dimension, an
   aggregate one there is a 400; a calculated dimension takes no `datePart` (`….datePart`) and is never
   date-grouped by `dateBucket`.
 - **Tree errors** name the node: `measures[0].calc.arg`, `rowDimensions[1].calc.l.r` — e.g. "SUM needs a

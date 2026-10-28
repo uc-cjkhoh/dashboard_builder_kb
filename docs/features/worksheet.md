@@ -93,9 +93,12 @@ to Columns).
 - **Role** defaults from type (numeric → measure, else dimension) and is convertible per pill: `Σ`
   turns a dimension into a measure, `#` a measure into a dimension. `roleOf(f)` resolves it.
 - **Aggregation** dropdown on measure pills offers only what the column's type supports
-  (`aggsFor` in `filter-rules.js`): `sum/avg/min/max/count/countDistinct` for numbers;
-  `count/countDistinct/min/max` for text **and dates**; `count/countDistinct` otherwise (boolean,
-  compound). `countDistinct` maps to ClickHouse `uniqExact`. Changing a pill's role to a type that
+  (`aggsFor` in `filter-rules.js`): `sum/avg/min/max/median/stddev/variance/count/countDistinct/countNonNull/attr`
+  for numbers; `count/countDistinct/countNonNull/min/max/attr` for text **and dates**;
+  `count/countDistinct/countNonNull` otherwise (boolean, compound). `countDistinct` maps to ClickHouse `uniqExact`;
+  `median` is the exact middle value, `stddev` / `variance` the sample statistics (empty for one value), `attr`
+  the single value of a group or empty ([calculated-fields.md](calculated-fields.md#formulas)). A percentile
+  of a plain field is a calculated field, `PERCENTILE([t.c], 0.9)`. Changing a pill's role to a type that
   doesn't support its aggregation resets it and says so. The server rejects `sum` / `avg` on a
   non-numeric column with a 400.
 - Pill tints: dimension blue (`--dim-*`), measure teal (`--meas-*`), Marks encodings violet (`--enc-*`).
@@ -250,7 +253,7 @@ touching the query, except Top-N:
 | Target | KPI: a goal for the first measure — progress bar + "% of target" ([worksheet-encodings.md](worksheet-encodings.md#date-range--comparison)); Gauge: the arc's maximum; Bullet: the target tick and bands ([worksheet-charts.md](worksheet-charts.md#chart-types)) |
 | A fall is good | with a Date range comparison: a fall shows as good (`--up`), a rise as bad |
 | Conditional formatting | Table / Text: colour scale, data bars and rules per measure ([Table view](#table-view--a-true-rows--columns-crosstab)) |
-| Approximate (faster) | `uniq` distinct counts and, on a table with a sampling key, a 10% sample scaled up — labelled on the info line ([D25](../reference/decisions.md#d25--a-short-lived-server-result-cache-and-approximate-mode)) |
+| Approximate (faster) | `uniq` distinct counts and, on a table with a sampling key, a 10% sample scaled up (counts and sums only; median, percentile, standard deviation, variance and ATTR are computed on the sample and not scaled, so they are estimates) — labelled on the info line ([D25](../reference/decisions.md#d25--a-short-lived-server-result-cache-and-approximate-mode)) |
 | Fit | Standard / Fit width / Fit height / Entire view (also in the ⋯ sheet actions) |
 | Group dates | charts: group the first date/time dimension by Auto (default — exact when ≤ 400 values, else the finest grain with ≤ 400 buckets), Exact, Hour, Day, Week, Month, Quarter or Year. A grouped axis isn't click-filterable |
 | Legend | show / position |
