@@ -17,6 +17,12 @@ the shared state in `Core/store.js`. Why one shared model:
   listener sits on the strip (`#tabs`), not the label — every switch rebuilds the strip, so a label-level
   listener would lose the double-click.
 - The close icon (`.tab__close`, `aria-label` "Close <name>") closes a dashboard — with a confirm dialog when it holds content.
+- The duplicate icon (`.tab__dup`, `aria-label` "Duplicate <name>") copies the worksheet: `store.duplicateDashboard` deep-copies the sheet
+  (shelves, calculated-field pills, filters, marks, format, chart type) and resets the transient state — selection cleared, drill back at
+  its first level, pages at the first member (members reload) — and the copy has no undo history. It is named `<name> copy`, then `<name> copy 2`, …
+  (a copy of a copy reuses the base name; trimmed to 60 characters), inserted right after the source and made active. At 50 worksheets
+  it toasts "A workbook holds at most 50 worksheets." and adds nothing. The naming, limit check and sheet copy are pure
+  (`Tabs/duplicate-model.js`). The copy is saved with the workbook like any tab.
 - The active tab carries `aria-current`.
 
 ## How views switch

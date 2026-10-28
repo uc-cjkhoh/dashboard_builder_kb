@@ -21,6 +21,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Relations/relations.js` | join-key connectors, links, cardinality — [relationships.md](../features/relationships.md) |
 | `Relations/relation-rules.js` | pure: `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked |
 | `Tabs/tabs.js` | Data Model tab + dashboard tabs — [tabs.md](../features/tabs.md) |
+| `Tabs/duplicate-model.js` | pure: duplicate-worksheet naming, limit check, sheet copy (node-tested) |
 | `Dashboard/dashboards.js` | the worksheet: field pane, shelves, toolbar, plan, render — [worksheet.md](../features/worksheet.md) |
 | `Dashboard/chart.js` | the only ECharts adapter — [worksheet-charts.md](../features/worksheet-charts.md#rendering--the-echarts-adapter) |
 | `Dashboard/contrast.js` | pure: WCAG `luminance`, `contrastRatio`, `pickInk` (treemap label ink) |
