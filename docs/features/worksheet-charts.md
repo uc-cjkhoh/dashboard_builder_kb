@@ -38,7 +38,7 @@ no rows returns `null`. Only **Table, Text and KPI** can show a string value; an
 a hint ("Min/Max of a text or date field shows as Table, Text or KPI — switch the chart type, or use
 Count."). Null values render as "—".
 
-All six P36 types run on the ordinary `/api/query` result (`renderP36` in `dashboards.js`; builders in
+All six P36 types run on the ordinary `/api/query` result (`renderP36` in `render-special.js`; builders in
 `chart.js`, pure helpers `waterfallSteps`, `niceMax`, `multiplesGrid` unit-tested). Waterfall scrolls like a
 bar chart; Bullet grows down the left; Funnel, Gauge, Sankey and Small multiples always fit the pane. They
 aren't click-to-filter targets.
@@ -106,7 +106,7 @@ Format → **Line style** (Line, Area, Combo; also the dashed comparison lines, 
 ## Query paths
 
 - **Standard types** (bar … treemap, KPI, table) all use the one bounded `POST /api/query`; heatmap and
-  treemap pivot its 2-dimension result client-side (`renderHeatmap` / `renderTreemap`).
+  treemap pivot its 2-dimension result client-side (`renderHeatmap` / `renderTreemap` in `render-special.js`; pivots in `result-model.js`).
 - **Histogram and box plot** are single-table shapes with their own endpoints
   (`POST …/histogram`, `…/boxplot`). They bypass `buildPlan` (`runStatChart`) and read the first
   numeric field. Bins default 20; the server rejects a count outside 1..100.
@@ -117,7 +117,7 @@ Format → **Line style** (Line, Area, Combo; also the dashed comparison lines, 
 - **Apache ECharts** is vendored at `Features/Core/vendor/echarts.min.js` and loaded as a classic
   global script **before** the module graph ([D13](../reference/decisions.md#d13--charting-via-self-hosted-apache-echarts-svg-renderer-themed-from-tokens)).
 - **`chart.js` is the only module that touches ECharts.** `renderChart(container, spec)` maps a result
-  to an option and manages **one live instance** (SVG renderer); `disposeChart()` tears it down before
+  to an option and manages **one live instance per container** (SVG renderer; the palette order and member colours are per-container state too); `disposeChart()` tears it down before
   every repaint. It dispatches by family: `buildCartesian`, `buildPie`, `buildScatter`,
   `buildScatterShapes`, `buildHeatmap`, `buildTreemap`, `buildHistogram`, `buildBoxplot`.
 - **Table, Text and KPI are native DOM**, not ECharts.

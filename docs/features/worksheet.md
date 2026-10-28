@@ -1,7 +1,7 @@
 # Dashboard worksheet — shelves, crosstab, sort, format, joins
 
 Each dashboard tab **is one Tableau-style worksheet**: a field pane beside shelves you drag fields onto,
-and a view that renders the result. Code: `Features/Dashboard/` (`dashboards.js`, `worksheet-view.js`, `sheet-plan.js`, `filter-rules.js`,
+and a view that renders the result. Code: `Features/Dashboard/` (`dashboards.js`, `worksheet-view.js`, `worksheet-render.js`, `render-*.js`, `sheet-plan.js`, `result-model.js`, `filter-rules.js`,
 `toolbar-rules.js`, `query-runner.js`, `chart.js`, `contrast.js`, `_Dashboard.cshtml`, `dashboard.css`,
 `QueryController.cs`). Companion docs: chart types and export in
 [worksheet-charts.md](worksheet-charts.md); Marks, Filters, Date range & comparison, click-to-filter, Drill and Pages in
@@ -156,7 +156,12 @@ measures → the server adds an implicit `count()`. The canonical dimension/meas
 
 Every shelf, encoding or format change calls `commit()` → `dashboard:changed` → `runChart()`, which runs the
 editor's one worksheet view (`createWorksheetView` in `worksheet-view.js`, on `#ws-chart`; the view owns its
-gate, table pager and fresh flag, and `chart.js` keeps one chart per container). What happens next
+gate, table pager and fresh flag, and `chart.js` keeps one chart per container, with its own palette order and
+member colours). The view draws through `renderWorksheet` (`worksheet-render.js`); the editor only hands it
+its state as options — `interactive`, `onSelect`, `onDrill`, `onLegend`, `legendFocus`, the tooltip and
+member-colour panels' hooks, `statusBar`, `notices` — so a view with `interactive: false` draws the same marks
+with no selection, drill, legend click or status line (the widget case; the editor's own view is interactive).
+What happens next
 (`Dashboard/query-runner.js`, unit-tested in `tests/js/`):
 
 1. **Latest wins.** `runChart` takes a ticket from a gate; starting a new query **aborts** the previous
@@ -210,7 +215,7 @@ removed, then `buildRowsRequest` (`Rows/rows-model.js`) turns it into the reques
 
 ## Table view — a true Rows × Columns crosstab
 
-`crosstabTable()` pivots the flat grouped rows client-side (ClickHouse has no `PIVOT`):
+`crosstabTable()` (`render-table.js`) pivots the flat grouped rows client-side (ClickHouse has no `PIVOT`):
 
 - Row-shelf dimensions form the nested **left stub** (rowSpan-merged repeats); Column-shelf dimensions
   the nested **top header** (colSpan); measures are the **cell values**.

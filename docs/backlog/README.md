@@ -30,12 +30,11 @@ Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5
 
 ## Recommended order
 
-1. Dashboard runtime (P24a) — every dashboard item needs an instantiable worksheet view.
-2. Dashboards as a tab kind (P24b) — the largest structural gap and the Release 0 exit.
-3. Cross-widget filtering (P24c) — the last Release 0 dashboard gap, and it needs widgets.
-4. Small P0 gaps (cast, duplicate sheet, tooltip editor, per-member colour, exclude) — each is independent and closes Release 0.
-5. Calculation aggregations, logic, text and date functions — the engine's tree path already exists.
-6. Parameters in formulas and table-calculation polish — both build on the function set.
+1. Dashboards as a tab kind (P24b) — the largest structural gap and the Release 0 exit; the widget runtime (P24a) is built, and its store rename lands inside this item.
+2. Cross-widget filtering (P24c) — the last Release 0 dashboard gap, and it needs widgets.
+3. Small P0 gaps (cast, duplicate sheet, tooltip editor, per-member colour, exclude) — each is independent and closes Release 0.
+4. Calculation aggregations, logic, text and date functions — the engine's tree path already exists.
+5. Parameters in formulas and table-calculation polish — both build on the function set.
 7. Data-model breadth (joins, union, groups, split, hierarchies) — independent of the engine; join types come before P43.
 8. Chart gaps and formatting — client-only, ordered by priority.
 9. Actions, navigation, P38 and P39 remainder — need dashboards and, for sets, P25.
