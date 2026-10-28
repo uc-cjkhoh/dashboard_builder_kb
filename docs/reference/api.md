@@ -51,7 +51,7 @@ the client mirrors them in `Core/validate.js` `LIMITS` and checks first, so a va
 | Measures | ≤ 10 (calculated measures count toward it, as calculated dimensions count toward the 12) |
 | Joins | ≤ 10 |
 | Filters per query | **≤ 20** (`MaxFilters`). The client allows 8 user filters, and the worksheet appends the shared filters (≤ 4), the drill path (≤ 5), the page, the selection and the date range |
-| Member colours (client-side only) | ≤ 100 coloured members per field, ≤ 20 fields per sheet, member key ≤ 100 characters, colour `#rrggbb` (`LIMITS.memberColors` / `memberColorFields` / `memberKey`) |
+| Member colours (client-side only) | ≤ 100 coloured members per field, ≤ 20 fields per sheet, member key ≤ 100 characters, colour `#rrggbb` (`LIMITS.memberColors` / `memberColorFields` / `memberField` / `memberKey`) |
 | `in` / `notin` values | ≤ 500; a filter value ≤ 1000 characters |
 | `limit` (rows) | 1–1000, default 100 (`MaxRowsLimit`, mirrored by `LIMITS.viewRows`); ≤ 200 `columns` (`MaxRowsColumns`); a cell ≤ 1000 characters (`MaxCellLength`, cut not rejected); rows × columns ≤ 50,000 (`MaxRowsCells`, `LIMITS.viewCells`) |
 | `limit` (query, box plot, distinct) | 1–5000 (default 50; [D24](decisions.md#d24--showing-all-data-bounded-requests-paging-other-date-grouping)) · CSV export 1–100,000 · distinct 1–1000 (default 200) |

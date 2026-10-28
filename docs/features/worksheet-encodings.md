@@ -206,16 +206,15 @@ panel says so. Rules: `Dashboard/period-model.js` (unit-tested).
 - **Member colours.** Format → **Edit member colours** lists the members the drawn chart colours by a discrete
   field — Colour-shelf members on bar/stacked/line/area, pie / donut slices, and the categories of a
   single-measure bar with *Colour by category*. Each row offers 24 fixed swatches (the three workbook palettes'
-  light colours) and **Reset**; the list stays open across redraws and is disabled until such a chart is drawn.
+  light colours) and **Reset**, with **Reset all for this field** below the list (it also removes colours of members no longer in the view, which still count toward the cap); the list stays open across redraws and is disabled until such a chart is drawn.
   Legend clicks are unchanged (highlight / select).
 - **Stored** as `sheet.memberColors = { "<table>.<column>": { "<member>": "#rrggbb" } }` — workbook data, so a
   validated hex, not a token. The member key is the raw value as text (`null` has its own key), so a colour
   survives a change of number/date format. Limits ([api.md](../reference/api.md#limits), client-side only):
-  100 members per field, 20 fields, member key ≤ 100 chars; invalid entries are dropped on import and reported.
+  100 members per field, 20 fields, member key ≤ 100 chars, field key ≤ 200 (maps are null-prototype, so a member named `constructor` or `__proto__` is an ordinary key; an imported `__proto__` is dropped and reported); invalid entries are dropped on import and reported.
   Old workbooks load with `{}`. A calculated field cannot be member-coloured; scatter groups and treemap / funnel
   are not yet wired.
-- **Contrast.** User colours are not adjusted; label inks still come from `Dashboard/contrast.js` (`pickInk`,
-  `inkFor`), which picks the higher-contrast ink for any hex.
+- **Contrast.** User colours are not adjusted; label inks still come from `Dashboard/contrast.js` (`pickInk`), which picks the higher-contrast ink for any hex.
 - **Reverse palette** (`format.paletteReverse`, boolean, default off) reverses the eight categorical colours' order
   and swaps the continuous ramp's ends (heatmap and scatter colour). Member colours are unaffected.
 - Pure logic: `Dashboard/colour-model.js` (`setMemberColor`, `cleanMemberColors`, `colorsByName`,
