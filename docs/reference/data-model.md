@@ -99,10 +99,12 @@ letting only checked keys be endpoints ([relationships.md](../features/relations
   period: null | { db, table, column, category: "temporal", preset, from, to, compare, compareFrom, compareTo },
   marks:  { size, label, detail: [], tooltip: [], shape, path, angle },
   format: { numberFormat, decimals, currencySymbol, dateFormat, topN, dateBucket, target, downIsGood, conditional, legend,
-            dataLabels, colorByDimension, xTitle, yTitle }
+            dataLabels, colorByDimension, xTitle, yTitle,
+            lineStyle, heatmapShape, targetMeasure }
 }
 ```
 
+- **Format chart settings:** `lineStyle` `straight` | `step` | `jump` (default `straight`); `heatmapShape` `square` | `circle` (default `square`); `targetMeasure` null or a shelf-measure index 1–19 (the bullet's target field; null = the fixed `target`). An unknown value is reset with a workbook import issue; a workbook without them opens unchanged.
 - **Pill:** `{ db, table, column, category, role?, agg?, datePart?, tableCalc?, choices? }` — `datePart` (P26) on a date dimension, `tableCalc` (P27) `{ type, along, window? }` on a measure, `choices` (P40) the slot's alternative fields. `role` overrides the type default
   (`'dimension'` → `GROUP BY`; `'measure'` → aggregated with `agg` ∈ `aggsFor(category)`:
   `sum/avg/min/max/median/stddev/variance/count/countDistinct/countNonNull/attr` for numbers,

@@ -4,10 +4,8 @@ Format: [README.md](README.md#how-to-read-an-entry). Chart types are in [workshe
 
 ## Chart gaps
 
-- **Line styles and date axis** (IDs: T03-05, T03-07; priority P1) — Open: step and jump lines (lines are always straight, on a category axis). Partial: discrete and truncated date parts exist; no continuous time axis or gap filling. Needs: none.
-- **Circle heatmap** (IDs: T03-10; priority P1) — Open: the heatmap is coloured squares only. Needs: none.
+- **Continuous time axis and gap filling** (IDs: T03-07; priority P1) — Open: lines sit on a category axis, so unevenly spaced dates are drawn evenly and missing periods are not filled. Partial: discrete and truncated date parts exist; no continuous time axis or gap filling. Needs: none.
 - **Dual axis and axis synchronisation** (IDs: T03-16, T03-17; priority P1) — Open: synchronise axes (the combo right axis is independent). Partial: dual axis exists only as the bar-plus-line combo, not as layered marks of any type. Needs: none.
-- **Bullet target from a field** (IDs: T03-12; priority P1) — partial: the bullet chart takes its target from Format, not from a field. Needs: none.
 - **Gantt and Density marks** (IDs: T03-14; priority P2) — Open: no interval marks, no density surface. Needs: none.
 - **Colour, size and shape beyond current marks** (IDs: T03-19, T03-20, T03-21, T01-21; priority P1) — Partial: continuous colour works on scatter, heatmap and table only, single hue, no palette or range editing; shape works on scatter only; size on scatter bubbles only. Needs: none.
 - **Palette editing, diverging colour and member-colour gaps** (IDs: T01-20 and T03-24 remainder, T03-33 remainder; priority P1) — Open: diverging continuous colour on heatmap and scatter (diverging exists only in table scales); custom palette editing and a free-hex picker (only 24 fixed swatches); member colours cannot be set from the legend (a legend click highlights), cannot be assigned to scatter groups, treemap or funnel members, and are unsupported for calculated fields; no stepped or reversed-per-field ramps. Needs: none.

@@ -44,6 +44,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/history.js` | pure (P23): per-dashboard undo / redo stacks of sheet snapshots (50) |
 | `Dashboard/table-calc.js` | pure (P27): `computeCalc` (running / % of total / difference / % difference / rank / moving average, partitioned by the other shelf), `applyTableCalcs` |
 | `Dashboard/cast-model.js` | pure (T02-34): `castChoices`, `effectiveCategory`, `withCasts` (adds `cast` to the plan), `syncCastCategories`, `statCastProblem` |
+| `Dashboard/line-style-model.js` / `heatmap-model.js` / `bullet-model.js` | pure: `LINE_STYLE_CHOICES`, `lineStep`, `linesTakeStyle`; `HEATMAP_SHAPE_CHOICES`, `circleSize`; `targetChoices`, `bulletTargets`, `bandsFor` — [worksheet-charts.md](../features/worksheet-charts.md) |
 | `Dashboard/date-parts.js` | pure (P26): `DATE_PART_CHOICES`, `stepPart` (+ / −), `partLabel`, `labelParts` |
 | `Dashboard/tooltip-model.js` | pure (T01-19): `parseTooltip`, `checkTooltipText`, `tooltipHtml` (escaped parts only), `tooltipCatalog` — [worksheet-encodings.md](../features/worksheet-encodings.md#tooltip-text-t01-19) |
 | `Dashboard/period-model.js` | pure (P35): `resolveRange` / `compareRange` (presets, previous period, last year), `rangeFilter`, `rangeLabel`, `changeOf` / `toneOf` / `pctText`, `alignCompare`, `targetProgress` — [worksheet-encodings.md](../features/worksheet-encodings.md#date-range--comparison) |

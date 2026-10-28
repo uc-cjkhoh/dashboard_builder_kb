@@ -19,14 +19,14 @@ Y) — add a second measure"), shared with Show Me so the two never disagree.
 | Scatter | 2 measures (X, Y) | Size, continuous Colour and Shape apply |
 | Combo (dual-axis) | 2 measures | 1st as bars, 2nd as a right-axis line; always vertical |
 | Square / Circle | as scatter | scatter builder with a symbol override |
-| Heatmap | 2 dimensions + 1 measure | single-hue token colour scale |
+| Heatmap | 2 dimensions + 1 measure | single-hue token colour scale; Format → **Shape** **Squares** (cells) or **Circles** (scatter marks on the same category grid, 80 % of the smaller cell side, 6–48 px, coloured by the same value legend; labels, tooltip and Reverse palette behave as for squares, the cell banding is dropped) |
 | Treemap | 1–2 dimensions + 1 measure | nested rectangles sized by the measure |
 | Histogram | 1 numeric field | equal-width bins; own endpoint |
 | Box plot | 1 numeric field (+ optional group dimension) | min/Q1/median/Q3/max; own endpoint |
 | Waterfall | ≥1 dimension + 1 measure | each value a change from the running total, then a **Total** bar; increases `--chart-cat-1`, decreases `--chart-cat-6`, total muted — legend-named and each step labelled with its sign; may run below zero (drawn as a custom series) |
 | Funnel | 1 dimension + 1 measure | stages widest first, each labelled with value and % of the first; label ink picked per stage |
 | Gauge | 1 measure, no dimension | arc from 0 to Format → **Target** (else a round maximum); value and "% of target" written in the middle |
-| Bullet | 1 measure (+ ≤1 dimension) + Format → **Target** | per member: the value bar over three bands (< 50 %, 50–75 %, 75–100 % of target) with the target tick; without a target, a hint |
+| Bullet | 1 measure (+ ≤1 dimension), + an optional 2nd measure, + Format → **Target** | per member: the value bar over three bands (< 50 %, 50–75 %, 75–100 % of target) with the target tick. Format → **Target field** picks the view's second (or later) measure as the target, so each member has its own target (the tooltip shows it and the %); with no field the fixed **Target** number applies to every member; with neither, a hint |
 | Sankey (flow) | 2 dimensions + 1 measure | flows from the first dimension's members to the second's; non-positive flows skipped; a member on both sides stays two nodes |
 | Small multiples | 2 dimensions + ≥1 measure | a mini line chart per member of the **first** dimension (at most 24 panels, with a notice), the second along each x axis, one shared y scale |
 | KPI | measures | big number per measure; with a dimension, an inline SVG **sparkline** of the trend |
@@ -98,7 +98,7 @@ unit-tested); over a cut-off result the info line says "Analytics use only the r
 
 `chartOrientation(sheet)` follows Tableau: a **dimension on Rows** (and none on Columns) renders
 **horizontal** bars (category down the left, first on top); a dimension on Columns renders vertical
-(the default). `buildCartesian` swaps the axes for bar/stacked/line/area. Row-dimension facets / small
+(the default). Format → **Line style** (Line, Area, Combo; also the dashed comparison lines, not the trend line) draws **Straight** (point to point), **Step** (each value holds until the next category, then changes) or **Jump** (the value changes half-way between two categories) — `format.lineStyle`, ECharts `step` `end` / `middle` via `lineStep`. `buildCartesian` swaps the axes for bar/stacked/line/area. Row-dimension facets / small
 multiples are not supported.
 
 ## Query paths
