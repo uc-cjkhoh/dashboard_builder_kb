@@ -44,7 +44,7 @@ Each widget is an `<article class="board-widget">` with a header — title, then
 
 | Kind | Header | Body |
 |---|---|---|
-| **Worksheet** | the worksheet's name; **Edit** (switches to that worksheet's tab) and **Remove** | a non-interactive worksheet view of the worksheet's sheet |
+| **Worksheet** | the worksheet's name; **Edit** (switches to that worksheet's tab) and **Remove** | a select-only worksheet view (`interactive: "select"`) of the worksheet's sheet |
 | **Text** | the heading (empty reads "Text"); **Edit** (inline, below) and **Remove** | the body text, plain (`textContent`; line breaks kept and wrapped, no Markdown, no markup) |
 
 Every widget is a focusable group (`tabindex="0"`, `role="group"`, `aria-roledescription="dashboard widget"`, `aria-label` its name,
@@ -106,7 +106,7 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
 
 - **One selection per dashboard**, `{ db, table, column, value, label, sourceWidgetId }`, taken from the clicked widget's primary
   dimension (the current level on a drill hierarchy — a widget never drills). Another click replaces it; the same mark in the same
-  widget clears it. Null marks, date-grouped or date-part first keys, calculated primary dimensions (the worksheet's refusal),
+  widget clears it. A NULL member or the "Other" group (the status line says why — never `= NULL`), date-grouped or date-part first keys, calculated primary dimensions (the worksheet's refusal), and **a field with a data type cast (it can't start a cross-filter)**,
   table and the types click-to-filter excludes ([worksheet-encodings.md](worksheet-encodings.md#click-to-filter)) select nothing.
   Legend clicks only highlight.
 - **Targets** (every other worksheet widget, a second copy of the same worksheet included) add one bound `=` filter through the
@@ -116,7 +116,7 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
   histogram or box plot (single-table endpoints) says it doesn't take it. Casts follow the plan as in the editor. Filter budget: 8 own
   + 4 shared + 5 drill + 1 page + 1 period + 1 selection = the server's 20.
 - **The source** is never filtered. It fades the other marks (bar, stacked, pie, donut; the other types have no per-mark style) and
-  shows an outline and a header badge "Selected: <label>" (text and icon, so the fade is never the only cue).
+  keeps **every** mark of the selected value (two row dimensions give several) at full strength, and shows an outline and a header badge "Selected: <label>" (text and icon, so the fade is never the only cue).
 - **The chip** in the bar reads "Filtering by orders.region = EU" with a labelled clear button (focus returns to the source widget);
   the polite status line announces set and clear. The value is data: always `textContent`.
 - **Transient:** in memory only, never in the workbook or autosave. It ends when the dashboard stops being shown (tab switch,
