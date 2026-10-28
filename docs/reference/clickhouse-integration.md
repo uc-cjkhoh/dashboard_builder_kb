@@ -184,7 +184,7 @@ becomes SQL in four steps; no formula text and no literal is ever written into S
    expression. Logic nodes: `(a = b)` (also `!= < <= > >=`), `and(a, b)`, `or(a, b)`, `not(a)`, `if(c, a, b)` (IF/IIF),
    `multiIf(c1, a1, …, else)` (CASE; `NULL` last without an ELSE), `ifNull(a, b)`, `isNull(a)`; a NULL condition is
    not true (IF takes its else, CASE the next WHEN — pinned by the live smoke). A boolean-typed calculation is
-   wrapped in `toBool(...)` so group keys read `true` / `false` (`FormatKey`).
+   wrapped in `toBool(...)`; as a dimension, `toString(...)` of it so keys read `true` / `false` (a plain Bool field keeps `True` / `False`).
 
 **One compile, one parameter list.** Each calculation is compiled once; its SQL string is reused in the
 page, the total (`count()` over the grouped query), the Other statement and inline in the Top-N

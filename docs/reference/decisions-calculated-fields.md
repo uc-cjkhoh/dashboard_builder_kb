@@ -137,7 +137,8 @@ are three-valued. Chosen over "NULL is false" so `x <> 'a'` does not silently in
 ClickHouse behaves this way natively (confirmed live). Division keeps `nullIf(r, 0)`; `IFNULL`/`ZN` is the explicit
 replace-NULL tool.
 
-### D52 — Text literals are bound, length-limited, and a boolean result is `Bool`
+### D52 — Text literals are bound, length-limited; a boolean dimension reads true/false
 A text literal is a `String` parameter like every number is a `Float64`, at most 100 characters (client parser, JS
-checker and server validator alike), never in SQL text. A boolean calculation is wrapped in `toBool(...)` and group
-keys of booleans read `true`/`false` (previously `True`/`False` for a Bool field), matching how cells already read.
+checker and server validator alike), never in SQL text. A boolean calculation is wrapped in `toBool(...)`; as a
+**dimension** it groups by `toString(...)` so its keys read `true`/`false`/`null`. A plain Bool field is unchanged
+(`True`/`False`), so saved filters and member colours still match.

@@ -46,7 +46,8 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
   Precedence, loosest first: `OR`, `AND`, `NOT`, comparison, `+ -`, `* /`; `1 + 2 > 2` works unparenthesised.
 - **`AND` / `OR` / `NOT`** need booleans (a comparison, `ISNULL`, a boolean field) and give a boolean.
 - **`IF(cond, a, b)`** (also `IIF`) and **`CASE WHEN c THEN a [WHEN …] [ELSE d] END`**; the simple form
-  `CASE [f] WHEN 'x' THEN a … END` tests `[f] = 'x'`. Conditions are booleans; every THEN and the ELSE must have
+  `CASE [f] WHEN 'x' THEN a … END` tests `[f] = 'x'` (the subject is copied into every arm, so each arm costs its nodes
+  again against the node limit). Conditions are booleans; every THEN and the ELSE must have
   **one type** (number, text, date or boolean), else `All results must be the same type — … is text, not number.` at the
   offending branch. The first true WHEN wins. A CASE with no ELSE is empty (NULL) when nothing matches.
 - **`IFNULL(a, b)`** is `a`, or `b` when `a` is empty (same type); **`ZN(a)`** is `IFNULL(a, 0)`; **`ISNULL(a)`** is true
@@ -67,7 +68,7 @@ The check yields a type (number, text, date, boolean) and whether the formula is
 | Formula | Role | Used as |
 |---|---|---|
 | contains an aggregate (`SUM([a]) / SUM([b])`) | measure | aggregated by the server, no further aggregation |
-| row-level text, date or boolean (`[status] = 'open'`, `CASE … 'big' …`) | dimension | a group key; a boolean shows `true` / `false` |
+| row-level text, date or boolean (`[status] = 'open'`, `CASE … 'big' …`) | dimension | a group key; a boolean calculation shows `true` / `false` (a plain Bool field keeps `True` / `False`) |
 | row-level number | measure **or** dimension | measure sums it per row (`SUM([price] * [qty])`); dimension groups by it |
 
 Mixing an aggregate with a bare row-level field in one formula is refused by the checker with a message. An aggregate

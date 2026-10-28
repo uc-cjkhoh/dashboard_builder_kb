@@ -4,6 +4,7 @@ Built: calculated fields with `+ − * /` and `SUM`/`AVG`/`MIN`/`MAX`/`COUNT`/`C
 
 - **Percentile as a plain measure** (IDs: T04-07; priority P2) — Open: a plain measure cannot take a percentile (it needs a fraction field on the pill and a `p` on the measure); it is available as `PERCENTILE([t.c], p)` in a calculated field. Needs: none.
 - **Function help** (IDs: T04-12; priority P1) — open: the dialog autocompletes fields only; no function glossary. Needs: none.
+- **Logic functions remainder** — Open: the keyword form `IF c THEN a ELSEIF d THEN b ELSE e END`, date and boolean literals, a `NULL` literal (use `ISNULL`/`IFNULL` today), `IN`/`BETWEEN` in formulas. Needs: none.
 - **Text functions** (IDs: T04-15, T04-16, T04-17, T04-18, T04-19; priority P1) — Open: `SPLIT`, `LEFT`/`RIGHT`, `LOWER`/`UPPER`, `REPLACE`. Partial: a case-insensitive contains filter exists, not a calculated predicate. Needs: none (logic functions are built).
 - **Date functions** (IDs: T04-21, T04-22, T04-23; priority P1–P2) — Open: date difference and arithmetic. Partial: week is Monday-truncated only (no ISO week or fiscal calendar); display format and date parts exist but no string-to-date parsing. Needs: none.
 - **Parameters in formulas** (IDs: T04-29, T04-31, T04-32; priority P1–P2) — Open: a calculation cannot read a parameter; a reference line cannot bind one. Partial: parameter step size is stored but the dialog always saves none. Needs: none.
