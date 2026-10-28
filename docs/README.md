@@ -45,6 +45,7 @@ matching whatever you're touching.
 |---|---|
 | [operations/development.md](operations/development.md) | Where the code is, build / run / test, throwaway ClickHouse |
 | [operations/deployment.md](operations/deployment.md) | Live service, Apache proxy, release flow, ops commands |
+| [operations/source-table-guidance.md](operations/source-table-guidance.md) | Sorting key, partitioning, types, join keys and sampling for the ClickHouse tables the app reads |
 | `operations/credentials.local.md` | SSH + ClickHouse logins — git-ignored, local only |
 
 ## design/ — the design system
