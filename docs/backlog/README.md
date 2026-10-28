@@ -14,6 +14,7 @@ The only place for work not yet built, grouped by topic. Built behaviour lives i
 | [platform.md](platform.md) | persistence, P45, P44, open risks, workbook additions, decisions to settle |
 | [journeys-and-releases.md](journeys-and-releases.md) | journeys and acceptance scenarios, releases R0–R3, quality targets |
 | [out-of-scope.md](out-of-scope.md) | what is deliberately excluded, and why (not backlog) |
+| [blocked.md](blocked.md) | work that could not be built, and why |
 | [p24-dashboards-spec.md](p24-dashboards-spec.md) | design spec for P24a and P24b |
 | [p24c-cross-widget-filtering.md](p24c-cross-widget-filtering.md), [p24c-plan.md](p24c-plan.md) | design spec and task plan for P24c |
 
