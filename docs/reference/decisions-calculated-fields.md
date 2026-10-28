@@ -1,6 +1,6 @@
 # Decisions — calculated fields
 
-Continues [decisions.md](decisions.md) (D1–D25). Decisions D26–D66. Behaviour: [calculated-fields.md](../features/calculated-fields.md).
+Continues [decisions.md](decisions.md) (D1–D25). Decisions D26–D68. Behaviour: [calculated-fields.md](../features/calculated-fields.md).
 Edit an entry in place when it changes.
 
 ### D26 — A calculated pill is a normal pill with an id
@@ -207,3 +207,21 @@ E15 state with its formula untouched (so re-adding the name heals it). Refusing 
 rewriting would hide the damage. The scan is textual (`[@Name]` anywhere in the formula, including inside a text literal), so it can only over-ask.
 A rename rewrites `[@Old]` the way a calculation rename rewrites `[Old]`. The reference line stores a parameter id (`analytics.ref.param`) and
 falls back to its own value when the parameter is gone (the workbook open also unlinks it, with a note).
+
+### D67 — Member labels are display-side, keyed by the raw value, positioned by the query's key order
+A member label (`memberAliases`, a field setting) changes only the text drawn: the query, groups, sort order, filters, drill path values, selections and
+member colours keep the raw value, so a label can never change what a click filters or which rows a group holds, and two members with one label stay two
+marks. The one place that draws categories is `renderWorksheet`: it wraps the category formatter as `fmtCat(key, position)` (`withMemberLabels`),
+where `position` is the key's index in `planDims(sheet).keyOrder`, so two fields can label the same raw value differently; callers that pass no position get
+the plain format. Maps are null-prototype and read by own key (a member can be `__proto__`); the per-field cap is 200 labels, a label 80 characters, a key 100.
+A selection chip's text is baked when the member is picked (like the drill label) and does not follow a later edit. **Rejected:** rewriting the result's keys before drawing
+(clicks, Path sorting and the colour-split pivot would see labels; equal labels would merge rows); one global value → label map (no per-field meaning).
+
+### D68 — A group field is a calculation whose tree is generated, not parsed
+Groups are stored on a calculation (`group` beside an empty `formula`), not in `fieldMeta`: a field can have several group sets, each becomes a pill, a chip and
+a value other formulas can use, and the workbook, undo, pills and query path already know calculations. `compileCalculation` builds the tree directly
+(`groupTree`), so formula text (500 characters) does not bound it; the engine's 200-node limit does: 2 + 4 nodes per member = 49 members in all.
+It is refused at edit time with a plain message (`checkGroupSpec`), never at query time, and the server independently refuses a larger tree. Members are `str` nodes
+(bound), the OR is balanced (depth ≤ 12), and ELSE is the field itself: an ungrouped member keeps its value and NULL stays NULL (a CASE condition on NULL is false). Only text fields
+(the engine compares text with text); the remainder is in the backlog. **Rejected:** generated formula text (the 500-character limit would allow about 25 members and a
+round trip through quoting); a new server `in` node (no gain until groups need more than 49 members).

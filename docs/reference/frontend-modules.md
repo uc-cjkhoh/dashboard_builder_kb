@@ -64,6 +64,8 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/tooltip-model.js` | pure (T01-19): `parseTooltip`, `checkTooltipText`, `tooltipHtml` (escaped parts only), `tooltipCatalog` — [worksheet-encodings.md](../features/worksheet-encodings.md#tooltip-text-t01-19) |
 | `Dashboard/period-model.js` | pure (P35): `resolveRange` / `compareRange` (presets, previous period, last year), `rangeFilter`, `rangeLabel`, `changeOf` / `toneOf` / `pctText`, `alignCompare`, `targetProgress` — [worksheet-encodings.md](../features/worksheet-encodings.md#date-range--comparison) |
 | `Dashboard/conditional-model.js` | pure (P37): `measureKey`, `extentOf`, `midpointOf`, `scaleColors` (tint + contrast-picked ink), `barGeometry`, `matchRule`, `isActive` — [worksheet.md](../features/worksheet.md#table-view--a-true-rows--columns-crosstab) |
+| `Dashboard/member-labels.js` | pure (T02-29): `aliasOf` / `setAlias` / `cleanMemberAliases` (null-prototype maps, own keys), `keyAliasMaps`, `withMemberLabels` (position-aware category formatter), `labelOf`, `memberRows`, `aliasesFromInputs` — [worksheet.md](../features/worksheet.md) |
+| `Dashboard/member-labels-dialog.js` | DOM: `openMemberLabelsDialog` — the field ⋯ menu's Edit member labels… |
 | `Dashboard/colour-model.js` | pure (T01-20, T03-33): member colour map validation / set / clear / lookup, palette and ramp reversal, swatches — [worksheet-encodings.md](../features/worksheet-encodings.md#member-colours-and-palette-order-t01-20-t03-33) |
 | `Dashboard/scale-model.js` | pure: `scalePlan` (limit / paging / Other / date grouping per chart type), `withOther`, `tableProgress`, `needsNextPage`, `bucketNotice` — [worksheet.md](../features/worksheet.md#table-view--a-true-rows--columns-crosstab) |
 | `Dashboard/chart-fit.js` | pure: `chartFit(spec, width, height)` — the room a chart's category axes need (min width/height, label rotation, zoom window), `markCount` (canvas vs SVG) — [worksheet-charts.md](../features/worksheet-charts.md#rendering--the-echarts-adapter) |
@@ -80,6 +82,8 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Calc/calc-dialog-model.js` | pure: `evaluateDraft` (validation), `chipFor` (role chip), `suggest` (`[` field, `[@` parameter and function-name autocomplete) |
 | `Calc/function-help.js` | pure: the function glossary `FUNCTION_HELP` (derived from `calc-types.js` + the logic keywords), `searchHelp`, `groupHelp`, `functionItems` — the dialog's Functions panel and name autocomplete |
 | `Calc/calc-pane-model.js` | pure: `paneState` (group items), `deleteCalcPlan`, `showUseAs` / session Use-as choice, `normaliseFormula` |
+| `Calc/group-model.js` | pure (T02-30): `groupTree` (CASE / OR-of-equals tree), `groupCost`, `MAX_GROUP_MEMBERS`, `checkGroupSpec`, `cleanGroupSpec`, `groupCalcName`, member ↔ group assignments — [calculated-fields.md](../features/calculated-fields.md#group-fields) |
+| `Calc/group-dialog.js` | DOM: `openGroupDialog({ field, fieldName, calcId?, load })` — the Group… dialog |
 | `Calc/calc-dialog.js` | DOM: `openCalcDialog(id?)` — the New / Edit calculated-field dialog |
 | `Calc/eval-order.js` | pure: `describeEvaluation` (the six stages), `evaluationInput(sheet, …)` — [calculated-fields.md](../features/calculated-fields.md#how-this-is-computed) |
 | `Calc/explain-popover.js` | DOM: `explainControl(getInput, { signal })` — the view bar's "How this is computed" button and popover |

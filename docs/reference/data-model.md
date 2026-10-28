@@ -172,7 +172,7 @@ What [workbook.md](../features/workbook.md) saves to `localStorage` and exports 
                                     | { kind: "text", heading, body, x, y, w, h } ] } ],
   tabs:          [ { kind: "worksheet" | "dashboard", index } ],   // the strip's order, ≤ 50
   active:        { kind, index } | null    // null = Data Model
-  fields:        { "db.table.column": { alias?, agg?, hidden? } }   // P28 — ≤ 2000
+  fields:        { "db.table.column": { alias?, agg?, hidden?, cast?, memberAliases?: { [rawValue]: label } } }   // P28, T02-34, T02-29 — ≤ 2000
   parameters:    [{ id: "prm<n>", name, type: number|text|date, value, allowed: { kind: any|list|range, list?, min?, max?, step? } }]   // P32 — ≤ 20
   bookmarks:     [{ name, worksheet: index | null, worksheetName, sheet, sharedFilters, savedAt }]   // P39 — ≤ 30
   sharedFilters: Filter[]                  // P40 — ≤ 4, applied by every worksheet where their table is in the view

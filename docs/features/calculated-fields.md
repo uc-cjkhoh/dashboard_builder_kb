@@ -211,8 +211,8 @@ count limit) and one chip per calculation showing its name, role chip (`Aggregat
 
 | Action | Behaviour |
 |---|---|
-| Edit… | opens the dialog |
-| Duplicate | adds `<name> copy` (`copy 2` … when taken) with the same formula and Use-as choice |
+| Edit… | opens the dialog (a group field: the Group dialog, [below](#group-fields)) |
+| Duplicate | adds `<name> copy` (`copy 2` … when taken) with the same formula (or groups) and Use-as choice |
 | Delete… | refused with a toast `Used by calculation 'B'.` while another calculation refers to it; when worksheets or shared Top-N filters use it, a confirm says how many, and Delete clears its pills (and a sort or Top-N ranking aimed at it) from them; otherwise it deletes at once |
 
 A calculation that can't be computed (its field left the model, an imported cycle) shows an **Error**
@@ -265,6 +265,19 @@ no longer exists) is kept, not dropped. Any sheet that uses it (a pill, or a Top
 slot and for CSV export, `Calculation 'X' can't be computed: <reason>`. Fix or delete the calculation and
 the view recomputes. A sheet whose only pills are field-less calculations shows the hint "Add a field from
 a table — a calculation with no field in it has nothing to group or total." (no query).
+
+## Group fields
+
+A field's **⋯** menu has **Group…** (T02-30): a text column's members go into named groups, saved as a **group calculation**
+(`{ id, name: "region (groups)", formula: "", group: { field, groups: [{ name, members }] } }`). The dialog (`group-dialog.js`;
+rules in `group-model.js`) names the field, adds groups (≤ 50, 1–80 characters, unique) and puts each member (the field's top 200,
+from the distinct-values read; NULL is skipped) in a group or leaves it **not grouped**. It is an ordinary calculated dimension afterwards: a
+chip in the pane (Edit… reopens this dialog, Duplicate copies the groups), a pill, a text value in formulas (`[region (groups)]`). Number, date and true/false
+fields are refused (the engine compares text only). Compile: `compileCalculation` takes the tree straight from `groupTree`, never formula text, so
+the 500-character limit does not apply: `CASE WHEN member = 'a' OR … THEN 'Group' … ELSE <the field> END`, one WHEN per group, an
+OR (balanced, so shallow) of `=` against `str` literals — bound parameters, nothing quoted into SQL. A member in no group keeps its own value;
+NULL stays NULL. The **node limit (200)** bounds it: 2 + 4 nodes per member, so **49 members across all groups** (`MAX_GROUP_MEMBERS`; the dialog says
+so and disables Save, and the server refuses a bigger tree too). A group-calculation pill takes no click-selection (E12), and member labels do not apply to it. Code: `Calc/group-model.js`.
 
 ## Non-null count
 

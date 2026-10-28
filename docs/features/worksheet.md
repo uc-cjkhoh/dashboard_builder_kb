@@ -57,6 +57,21 @@ support a cast field yet (a hint, no request); the filter value picker still lis
 View data leaves out filters and a selected mark on a cast field (it reads stored values) and says so.
 A value that fails to convert is NULL, so filters on it drop it (`notin` keeps it). Code: `Dashboard/cast-model.js`, `ClickHouse/TypeCast.cs`.
 
+**Member labels** (T02-29): **Edit member labels…** (not offered on date fields) opens a dialog listing the field's
+top members (the bounded distinct-values read, first 200) with one label input each (≤ 80 characters; blank or
+equal to the value = no label; **Reset all**; Enter moves down the list, Esc discards). The map is the field setting
+`memberAliases` (`{ [rawValue]: label }`, ≤ 200 entries, key ≤ 100 characters; `Dashboard/member-labels.js`). It is
+**display only**: queries, grouping, sorting, filters, drill and selections keep the raw value. A label replaces the
+text drawn for a member on category axes, pie slices and legends, colour-split series, heatmap / treemap / Sankey /
+small-multiples labels, tooltips (default head, the template's `<table.column>` field and Tooltip fields, all still
+HTML-escaped), crosstab headers and the Label mark, each **by key position** (`withMemberLabels`: two fields may label
+the same raw value differently). A filter card / `in` picker shows the label with the raw value as secondary text and
+title, and ticking a member stores the raw value. A click-selection chip, the legend selection chip, the drill
+breadcrumb and the dashboard filter chip name the member by its label when it is picked (the stored label text does
+not follow a later edit). Member colours stay keyed by the raw member. Maps are null-prototype objects read with own-key
+checks, so a member called `constructor` or `__proto__` is an ordinary member. Not labelled: calculated or group
+dimensions, date-part keys, NULL, Pages, the Rows data dialog.
+
 Drag a field onto a shelf or tool, or press its **`＋`** (keyboard path: measures go to Rows, dimensions
 to Columns).
 
