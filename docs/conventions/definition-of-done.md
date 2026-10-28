@@ -44,3 +44,12 @@ A change is done only when every box holds.
 - [ ] **Always merge to `main` after tests pass or an error is fixed.** Once the suites above are green
       (or a failing test or error has been fixed and they are green again), merge the work branch into
       `main` locally — no waiting for a separate go-ahead — then run the suites again on the merged result.
+
+## Status dashboard
+
+- [ ] **Update the backlog status dashboard after every update to the backlog or to what is built** (an
+      item added, changed, moved or finished; a requirement's state changing). The dashboard is the
+      artifact <https://claude.ai/artifact/C5S1oYsan7vXMbfpaS5USA>, listed in
+      [backlog/README.md](../backlog/README.md). Refresh it by recomputing the counts from
+      `docs/backlog/`, re-uploading the changed data files to the artifact, and updating each
+      dataset's `url` and `updated` time — do not republish the page itself.

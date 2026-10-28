@@ -17,6 +17,8 @@ The only place for work not yet built, grouped by topic. Built behaviour lives i
 | [p24-dashboards-spec.md](p24-dashboards-spec.md) | design spec for P24a and P24b |
 | [p24c-cross-widget-filtering.md](p24c-cross-widget-filtering.md), [p24c-plan.md](p24c-plan.md) | design spec and task plan for P24c |
 
+Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5S1oYsan7vXMbfpaS5USA). Update it after every backlog update ([definition-of-done.md](../conventions/definition-of-done.md#status-dashboard)).
+
 ## How to read an entry
 
 `- **name** (IDs: Txx-nn; priority P0–P3; effort S/M/L if stated) — open: nothing implements it, or partial: what exists and what is missing. Needs: dependency or none. Spec: file.`
