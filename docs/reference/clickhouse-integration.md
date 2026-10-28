@@ -122,6 +122,14 @@ bound parameter or a validated integer (out-of-range limits are rejected before 
   `toHour` (discrete) via `DatePartExpression` — a whitelist, `hour` on a `Date` column becomes `day`,
   `hourOfDay` needs a time; a part on a non-date column is a 400. A dimension with its own part is left
   out of the chart-wide `dateBucket`. Tests: `DatePartTests`.
+- **Type cast** (T02-34, `cast` on a dimension, measure, filter or `topBy`): `text` | `number` | `date`,
+  validated in `RequestRules` (unknown word or a cast on a calculation = 400 at `….cast`) and applied in
+  `TypeCast.Apply` after the catalog-checked, quoted column: to text `toString`; text → number
+  `toFloat64OrNull(toString(x))`; boolean → number `toFloat64`; text → date `parseDateTimeBestEffortOrNull(toString(x))`;
+  an already-matching type is left alone, and number/date → date or date → number is a 400. Only `OrNull`
+  variants, so bad data is NULL. The cast column's category (and "not a `Date`") then drives the aggregation
+  check, filter value coercion and date parts. Join keys, histogram, box plot and distinct values ignore it.
+  Tests: `TypeCastTests`, `tests/live/cast-smoke.mjs`.
 - **Date grouping** (`dateBucket`): the first temporal dimension is wrapped in one whitelisted function —
   `toStartOfHour` / `toDate` / `toMonday` / `toStartOfMonth` / `toStartOfQuarter` / `toStartOfYear`
   (`BucketExpression`; a Date column never goes finer than day). `auto` first reads `uniq`, `min`, `max`

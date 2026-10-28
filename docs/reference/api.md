@@ -60,6 +60,7 @@ the client mirrors them in `Core/validate.js` `LIMITS` and checks first, so a va
 | `calc` tree (dimension, measure, `topBy`) | depth ≤ 12 (root is depth 1), ≤ 200 nodes (`CalcLimits.MaxDepth`, `MaxNodes`); the label in `column` ≤ 60 characters (`CalcLimits.MaxName`, error at `….column`). Formula ≤ 500 characters and ≤ 20 calculations per workbook are client-only (`CalcLimits.MaxFormula`, `MaxCalcs`; mirrored by `LIMITS.calcFormula`, `LIMITS.calculations`, `LIMITS.calcName` in `validate.js` and by `CALC_LIMITS` in `Features/Calc/calc-types.js`) — the server never sees formula text |
 | `fresh`, `approximate` (query) | booleans — skip the result cache; approximate mode ([D25](decisions.md#d25--a-short-lived-server-result-cache-and-approximate-mode)). The response adds `cached` and `approx: { distinct, sample }` |
 | `datePart` (a row / column dimension) | `auto`, `exact`, `year`, `quarter`, `month`, `week`, `day`, `hour`, `quarterOfYear`, `monthOfYear`, `dayOfWeek`, `hourOfDay`; date columns only |
+| `cast` (dimension, measure, filter, `topBy`) | `text`, `number`, `date`; the column is read as that type (NULL where a value doesn't convert). Unknown word, a calculation, or a pairing with no safe conversion (date → number, number → date) is a 400 at `….cast` / the field |
 | `dateBucket` (query) | `auto`, `hour`, `day`, `week`, `month`, `quarter`, `year` |
 | Histogram `buckets` | 1–100 |
 | `sort.column` | must be a generated `k{n}` / `v{n}` alias for this request |

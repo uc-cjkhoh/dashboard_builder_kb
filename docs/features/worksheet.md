@@ -45,6 +45,17 @@ uses the real, catalog-validated column; renamed fields read in italics), **Defa
 fields: the aggregation a new measure pill starts with) and **Hide from the field list** (with a **Show
 hidden (n)** toggle). Settings are per workbook (`fields` in the file; store `fieldMeta`).
 
+**Data type cast** (T02-34): the ⋯ menu also has **Data type** — *Original*, or the casts that make sense
+for the column: text → Number / Date, number or date → Text, boolean → Text / Number, anything else → Text
+(`castChoices`; the setting is `cast`: `text` | `number` | `date`). The server converts in the query, so the
+field groups, aggregates, filters and ranks (Top-N) as its new type; a value that doesn't fit becomes empty
+(NULL), never an error. The field takes the new category everywhere: it moves to Dimensions / Measures, offers
+that type's aggregations, operators and date parts, and shows an **as Number** tag (icon + text) on its chip
+and pills. Changing a cast re-categorises the pills, filters, drill levels and shared filters that read the field
+(`syncCastCategories`). Calculated fields have their own type and take no cast. Histogram and box plot don't
+support a cast field yet (a hint, no request); the filter value picker still lists the stored text.
+Code: `Dashboard/cast-model.js`, `ClickHouse/TypeCast.cs`.
+
 Drag a field onto a shelf or tool, or press its **`＋`** (keyboard path: measures go to Rows, dimensions
 to Columns).
 

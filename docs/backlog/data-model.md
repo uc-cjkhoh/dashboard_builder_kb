@@ -2,7 +2,6 @@
 
 Today relationships are logical, inner or left, one equality pair each ([relationships.md](../features/relationships.md)). Entries are in dependency order. A union compiles to `UNION ALL` with explicit column alignment; unpivot and split compile to ClickHouse array and string functions; source tables are never altered, and null, empty string, zero, invalid date and non-finite number stay distinct. Format: [README.md](README.md#how-to-read-an-entry).
 
-- **Type cast** (IDs: T02-34; priority P0) — Open: only role convert and date parts; no cast between string, number and date. Needs: server cast whitelist.
 - **Right and full joins** (IDs: T02-12, T02-13; priority P1) — Open: join type is validated to inner or left only. Needs: validation, SQL builder and dialog changes.
 - **Compound joins and key suggestion** (IDs: T02-14, T02-15; priority P2) — Open: manual single-pair equality only; no matching-name suggestion. Needs: none.
 - **Union** (IDs: T02-16; priority P1) — Open: no manual union of tables. Needs: a bounded server query shape.
