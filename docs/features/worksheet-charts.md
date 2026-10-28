@@ -17,7 +17,7 @@ Y) — add a second measure"), shared with Show Me so the two never disagree.
 | Line / Area | ≥1 measure | Path can reorder vertices |
 | Pie / Donut | 1 dimension + 1 measure | legend-labelled slices; measure → angle |
 | Scatter | 2 measures (X, Y) | Size, continuous Colour and Shape apply |
-| Combo (dual-axis) | 2 measures | 1st as bars, 2nd as a right-axis line; always vertical |
+| Combo (dual-axis) | 2 measures | 1st as bars, the rest on a right axis as a line (Format → **Right-axis marks**: Line, Bars or Area); always vertical; Format → **Synchronise axes** shares one range |
 | Square / Circle | as scatter | scatter builder with a symbol override |
 | Heatmap | 2 dimensions + 1 measure | single-hue token colour scale; Format → **Shape** **Squares** (cells) or **Circles** (scatter marks on the same category grid, 80 % of the smaller cell side, 6–48 px, re-sized with the pane; cells without a value draw no circle; coloured by the same value legend; labels, tooltip and Reverse palette behave as for squares, the cell banding is dropped) |
 | Treemap | 1–2 dimensions + 1 measure | nested rectangles sized by the measure |
@@ -102,6 +102,14 @@ unit-tested); over a cut-off result the info line says "Analytics use only the r
 multiples are not supported.
 
 Format → **Line style** (Line, Area, Combo; also the dashed comparison lines, not the trend line) draws **Straight** (point to point), **Step** (each value holds until the next category, then changes) or **Step (centred)** (stored as `jump`; a connected step that changes half-way between two categories) — `format.lineStyle`, ECharts `step` `end` / `middle` via `lineStep`.
+
+### Dual axis, marker size and mark borders
+
+- **Right-axis marks** (combo only; `format.secondaryType` `line` | `bar` | `area`, default `line`) draws every measure after the first on the right axis as lines, bars or a filled line. Bars on the right axis sit beside the left bars; the line style applies to line and area.
+- **Synchronise axes** (combo only; `format.syncAxes`, default off) gives both value axes the same `min` / `max`: the range of all the measures' finite values, always including 0 (the first measure is bars), rounded out to a 1 / 2 / 5 × 10ⁿ step (`syncRange` in `Dashboard/axis-sync-model.js`; null, NaN and non-numbers are skipped; no data leaves the axes automatic; all zero gives 0–1). Off, each axis scales on its own. Layered marks of any type beyond a single bar-plus-secondary combo are not built.
+- **Marker size (px)** (`format.markerSize`: blank = automatic, else a whole number 4–40; out-of-range input is refused with a toast, never clamped) sets the point size of scatter / square / circle marks (default 14, shape scatter 12) when no Size field is mapped, line / area / combo markers (default 8, which also keeps the dots on a long series), and the circle heatmap (otherwise 80 % of the cell). It is not offered on squares heatmaps or on charts without point marks.
+- **Mark border** (`format.markBorder` `none` | `thin` (1 px) | `thick` (3 px), default `none`) strokes bars (also stacked, combo, colour-by-category and the Other bar), scatter / shape points, line markers and heatmap cells in the muted chart ink (`--chart-muted`, so it follows light and dark). `none` keeps today's look (the heatmap keeps its surface-coloured hairline); a chosen border replaces that hairline. Pure mapping in `Dashboard/mark-style-model.js` (`markBorder`, `markerSizeOr`, `markerSizeError`).
+- Both Format cards and the dashboard widgets read the same sheet `format`, so non-interactive views draw the options too. Browser check: `tests/live/charts2-ui.mjs`.
 
 ## Query paths
 
