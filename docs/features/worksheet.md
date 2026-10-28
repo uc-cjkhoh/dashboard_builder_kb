@@ -54,7 +54,8 @@ that type's aggregations, operators and date parts, and shows an **as Number** t
 and pills. Changing a cast re-categorises the pills, filters, drill levels and shared filters that read the field
 (`syncCastCategories`). Calculated fields have their own type and take no cast. Histogram and box plot don't
 support a cast field yet (a hint, no request); the filter value picker still lists the stored text.
-Code: `Dashboard/cast-model.js`, `ClickHouse/TypeCast.cs`.
+View data leaves out filters and a selected mark on a cast field (it reads stored values) and says so.
+A value that fails to convert is NULL, so filters on it drop it (`notin` keeps it). Code: `Dashboard/cast-model.js`, `ClickHouse/TypeCast.cs`.
 
 Drag a field onto a shelf or tool, or press its **`＋`** (keyboard path: measures go to Rows, dimensions
 to Columns).

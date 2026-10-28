@@ -125,9 +125,10 @@ bound parameter or a validated integer (out-of-range limits are rejected before 
 - **Type cast** (T02-34, `cast` on a dimension, measure, filter or `topBy`): `text` | `number` | `date`,
   validated in `RequestRules` (unknown word or a cast on a calculation = 400 at `….cast`) and applied in
   `TypeCast.Apply` after the catalog-checked, quoted column: to text `toString`; text → number
-  `toFloat64OrNull(toString(x))`; boolean → number `toFloat64`; text → date `parseDateTimeBestEffortOrNull(toString(x))`;
+  `toFloat64OrNull(toString(x))` kept only when finite (`inf`, `nan`, `1e999` are NULL; padded, comma and hex text are NULL too); boolean → number `toFloat64`; text → date `parseDateTimeBestEffortOrNull(toString(x))`, but text of only digits, spaces, signs, commas and dots is NULL unless it is `YYYYMMDD` (best-effort would read `10` as the 10th of the *current* month);
   an already-matching type is left alone, and number/date → date or date → number is a 400. Only `OrNull`
-  variants, so bad data is NULL. The cast column's category (and "not a `Date`") then drives the aggregation
+  variants, so bad data is NULL. A filter on a cast column compares those values, so a row that failed to
+  convert is NULL: `=`, `!=`, `>`, `between` and `in` drop it, `notin` keeps it. The cast column's category (and "not a `Date`") then drives the aggregation
   check, filter value coercion and date parts. Join keys, histogram, box plot and distinct values ignore it.
   Tests: `TypeCastTests`, `tests/live/cast-smoke.mjs`.
 - **Date grouping** (`dateBucket`): the first temporal dimension is wrapped in one whitelisted function —
