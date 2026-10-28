@@ -1,6 +1,6 @@
 # P24a + P24b — Worksheet views and multi-worksheet dashboards
 
-A proposal, not yet built. P24 is split into four phases; this spec covers the first two:
+P24 is split into four phases; this spec covers the first two. 24a (the widget runtime) and the data side of 24b (tab kinds, store, limits, validation, workbook format v2) are built — [tabs.md](../features/tabs.md), [data-model.md](../reference/data-model.md#tabs-and-dashboards), [workbook.md](../features/workbook.md), [D61](../reference/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2). Still to build is the board (stages 2–3, [backlog/dashboards.md](dashboards.md)):
 
 | Phase | What | This spec |
 |---|---|---|
@@ -40,7 +40,7 @@ only 24c / 24d, and this file and its plan are deleted
 | B5 | **Approach A** — extract `createWorksheetView`; `chart.js` keyed by container | one renderer (rejected: a second simplified renderer — drifts; iframes — N app copies, cross-frame 24c) |
 | B6 | Internal rename: today's `dashboard` (= one worksheet) becomes `worksheet` in code | "dashboard" must mean only the new kind |
 
-Recorded as **D26** in [decisions.md](../reference/decisions.md) when built; it answers O3.
+Recorded as [D61](../reference/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2) (it answers O3 for the data side).
 
 ## 24a — Widget runtime (no visible change)
 
@@ -69,34 +69,14 @@ Recorded as **D26** in [decisions.md](../reference/decisions.md) when built; it 
 - **Stays in `dashboards.js`** (the worksheet editor): field pane, shelves, Marks tools, view bar, Show Me,
   Format / Analytics cards, status chips, undo / redo, full screen and print of one worksheet. It creates
   one interactive view for its chart pane.
-- **Store rename:** `dashboards` → `worksheets`, `activeDashboard` → `activeWorksheet`,
-  `createDashboard` → `createWorksheet`, `dashboard:changed` → `worksheet:changed`, ids `ws#N`.
 - **Done when (24a):** the app behaves exactly as before — both suites and the P22 browser checks green —
   and two views can render into two containers at once (browser check).
 
 ## 24b — Dashboards
 
-### Tabs
+### Tabs, store and workbook format
 
-- Strip: **Data Model** (pinned), then worksheet and dashboard tabs in one ordered list, each with its kind's
-  icon (`chart-bar` / a new `dashboard` icon) and its kind in the accessible name.
-- **+** opens a menu: *New worksheet* / *New dashboard*. Default names "Worksheet N" / "Dashboard N".
-- `LIMITS.dashboards` (50) is renamed `LIMITS.tabs` and covers both kinds; it is enforced at creation (a toast
-  says why) as well as on import.
-- Closing a **worksheet** used by dashboards: the confirm names them ("Used on: Sales overview, Ops") and its
-  widgets are removed from them. Closing a dashboard never touches its worksheets.
-
-### Store
-
-```
-tabs:    [ { id: "ws#3", kind: "worksheet", name, sheet },
-           { id: "db#1", kind: "dashboard", name, widgets: [ widget, … ] }, … ]
-widget:  { id: "w#7", kind: "sheet", sheetId: "ws#3", x, y, w, h }
-       | { id: "w#8", kind: "text", heading, body, x, y, w, h }
-```
-
-`activeView` becomes `{ kind: "model" } | { kind: "worksheet", id } | { kind: "dashboard", id }`. Events:
-`dashboard:changed { id }` (new meaning: layout / text edits), `worksheet:changed { id }`.
+Built: [tabs.md](../features/tabs.md), [data-model.md](../reference/data-model.md#tabs-and-dashboards) and [workbook.md](../features/workbook.md) describe the strip, the `tabs` / widget records, `activeView`, the events, `LIMITS.tabs`, the widget limits and the import clean-up. The widget rules (`overlaps`, `firstFreeSpot`, `placeNew`, `checkPlacement`) are in `Board/board-model.js` for the canvas to use.
 
 ### Canvas
 
@@ -138,25 +118,6 @@ widget:  { id: "w#7", kind: "sheet", sheetId: "ws#3", x, y, w, h }
   bookmark action is hidden on dashboard tabs, and a bookmark whose worksheet was closed is reported, as
   today.
 
-### Workbook format v2
-
-```
-{ format, version: 2, savedAt, entities, relationships, theme, sharedFilters, fields, parameters, bookmarks,
-  worksheets: [ { name, sheet } ],
-  dashboards: [ { name, widgets: [ { kind: "sheet", sheet: <worksheet index>, x, y, w, h }
-                                 | { kind: "text", heading, body, x, y, w, h } ] } ],
-  tabs:   [ { kind: "worksheet" | "dashboard", index } ],     // strip order
-  active: { kind, index } | null }
-```
-
-- **v1 → v2** (`migrateV1`): every v1 `dashboards[i]` becomes `worksheets[i]`; no dashboards; tab order =
-  worksheet order; `active` and bookmark `dashboard` indexes carry over as worksheet indexes.
-- **Import validation** (into the existing `issues` list, never silent): a widget whose worksheet index is
-  missing is dropped; an off-grid or undersized widget is clamped; an overlapping widget is moved to the
-  first free spot; widgets past 12 and tabs past 50 are dropped — each reported.
-- **Autosave** writes key `dashboardbuilder.workbook.v2|host|port|user`; on load, if it is absent, the v1 key
-  is read and migrated (and left in place).
-
 ## Code
 
 | File | Change |
@@ -165,33 +126,25 @@ widget:  { id: "w#7", kind: "sheet", sheetId: "ws#3", x, y, w, h }
 | `Features/Dashboard/worksheet-view.js` | **new** — the query-and-render path (24a) |
 | `Features/Dashboard/sheet-plan.js` | **new** — DOM-free plan building (`buildPlan`, `planDims`, `planMeasures`, sort targets), shared by the editor and the view (24a) |
 | `Features/Dashboard/dashboards.js` | editor only; uses one view; store renames (24a) |
-| `Features/Core/store.js`, `Core/validate.js`, `Core/icons.js` | `tabs`, widgets, renames, limits, `dashboard` icon |
-| `Features/Tabs/tabs.js` | two tab kinds, **+** menu, worksheet-in-use confirm |
-| `Features/Board/` | **new** — `_Board.cshtml`, `board.js` (canvas, widgets, side panel, undo), `board.css`, `board-drag.js` (pointer move / resize), `board-layout.js` (pure: snap, collide, first free, clamp) |
-| `Features/Workbook/workbook-model.js`, `workbook.js` | v2 format, `migrateV1`, widget validation, v2 autosave key with v1 fallback |
-| `Features/Shell/Index.cshtml`, `app.js` | mount the Board feature |
-| tests | `board-layout.test.mjs` (new), `workbook-model.test.mjs` (v2 + migration), `chart.js` per-container and `worksheet-view` where pure |
+| `Features/Board/` | `_Board.cshtml`, `board-model.js` (built); **to build:** `board.js` (canvas, widgets, side panel, undo), `board.css`, `board-drag.js` (pointer move / resize), `board-layout.js` (pure: snap from pixels, collide, clamp, keyboard bounds) |
+| tests | `board-layout.test.mjs` (to build); `board-model.test.mjs`, `workbook-v2.test.mjs`, `store-tabs.test.mjs` and `tests/live/tabs-ui.mjs` exist |
 
 ## Testing
 
 - **Pure:** `board-layout` — snap from pixels, collision, first free spot, clamp, keyboard move / resize
-  bounds; `workbook-model` — v2 round trip, v1 file → v2, each import issue above, 12 / 50 caps;
+  bounds;
   `worksheet-view` plan building over the existing plan cases.
 - **Browser (headless, mocked API, light + dark):** two worksheets on one dashboard each send their own
   query and draw; one failing query leaves the other drawn; move + resize persist across reload; overlap
-  drop snaps back; Edit opens the worksheet; text widget edit + undo; a v1 autosave opens as worksheets;
-  closing a used worksheet names its dashboards; every P22 check still passes.
+  drop snaps back; Edit opens the worksheet; text widget edit + undo; every earlier browser check still passes.
 - `dotnet test` unchanged and green.
 
 ## Docs
 
-New `features/dashboards.md`; update `features/tabs.md`, `features/workbook.md`, `features/worksheet.md`
-(it is now "a worksheet tab"), `reference/data-model.md`, `reference/frontend-modules.md`,
-`reference/decisions.md` (D26, O3 answered; D16's "a dashboard is one worksheet" reworded), `ARCHITECTURE.md`,
-`design/layout.md` (the canvas), `backlog/dashboards.md` (P24 → 24c, 24d only).
+New `features/dashboards.md` (the board); extend `features/tabs.md`, `reference/frontend-modules.md`, `design/layout.md` (the canvas)
+and `ARCHITECTURE.md`; `backlog/dashboards.md` keeps only 24c, 24d once the board is built.
 
 ## Done when
 
-24a: no visible change, all suites and P22 checks green, two views render side by side. 24b: ≥ 2 worksheets
-on one dashboard, arranged and resized on the grid, re-querying independently; text widgets; v1 workbooks
-and autosaves open as worksheets; the KB updated and this file deleted.
+24b board: ≥ 2 worksheets on one dashboard, arranged and resized on the grid, re-querying independently; text widgets;
+the KB updated and this file deleted.

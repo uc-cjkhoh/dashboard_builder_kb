@@ -1,6 +1,6 @@
-# Dashboard worksheet — shelves, crosstab, sort, format, joins
+# Worksheet — shelves, crosstab, sort, format, joins
 
-Each dashboard tab **is one Tableau-style worksheet**: a field pane beside shelves you drag fields onto,
+Each worksheet tab (a dashboard tab composes worksheets — [tabs.md](tabs.md)) is one Tableau-style worksheet: a field pane beside shelves you drag fields onto,
 and a view that renders the result. Code: `Features/Dashboard/` (`dashboards.js`, `worksheet-view.js`, `worksheet-render.js`, `render-*.js`, `sheet-plan.js`, `result-model.js`, `filter-rules.js`,
 `toolbar-rules.js`, `query-runner.js`, `chart.js`, `contrast.js`, `_Dashboard.cshtml`, `dashboard.css`,
 `QueryController.cs`). Companion docs: chart types and export in
@@ -24,7 +24,7 @@ Data on top, view controls on the chart ([design/layout.md](../design/layout.md#
 
 - **Undo / Redo** — buttons beside the chart-type picker and `Ctrl/⌘+Z`, `Ctrl/⌘+Shift+Z` / `Ctrl+Y`
   (not while typing in a field). Every committed edit records the sheet as it was (50 steps per
-  dashboard, this session only); Pages autoplay doesn't record (`Dashboard/history.js`).
+  worksheet, this session only); Pages autoplay doesn't record (`Dashboard/history.js`).
 - **Sheet actions** (⋯ in the view bar): **Swap Rows and Columns**, **Clear sheet…** (confirm; keeps the
   chart type; Undo restores), **Fit** — Standard (a slot per category, the pane scrolls), Fit width, Fit
   height, Entire view (the fitted axis shares the pane; its labels thin out) — and **Show title and
@@ -154,7 +154,7 @@ measures → the server adds an implicit `count()`. The canonical dimension/meas
 
 ## Query lifecycle
 
-Every shelf, encoding or format change calls `commit()` → `dashboard:changed` → `runChart()`, which runs the
+Every shelf, encoding or format change calls `commit()` → `worksheet:changed` → `runChart()`, which runs the
 editor's one worksheet view (`createWorksheetView` in `worksheet-view.js`, on `#ws-chart`; the view owns its
 gate, table pager and fresh flag, and `chart.js` keeps one chart per container, with its own palette order and
 member colours). The view draws through `renderWorksheet` (`worksheet-render.js`); the editor only hands it
@@ -169,10 +169,10 @@ What happens next
    and any answer that arrives for a superseded ticket is dropped, so a slow old result can never
    overwrite a newer chart. Leaving for the Data Model cancels the in-flight query.
 2. **Cache before query.** The request (endpoint + full plan) is the cache key. The last **16** results
-   per dashboard are kept, so presentation-only changes (legend, decimals, axis titles, data labels,
+   per worksheet are kept, so presentation-only changes (legend, decimals, axis titles, data labels,
    colour-by-category) and paging back through the Pages shelf re-render instantly with **no** ClickHouse
    query. Anything that changes the plan (fields, filters, sort, Top-N, chart family) queries.
-3. **Refresh** (icon button) on the view bar drops the dashboard's cache and re-queries with `fresh`, so
+3. **Refresh** (icon button) on the view bar drops the worksheet's cache and re-queries with `fresh`, so
    the server's 60-second result cache is bypassed too ([D25](../reference/decisions.md#d25--a-short-lived-server-result-cache-and-approximate-mode)) —
    use it when the data in ClickHouse has changed. A result from the server cache says so on the info line.
    While a query runs, **Loading…** carries a **Cancel** button: it aborts the request (the server stops the

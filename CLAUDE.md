@@ -62,7 +62,7 @@ src/DashboardBuilder/
 │                           #   ConnectionRegistry, CsvUtil, *Models.cs
 └── Features/               # one folder per feature: controller + _View.cshtml + .css + .js
     ├── ApiControllerBase.cs  ApiErrors.cs   # RunAsync / SafeError; the one { error, field? } shape
-    ├── Shell/  Core/  Connection/  Schema/  Canvas/  Relations/  Tabs/  Dashboard/  Workbook/
+    ├── Shell/  Core/  Connection/  Schema/  Canvas/  Relations/  Tabs/  Board/  Dashboard/  Workbook/
 tests/DashboardBuilder.Tests/   # xUnit
 tests/js/                       # node --test, for the pure JS modules
 ```
@@ -113,7 +113,7 @@ Full text: [docs/conventions/golden-rules.md](docs/conventions/golden-rules.md).
 | Connection flow | `ClickHouse/ConnectionRegistry.cs`, `Features/Connection/` | [connection.md](docs/features/connection.md) |
 | Drag/drop, entity cards | `Features/Canvas/canvas.js` | [canvas.md](docs/features/canvas.md) |
 | Relationships / cardinality | `Features/Relations/relations.js` | [relationships.md](docs/features/relationships.md) |
-| Tabs | `Features/Tabs/tabs.js`, `Core/store.js` | [tabs.md](docs/features/tabs.md) |
+| Tabs / dashboard data | `Features/Tabs/tabs.js`, `Core/store.js`, `Features/Board/board-model.js` | [tabs.md](docs/features/tabs.md) |
 | Worksheet shelves / plan / crosstab | `Features/Dashboard/dashboards.js` | [worksheet.md](docs/features/worksheet.md) |
 | Chart types / rendering / export | `Features/Dashboard/chart.js` | [worksheet-charts.md](docs/features/worksheet-charts.md) |
 | Marks, filters, drill, pages | `Features/Dashboard/dashboards.js` | [worksheet-encodings.md](docs/features/worksheet-encodings.md) |

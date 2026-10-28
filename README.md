@@ -2,7 +2,7 @@
 
 An ASP.NET Core web app for **visually exploring a ClickHouse server**: connect, browse databases and
 tables, **drag tables onto a shared data model**, **draw logical relationships** between them, and
-build **Tableau-style worksheets** — one per dashboard tab — that chart data across the related tables.
+build **Tableau-style worksheets** — one per worksheet tab — that chart data across the related tables, and add dashboard tabs for arranging them.
 
 **Status:** built and running at `https://10.168.49.20:8443/dashboardbuilder`. This directory is the
 knowledge base; the source lives at `/unified/user/cj/web_development/prototype/dashboard_builder/`
@@ -14,7 +14,7 @@ knowledge base; the source lives at `/unified/user/cj/web_development/prototype/
 2. When connected, show a **dropdown of the available databases**.
 3. After a database is selected, list its **tables**.
 4. **Drag a table** onto the right-hand panel to display it in an **entity view**.
-5. Create **new subtabs** and build a dashboard from the dragged tables.
+5. Create **new worksheet and dashboard tabs** and build from the dragged tables.
 6. Every dragged table must have **one or more columns selected** to define relationships between
    tables (one-to-one, one-to-many, …).
 
@@ -26,7 +26,7 @@ knowledge base; the source lives at `/unified/user/cj/web_development/prototype/
 | Browse | database picker → searchable, draggable table chips | [schema-browser.md](docs/features/schema-browser.md) |
 | Model | entity cards with type badges and join keys | [canvas.md](docs/features/canvas.md) |
 | Relate | click-to-click links with 1:1 / 1:N / N:1 / N:M cardinality | [relationships.md](docs/features/relationships.md) |
-| Dashboards | Data Model tab + any number of dashboard tabs | [tabs.md](docs/features/tabs.md) |
+| Tabs | Data Model tab + any number of worksheet and dashboard tabs (50 in all) | [tabs.md](docs/features/tabs.md) |
 | Worksheet | Columns/Rows shelves, automatic cross-table joins, crosstab, sort, format | [worksheet.md](docs/features/worksheet.md) |
 | Charts | 23 types incl. heatmap, treemap, histogram, box plot, waterfall, funnel, gauge, bullet, Sankey, small multiples, KPI; PNG/SVG/CSV export | [worksheet-charts.md](docs/features/worksheet-charts.md) |
 | Encodings | Marks (Color, Size, Label, Detail, Tooltip, Shape, Path, Angle), Filters, click-to-filter, Drill, Pages | [worksheet-encodings.md](docs/features/worksheet-encodings.md) |
@@ -68,5 +68,5 @@ knowledge base; the source lives at `/unified/user/cj/web_development/prototype/
   files you export), not shared with other users or browsers.
 - **Not multi-user.** No accounts, auth, sharing or saved connections; one connection per browser
   session.
-- **Not a full BI suite.** No scheduled reports, alerting or multi-worksheet dashboards yet — see
+- **Not a full BI suite.** No scheduled reports, alerting or arranging worksheets on a dashboard yet — see
   the [backlog](docs/backlog/README.md).

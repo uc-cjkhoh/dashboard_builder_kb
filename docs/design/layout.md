@@ -112,7 +112,7 @@ show/hide switch for state.
   (a fixed overlay with an `Esc` handler where the API is refused); `Esc` or the button leaves; switching
   views leaves it.
 - **Print / PDF** (Export menu → **Print / PDF…**, or the browser's print): landscape, only the active
-  chart card, under a print header — the dashboard name, the Date range and applied filters, the notice
+  chart card, under a print header — the worksheet name, the Date range and applied filters, the notice
   line and the print time (`.ws-print-head`, added on `beforeprint`, removed on `afterprint`). The chart is
   drawn at 1000 × 560 for the page (`sizeChart`); a crosstab repeats its header on each page. Black on
   white (`--print-paper` / `--print-ink`) whatever the scheme.

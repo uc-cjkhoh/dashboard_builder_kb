@@ -6,7 +6,7 @@ The only place for work not yet built, grouped by topic. Built behaviour lives i
 
 | File | Holds |
 |---|---|
-| [dashboards.md](dashboards.md) | P24a–d, dashboard layout, actions, navigation, P38, P39 remainder |
+| [dashboards.md](dashboards.md) | P24b board, P24c–d, dashboard layout, actions, navigation, P38, P39 remainder |
 | [calculations.md](calculations.md) | functions the engine lacks, parameters in formulas, LOD, table-calculation polish, P25 |
 | [data-model.md](data-model.md) | joins, union, groups, split, cast, hierarchies, P43 |
 | [charts-and-formatting.md](charts-and-formatting.md) | chart, authoring, formatting and export gaps |

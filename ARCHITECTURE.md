@@ -8,7 +8,7 @@ files linked below.
 
 A single ASP.NET Core MVC app serves **one HTML page** plus a small **read-only JSON API**. The
 **browser holds all builder state**: the one shared data model (tables dragged onto the canvas + the
-relationships drawn between them) and one worksheet per dashboard tab. The **server is a thin,
+relationships drawn between them), one worksheet per worksheet tab and a board of widgets per dashboard tab. The **server is a thin,
 session-scoped proxy to ClickHouse**: it keeps the session's connection, validates every identifier
 against the live catalog, runs introspection and bounded aggregate/join queries, and returns JSON.
 **There is no application database** — ClickHouse is the only external system
@@ -21,7 +21,7 @@ Browser — one page, vanilla JS ES modules          ASP.NET Core MVC (Kestrel) 
 ┌──────────────────────────────────────┐  JSON   ┌───────────────────────────────┐  HTTPS  ┌──────────┐
 │ Sidebar: connection · db · tables    │ ──────▶ │ Connection / Schema / Query   │ ──────▶ │ 8443 TLS │
 │ Data Model: entities + relationships │         │   API controllers             │  SHOW   │ read-only│
-│ Dashboards: one worksheet each       │ ◀────── │ ClickHouseGateway + Identifier│ DESCRIBE│          │
+│ Worksheets (+ dashboards, a board)   │ ◀────── │ ClickHouseGateway + Identifier│ DESCRIBE│          │
 │   (field pane · shelves · chart)     │         │ ConnectionRegistry (session)  │ SELECT  │          │
 └──────────────────────────────────────┘         └───────────────────────────────┘ ◀────── └──────────┘
    all builder state lives here                    holds only the session connection
@@ -41,10 +41,10 @@ In production Apache httpd terminates TLS and proxies `/dashboardbuilder` to Kes
 3. **Model.** Dropping a chip fetches the table's columns (`DESCRIBE`, type-categorised) and renders an
    entity card. Ticking join keys and linking them declares a relationship with a cardinality —
    entirely client-side. → [canvas.md](docs/features/canvas.md), [relationships.md](docs/features/relationships.md)
-4. **Build a worksheet.** On a dashboard tab, fields dragged onto shelves and encodings become one plan:
+4. **Build a worksheet.** On a worksheet tab, fields dragged onto shelves and encodings become one plan:
    dimensions, measures, filters, sort, limit. The client resolves a **join path** over the drawn
    relationships. → [worksheet.md](docs/features/worksheet.md)
-5. **Query.** Unless the result is already cached for this dashboard, the client sends the plan
+5. **Query.** Unless the result is already cached for this worksheet, the client sends the plan
    (aborting any query it supersedes). The server first validates the request's shape and limits
    (rejecting, never clamping), then every table and column against the catalog, quotes them, converts
    and binds every value by its column's type, applies the limit (+1 probe row to detect truncation), builds the
@@ -79,7 +79,7 @@ each feature owns its controller, view partial, CSS and JS in one folder. Source
 | `Features/Shell/` | `ShellController` (`GET /`), `Index.cshtml` composing the partials, `app.js` bootstrap, `sidebar.js`, `scheme-toggle.js` |
 | `Features/Core/` | `core.css` (tokens + shared components), `api.js`, `ui.js`, `validate.js`, `icons.js`, `menu.js`, `store.js`, `format.js`, `sheet-schema.js`, vendored ECharts |
 | `Features/Connection/`, `Schema/` | sidebar features, each with its API controller |
-| `Features/Canvas/`, `Relations/`, `Tabs/` | client-only features (no controller); pure rule modules `empty-state.js`, `relation-rules.js` |
+| `Features/Canvas/`, `Relations/`, `Tabs/`, `Board/` | client-only features (no controller); `Board/` holds the dashboard tab's body and the pure widget rules `board-model.js`; pure rule modules `empty-state.js`, `relation-rules.js` |
 | `Features/Dashboard/` | the worksheet editor (`dashboards.js`), the instantiable query-and-render lifecycle (`worksheet-view.js`), the drawing of a result (`worksheet-render.js` + `render-*.js`, no editor state), the pure query plan (`sheet-plan.js`) and result shaping (`result-model.js`), pure rules (`filter-rules.js`, `toolbar-rules.js`, `contrast.js`), query gate + cache (`query-runner.js`), ECharts adapter (`chart.js`), `QueryController` |
 | `Features/Workbook/` | auto-save, restore, Export/Import (`workbook.js`) + the file format and its validation (`workbook-model.js`) |
 | `tests/DashboardBuilder.Tests/`, `tests/js/` | xUnit suite; `node --test` suite for the pure JS modules |

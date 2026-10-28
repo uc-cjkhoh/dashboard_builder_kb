@@ -36,7 +36,7 @@ matching whatever you're touching.
 | [reference/clickhouse-integration.md](reference/clickhouse-integration.md) | Driver, TLS, the exact SQL, identifier safety, type mapping |
 | [reference/data-model.md](reference/data-model.md) | Server and client state shapes, incl. the worksheet `sheet` |
 | [reference/frontend-modules.md](reference/frontend-modules.md) | Module map, wiring, event bus, `api.js` / `ui.js` helpers |
-| [reference/decisions.md](reference/decisions.md) | Decisions D1–D25 with rationale; [calculated fields D26–D47](reference/decisions-calculated-fields.md); open questions |
+| [reference/decisions.md](reference/decisions.md) | Decisions D1–D25 with rationale; [calculated fields D26–D60](reference/decisions-calculated-fields.md); [dashboards D61](reference/decisions-dashboards.md); open questions |
 | [reference/glossary.md](reference/glossary.md) | Domain terms |
 
 ## operations/ — build, run, deploy
@@ -72,7 +72,7 @@ Overview: [../DESIGN.md](../DESIGN.md).
 | [backlog/platform.md](backlog/platform.md) | persistence, P45, P44, risks, workbook additions, decisions to settle |
 | [backlog/journeys-and-releases.md](backlog/journeys-and-releases.md) | journeys, acceptance scenarios, releases R0–R3, quality targets |
 | [backlog/out-of-scope.md](backlog/out-of-scope.md) | deliberately excluded topics and why |
-| [backlog/p24-dashboards-spec.md](backlog/p24-dashboards-spec.md) | design spec: P24a worksheet views, P24b multi-worksheet dashboards |
+| [backlog/p24-dashboards-spec.md](backlog/p24-dashboards-spec.md) | design spec: P24a worksheet views (built), P24b multi-worksheet dashboards (data built; the board is open) |
 | [backlog/p24c-cross-widget-filtering.md](backlog/p24c-cross-widget-filtering.md) | design spec: P24c cross-widget filtering; [plan](backlog/p24c-plan.md) |
 
 ## Not here

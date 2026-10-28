@@ -22,7 +22,9 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Relations/relations.js` | join-key connectors, links, cardinality — [relationships.md](../features/relationships.md) |
 | `Relations/join-preview-model.js`, `Relations/join-check.js` | pure wording and declared-vs-observed comparison of a join preview (`describePreview`, `observedCardinality`, `pct`, `previewRequest`); the dialog's "Check this join" section (DOM, `textContent` only) |
 | `Relations/relation-rules.js` | pure: `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked; `JOIN_TYPES`, `normalizeJoinType`, `joinChoices`, `planJoinType`, `joinBadge` — join types |
-| `Tabs/tabs.js` | Data Model tab + dashboard tabs — [tabs.md](../features/tabs.md) |
+| `Tabs/tabs.js` | Data Model tab + one ordered list of worksheet and dashboard tabs, the `[+]` menu, close confirms — [tabs.md](../features/tabs.md) |
+| `Board/board-model.js` | pure (P24b): widget geometry and limits — `overlaps`, `inBounds`, `firstFreeSpot`, `placeNew`, `checkPlacement`, the import clean-up `cleanWidgets`, `savedWidgets`, `removeSheetWidgets`, `dashboardsUsing`, `defaultTabName` — [data-model.md](data-model.md#tabs-and-dashboards) |
+| `Board/board.js` | the dashboard tab's body (`#board-view`): a placeholder panel until the board canvas lands |
 | `Tabs/duplicate-model.js` | pure: duplicate-worksheet naming, limit check, sheet copy (node-tested) |
 | `Dashboard/dashboards.js` | the worksheet editor: field pane, shelves, toolbar, status bar, selection / drill / legend handling; owns exactly one worksheet view and passes its state in as the view's options (`interactive`, `onSelect`, `onDrill`, `onLegend`, …) — it draws nothing itself — [worksheet.md](../features/worksheet.md) |
 | `Dashboard/worksheet-view.js` | `createWorksheetView(container, getContext, options)` → `{ run, refresh, cancel, destroy }`: plan → latest-wins fetch through the shared result cache → `renderWorksheet` into one container; owns its own gate, table pager, fresh flag and the last drawing's notice line. `getContext()` supplies `dash`, `noticeEl` (or null), `results`, `plan` (the `sheet-plan.js` context), `categoryOf`, `castOf`. `options` (static, all optional): `interactive` (false = a static widget — no mark selection, drill, legend click or status bar), `onSelect(dimField, raw)`, `onDrill(raw)`, `onLegend({ sheet, field, name, raw, bucketed })`, `legendFocus()`, `onTooltipFields`, `onMemberColors`, `statusBar`, `notices(sheet)`, `draw` (test seam). Also the single-table histogram / box plot path; re-exports the `notices.js` helpers — [worksheet.md](../features/worksheet.md#query-lifecycle) |
@@ -48,7 +50,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Rows/rows-dialog.js` | the rows dialog: `openTablePreview(db, table)` (schema browser) and `openRowsDialog({title, subtitle, request, notes, filename})` — [schema-browser.md](../features/schema-browser.md#row-preview) |
 | `Dashboard/action-model.js` | pure (P39): `templateError`, `buildActionUrl` (https-only, encoded `{value}`), `cleanAction` |
 | `Dashboard/analytics-model.js` | pure (P21): `refValue`, `trendFit` (linear / log / poly2 least squares, R²), `trendSeries` (+ forecast), `combine` (totals by aggregation) |
-| `Dashboard/history.js` | pure (P23): per-dashboard undo / redo stacks of sheet snapshots (50) |
+| `Dashboard/history.js` | pure (P23): per-worksheet undo / redo stacks of sheet snapshots (50), keyed by tab id |
 | `Dashboard/table-calc.js` | pure (P27): `computeCalc` (running / % of total / difference / % difference / rank / moving average, partitioned by the other shelf), `applyTableCalcs` |
 | `Dashboard/cast-model.js` | pure (T02-34): `castChoices`, `effectiveCategory`, `withCasts` (adds `cast` to the plan), `syncCastCategories`, `statCastProblem` |
 | `Dashboard/line-style-model.js` / `heatmap-model.js` / `bullet-model.js` | pure: `LINE_STYLE_CHOICES`, `lineStep`, `linesTakeStyle`; `HEATMAP_SHAPE_CHOICES`, `circleSize`; `targetChoices`, `bulletTargets`, `bandsFor` — [worksheet-charts.md](../features/worksheet-charts.md) |
@@ -76,7 +78,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Calc/explain-popover.js` | DOM: `explainControl(getInput, { signal })` — the view bar's "How this is computed" button and popover |
 | `Calc/calc.css` | styles for the dialog, the role chip, the pane group and the explainer (tokens only) |
 | `Workbook/workbook.js` | auto-save, restore on connect, Export/Import — [workbook.md](../features/workbook.md) |
-| `Workbook/workbook-model.js` | pure: workbook serialize / `parseWorkbook` (full validation + issue list) / `sanitizeSheet` / storage key — [workbook.md](../features/workbook.md#validation-parseworkbook) |
+| `Workbook/workbook-model.js` | pure: workbook serialize (v2) / `parseWorkbook` (full validation + issue list; v1 files via `migrateV1`) / `sanitizeSheet` / storage keys (`storageKey`, `legacyStorageKey`) — [workbook.md](../features/workbook.md#validation-parseworkbook) |
 | `Core/api.js` | `fetch` helpers (JSON, errors, path base, optional `AbortSignal`) |
 | `Core/ui.js` | toast, pill, `show`/`hide`/`toggle`, `fieldError` / `clearFieldError` / `checkField`, `listDialog`, `confirmDialog`, `openDialog`/`closeDialog` |
 | `Core/validate.js` | pure input parsers (`host`, `port`, `text`, `number`, `dateTime`, `filterValue`, `range`) returning `{ ok, value }` or `{ ok:false, error }`, plus `LIMITS` and `HOST_MESSAGES` — mirror of the server's `ApiLimits` / `RequestRules` |
@@ -85,7 +87,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Core/menu.js` | `wireMenu(button, list)` — keyboard-operable popover menu (`menuitem` / `menuitemradio` items); animated open/close via `motion.js` |
 | `Core/motion.js` | `enter` / `exit` (WAAPI, opacity + transform, Fluent timing) and `reducedMotion()`; no-ops under reduced motion — [motion-accessibility.md](../design/motion-accessibility.md#motion) |
 | `Core/resizer.js` | `wireResizer(handle, …)` — drag / arrow-key width handle (`role="separator"`) used by the sidebar and the field pane; pure `clampWidth` |
-| `Core/store.js` | shared model + dashboards + active view + event bus — [data-model.md](data-model.md#client-side--featurescorestorejs) |
+| `Core/store.js` | shared model + the ordered worksheet / dashboard tabs + active view + event bus — [data-model.md](data-model.md#client-side--featurescorestorejs) |
 | `Core/format.js` | value and category formatters shared by charts, crosstab, KPI |
 
 ## Wiring
@@ -96,7 +98,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
   **event bus** or `document` `CustomEvent`s — never by reaching into another module's nodes.
 - **Cross-feature calls:** the Workbook feature rebuilds the model through `canvas.addEntity` /
   `canvas.clearModel` and `relations.restoreRelationship` — exported functions, not DOM reach-ins.
-- **Pure modules** (`query-runner.js`, `sheet-plan.js`, `result-model.js`, `grid-model.js`, `notices.js`, `workbook-model.js`, `validate.js`, `sheet-schema.js`,
+- **Pure modules** (`query-runner.js`, `sheet-plan.js`, `result-model.js`, `grid-model.js`, `notices.js`, `workbook-model.js`, `board-model.js`, `validate.js`, `sheet-schema.js`,
   `filter-rules.js`, `show-me-rules.js`, `toolbar-rules.js`, `contrast.js`, `relation-rules.js`, `table-filter.js`,
   `connection-rules.js`, `empty-state.js`, `api.js`'s `basePathFrom`) hold the testable logic and never
   touch the DOM; they run under `node --test` ([development.md](../operations/development.md#test)).

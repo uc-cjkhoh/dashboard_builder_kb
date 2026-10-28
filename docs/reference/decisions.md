@@ -136,8 +136,8 @@ asked to create or validate them.
 
 ### D12 — Subtabs are dashboards over one shared data model
 The dragged tables + relationships form **one shared data model** (the pinned Data Model tab);
-dashboards are built *from* it. Each dashboard tab **is one Tableau-style worksheet** — a field pane
-plus shelves you drag fields onto.
+worksheets and dashboards are built *from* it ([D61](decisions-dashboards.md)). Each worksheet tab **is one Tableau-style
+worksheet** — a field pane plus shelves you drag fields onto.
 - **Joins are executed.** Fields from different tables join automatically along the drawn
   relationships: the client finds a join path (BFS over the relationship graph); `QueryAsync` builds
   aliased, identifier-safe `INNER JOIN`s. Fan-out on the many side is the user's declared intent —
@@ -169,7 +169,7 @@ Table gets an extra header level). No new query shape, so D1/D6 are untouched.
 - **Not supported:** histogram/box-plot CSV (their shape isn't a `QueryRequest`).
 
 ### D16 — Click-to-filter is a select-then-act worksheet selection
-A dashboard is one worksheet, so clicking a mark **selects** its primary-dimension value and a chip
+A worksheet shows one chart, so clicking a mark **selects** its primary-dimension value and a chip
 offers **Keep only** / **Exclude** / clear, applied as a bound filter only when the column's table is
 already in the query (a click never forces a join).
 - **Why not filter immediately (Tableau's filter action)?** On a single view, self-filtering to the
@@ -289,7 +289,7 @@ and holds only results the user could already see — no application database (D
 a 10% `SAMPLE` (counts and sums scaled by `_sample_factor`) on a base table that declares a sampling key.
 If the server refuses the sampled query it runs once more unsampled (logged).
 
-Calculated-field decisions D26–D52: [decisions-calculated-fields.md](decisions-calculated-fields.md).
+Calculated-field decisions D26–D60: [decisions-calculated-fields.md](decisions-calculated-fields.md). Dashboard decision D61: [decisions-dashboards.md](decisions-dashboards.md).
 
 ## Open questions
 
@@ -297,4 +297,4 @@ Calculated-field decisions D26–D52: [decisions-calculated-fields.md](decisions
 |---|---|---|
 | **O1** | Should workbooks persist on the server (shared across browsers/users)? | Browser persistence is decided ([D21](#d21--workbooks-persist-in-the-browser-not-on-the-server)). Server-side storage only with accounts — see [platform.md](../backlog/platform.md). |
 | **O2** | Where are multiple saved connections stored? | One active connection per session, not saved. Later: named profiles **without** persisting passwords server-side. |
-| **O3** | How far does dashboard composition go? | Today one worksheet per tab; multi-worksheet dashboards are the [P24a + b spec](../backlog/p24-dashboards-spec.md) and would revisit O1. |
+| **O3** | How far does dashboard composition go? | Worksheets and dashboards are separate tab kinds and a dashboard's data is built ([D61](decisions-dashboards.md)); the board canvas is the [P24b backlog entry](../backlog/dashboards.md) and would revisit O1 only if dashboards were shared. |

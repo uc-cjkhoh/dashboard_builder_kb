@@ -41,10 +41,11 @@ client — `GET /api/connection` returns a password-free view.
 ```
 entities:      Map id → Entity              ┐ ONE shared data model
 relationships: Map id → Relationship        ┘ (the Data Model tab)
-dashboards:    [ { id: "dash#n", name, sheet } ]   one worksheet per dashboard tab
-activeView:    { kind: "model" } | { kind: "dashboard", id }
+tabs:          [ Tab, … ]                   ONE ordered list — worksheet and dashboard tabs (below)
+activeView:    { kind: "model" } | { kind: "worksheet", id } | { kind: "dashboard", id }
 bus:           EventTarget — entity:added · entity:loaded · entity:moved · entity:removed
-                             joinkey:changed · rel:changed · view:changed · tabs:changed · dashboard:changed
+                             joinkey:changed · rel:changed · view:changed · tabs:changed
+                             worksheet:changed { id } · dashboard:changed { id }
 ```
 
 ### Entity
@@ -77,6 +78,24 @@ A **logical** link — the database neither creates nor validates it
 
 The project statement requires every dragged-in table to select ≥1 join key; the UI enforces it by
 letting only checked keys be endpoints ([relationships.md](../features/relationships.md)).
+
+### Tabs and dashboards
+
+```
+Tab:     { id: "ws#n", kind: "worksheet", name, sheet }                 one worksheet (the editor)
+       | { id: "db#n", kind: "dashboard", name, widgets: [Widget] }      a board of widgets
+Widget:  { id: "w#n", kind: "sheet", sheetId: "ws#n", x, y, w, h }       a worksheet's view
+       | { id: "w#n", kind: "text", heading, body, x, y, w, h }          a text block
+```
+
+Tab names are 1–60 characters; a workbook holds at most **50 tabs** of either kind. A dashboard lays widgets on a **12-column snap
+grid** in whole cells with no overlap: `w` 2–12, `h` 2–24 (text 1–24), `y + h` ≤ 96, at most **12 widgets**, text `heading` ≤ 80 and
+`body` ≤ 2000 characters (`LIMITS`, `Core/validate.js`; the rules and the first-free-spot scan are pure, in `Board/board-model.js`).
+A widget points at a worksheet by tab id; one worksheet may sit on several dashboards, even twice on one. `store` helpers:
+`worksheets()` / `dashboards()` (the tabs of a kind), `createWorksheet` / `createDashboard` (null at the tab limit),
+`duplicateWorksheet`, `closeTab` (a closed worksheet's widgets leave every dashboard), `updateSheet` (→ `worksheet:changed`),
+`setWidgets` + `nextWidgetId` (→ `dashboard:changed`). Nothing here reaches the server — dashboards add no endpoint
+([D61](decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2)).
 
 ## Worksheet (`sheet`)
 
@@ -115,7 +134,7 @@ letting only checked keys be endpoints ([relationships.md](../features/relations
   the column catalog when absent (older workbooks).
 - **Caps** (client `LIMITS`, `Core/validate.js`; the server's view caps are in
   [api.md § Limits](api.md#limits)): 20 pills per shelf · 12 dimensions · 10 measures · 8 filters ·
-  6 drill levels · 100 entities · 200 relationships · 50 dashboards · tab name 60 characters · axis
+  6 drill levels · 100 entities · 200 relationships · 50 tabs · 12 widgets per dashboard · tab name 60 characters · axis
   title 80 · filter value 1000.
 - **Format defaults:** `numberFormat:"auto"`, `decimals:null`, `currencySymbol:"$"`,
   `dateFormat:"auto"`, `topN:null` (All — up to 5000), `dateBucket:"auto"`, `conditional:{}` (P37: `{ [db.table.column:agg]: { mode: none|scale|bars, scale: sequential|diverging, mid, rules: [{ op, value, tone: good|bad|warn|info }] } }`), `legend:"auto"`, `dataLabels:false`,
@@ -145,20 +164,25 @@ What [workbook.md](../features/workbook.md) saves to `localStorage` and exports 
 
 ```
 {
-  format: "dashboard-builder-workbook", version: 1 (integer ≥ 1), savedAt: ISO-8601,
+  format: "dashboard-builder-workbook", version: 2 (integer ≥ 1; version 1 files still open), savedAt: ISO-8601,
   entities:      [ { id, db, table, x, y, joinKeys: [column] } ],
   relationships: [ { from: { entityId, column }, to: { entityId, column }, cardinality, joinType } ],
-  dashboards:    [ { name, sheet } ],      // sheet as above, minus pages.members
-  active:        dashboardIndex | null     // null = Data Model
+  worksheets:    [ { name, sheet } ],      // sheet as above, minus pages.members
+  dashboards:    [ { name, widgets: [ { kind: "sheet", sheet: worksheetIndex, x, y, w, h }
+                                    | { kind: "text", heading, body, x, y, w, h } ] } ],
+  tabs:          [ { kind: "worksheet" | "dashboard", index } ],   // the strip's order, ≤ 50
+  active:        { kind, index } | null    // null = Data Model
   fields:        { "db.table.column": { alias?, agg?, hidden? } }   // P28 — ≤ 2000
   parameters:    [{ id: "prm<n>", name, type: number|text|date, value, allowed: { kind: any|list|range, list?, min?, max?, step? } }]   // P32 — ≤ 20
-  bookmarks:     [{ name, dashboard: index | null, dashName, sheet, sharedFilters, savedAt }]   // P39 — ≤ 30
-  sharedFilters: Filter[]                  // P40 — ≤ 4, applied by every dashboard where their table is in the view
+  bookmarks:     [{ name, worksheet: index | null, worksheetName, sheet, sharedFilters, savedAt }]   // P39 — ≤ 30
+  sharedFilters: Filter[]                  // P40 — ≤ 4, applied by every worksheet where their table is in the view
   theme:         { accent: "crimson" | "blue" | "teal" | "violet" | "graphite" | "#rrggbb", palette: "default" | "okabe" | "muted" }
 }
 ```
 
-Entity ids are only cross-references inside the file; opening it creates fresh ids. No connection
+Entity ids are only cross-references inside the file; opening it creates fresh ids (worksheet and dashboard ids too — widgets and
+bookmarks point at worksheets by index). A v1 file (`dashboards: [{ name, sheet }]`, numeric `active`, bookmarks with `dashboard` /
+`dashName`) is migrated on read ([workbook.md](../features/workbook.md#format-v2-and-old-files)). No connection
 details or passwords are ever included. On open, every field is validated against
 `Core/sheet-schema.js` and the `LIMITS` above; invalid parts are reset to defaults and reported
 ([workbook.md § Validation](../features/workbook.md#validation-parseworkbook)). `selection` is never

@@ -45,7 +45,7 @@ messages) and answers `400 { error, field }` — [api.md](../reference/api.md#er
    - **change** (edit icon) — reopens the form with **Cancel**; the existing connection stays active
      until a new connect succeeds.
    - **disconnect** (power icon) — `POST /api/connection/disconnect` with `{}` (the proxy blocks `DELETE`). The
-     form returns and the workspace is cleared — cards and dashboard tabs fade out; reconnecting to the
+     form returns and the workspace is cleared — cards and tabs fade out; reconnecting to the
      same server reopens them from the autosaved workbook ([workbook.md](workbook.md#auto-save)).
 4. On page load `GET /api/connection` restores the summary for an existing session (password-free
    view).
