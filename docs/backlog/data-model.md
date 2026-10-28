@@ -10,7 +10,6 @@ Today relationships are logical, inner/left/right/full, one equality pair each (
 - **Split and unpivot** (IDs: T02-31, T02-32; priority P1) — Open: no string split, no unpivot of wide columns. Needs: none.
 - **Named hierarchies** (IDs: T03-29; priority P1) — partial: an unnamed per-sheet drill path; no reusable model hierarchies or expand/collapse headers. Needs: none.
 - **Field details and copy** (IDs: T02-33, T02-28; priority P1–P2) — Partial: type and role shown, no field-properties panel (sort, semantic role). Open: no copy of a field or values. Needs: none.
-- **Join safety preview** (priority P1) — open: no matched/unmatched estimate and no fan-out warning before a join is used by a worksheet (cardinality is the user's declaration, golden rule 5). Needs: a bounded count query.
 - **Column profile** (priority P1) — open: a read-only inspector per field with distinct count, null share and top values, from one bounded endpoint `POST /api/databases/{db}/tables/{table}/profile`. Needs: the endpoint, identifier-validated.
 - **Query-time cleaning** (priority P1) — open: trim, recode, date construction and replace-null as field metadata or calculated fields; there are no prep flows, materialised output or saved flows (see [out-of-scope.md](out-of-scope.md)). Needs: text, logic and date functions in [calculations.md](calculations.md).
 - **Indexing and partition guidance** (IDs: T02-37; priority document only) — Open: no guidance for source tables. Needs: none.

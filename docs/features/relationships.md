@@ -61,6 +61,21 @@ on both sides of a full join. Grouping by the *non-preserved* table's key shows 
 right/full joins on a connection whose server refuses settings (`join_use_nulls` is required). Approximate
 mode reads such a view exactly (no sample).
 
+## Check this join (join safety preview)
+
+The relationship dialog (new link and edit) has a **Check this join** button: one bounded, read-only call
+(`POST /api/relationships/preview`, [api.md](../reference/api.md#relationship-preview)) that reads at most the first
+1,000,000 rows of each table and reports, in plain words: the share of each table's rows that have a match in the other
+("94% of the rows in orders have a match in customers; 6% don't"), how often a key repeats on each side, NULL keys (never
+match), and the shape the data shows (`1:1`, `1:N`, `N:1`, `N:M`; first letter = the first table). Pure wording:
+`join-preview-model.js`. A note says so when a side hit the row bound ("Based on the first 1,000,000 rows").
+
+**Warnings** (icon + text, amber; never block saving — the relationship stays the user's declaration): keys repeat on **both** sides
+(many-to-many fan-out, sums and counts can double-count); a side declared "one" whose keys repeat (edit dialog only — a new link has no
+declaration yet, so it gets the reading instead); no keys match at all. While running, the button is disabled and a busy note shows;
+a failure (e.g. incompatible key kinds, a timeout) shows the server message with an error icon. Closing the dialog cancels the request.
+Not done: no hint on the drawn line, and nothing is saved with the relationship.
+
 ## What cardinality means
 
 `1:N` from A→B means "one row in A relates to many rows in B, matched on the chosen columns." It drives

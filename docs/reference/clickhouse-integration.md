@@ -88,7 +88,7 @@ ClickHouse on `10.168.49.13` limits `default` to `127.0.0.1`, so from the app ho
 
 `{db}`, `{table}`, `{col}` are **interpolated identifiers** (see below); every other variable part is a
 bound parameter or a validated integer (out-of-range limits are rejected before the builder runs —
-[api.md § Limits](api.md#limits)).
+[api.md § Limits](api.md#limits)). **Join preview** (`JoinPreviewAsync`, `ClickHouse/JoinPreview.cs`, [api.md](api.md#relationship-preview)): one `SELECT` per side, run together, over `(SELECT {col} AS k FROM {db}.{table} LIMIT n)` grouped by key — rows, NULL rows, distinct keys, max repeat, and `k IN (the other table's first n keys)` counts (text keys compare as `toString`); n is 1..1,000,000.
 
 ### Worksheet query (`QueryAsync`)
 

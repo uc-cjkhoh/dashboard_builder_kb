@@ -122,6 +122,22 @@ display text (numbers invariant, dates ISO, arrays compact) or `null` for SQL NU
 characters plus `…` — **inside ClickHouse** (each column is selected as `if(isNull(c), NULL, left(toString(c), 1001))`), so a huge value never leaves it; arrays, tuples, maps and dates read as `toString` prints them. `truncated` = more rows matched than `limit`; `columnsTruncated` = the default column set was cut.
 Errors use the usual `{ error, field? }` shape: 400 rule breaks and unknown names, 409 not connected, 502 / 504 ClickHouse.
 
+## Relationship preview
+
+Controller: `Features/Relations/RelationsController.cs`. `POST /api/relationships/preview` — the relationship
+dialog's "Check this join": bounded, read-only match and duplicate counts for one key pair. Joins nothing, writes nothing.
+
+| Field | Rule |
+|---|---|
+| `from`, `to` | `{ db, table, column }` each, all required (400 at `from.db`, `to.column`, …); catalog-validated (unknown → 400) |
+| key kinds | must be joinable and equal: number-number, text-text, date-date, boolean-boolean — else 400 `Can't relate a.x (numeric) to b.y (text) — join keys must hold the same kind of value.` (field `to.column`) |
+| `sampleLimit` | optional, 1–1,000,000 (default and cap `MaxSampleRows`): rows read from **each** table; outside → 400 (`sampleLimit`), never clamped |
+
+Response `{ from, to, sampleLimit, sampled }`; each side `{ rows, nullRows, keys, matchedKeys, matchedRows, maxDuplicates, avgDuplicates }`
+over the rows examined: `keys` = distinct non-NULL keys, `matchedKeys`/`matchedRows` = those present on the other side (NULL never
+matches), `maxDuplicates`/`avgDuplicates` = how often a key repeats within the side. `sampled` is true when a side reached the bound
+(its numbers describe the first `sampleLimit` rows). Errors: usual `{ error, field? }`; 409 not connected, 502 / 504 ClickHouse.
+
 ## Query
 
 Controller: `Features/Dashboard/QueryController.cs`. All `POST` with a JSON body.
