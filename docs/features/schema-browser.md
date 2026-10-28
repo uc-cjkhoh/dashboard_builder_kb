@@ -39,6 +39,7 @@ Sidebar, below the connection panel. Code: `Features/Schema/` (`SchemaController
   dialog (max 80vh); the page never scrolls. A SQL `NULL` cell reads *NULL* in italic muted text, distinct from an
   empty string. A cell longer than 1000 characters is cut with an ellipsis; at most the table's first 200 columns
   show (the footer says "first N columns"). The footer states "N rows" or "First N rows — more exist".
+- When any cell was cut, the dialog says so ("Some cells were cut at 1000 characters; the CSV export has the cut text too").
 - **Export CSV** saves the rows shown (RFC 4180 quoting; a cell starting `= + - @` is prefixed with `'`, like the
   server's `CsvUtil`). A failure (a 400 / 502 / 504) shows its message in the dialog and a toast; the export stays disabled.
 - The same dialog serves the worksheet's *View data* ([worksheet.md](worksheet.md#view-data)). Canvas entity cards
