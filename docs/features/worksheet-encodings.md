@@ -101,9 +101,12 @@ Filters are worksheet-scoped unless **shared**. At most **8** user filters; the 
 workbook parameter of the field's type (number for numeric fields and top-N counts, date for dates,
 text for text); the value editor becomes a parameter picker, and **{ }** again unbinds it (keeping the
 current value). The bound value is filled in at plan time (`withParamValue`) and sent as an ordinary
-bound filter value. Every parameter a sheet uses — its filters, the shared filters, Format → Top N — gets
-a control above the filter cards: a select for a list, a slider + box for a number range, else a typed
-input; a value outside the allowed ones is refused with the reason, and a change re-runs the view.
+bound filter value. Every parameter a sheet uses — its filters, the shared filters, Format → Top N, calculated fields, a bound reference line — gets
+a control above the filter cards (also each parameter a calculated pill reads as `[@Name]`, and a bound reference line): a select for a list, a slider + box for a number range (the slider moves by the parameter's **step size** when it has one), else a typed
+input; a value outside the allowed ones is refused with the reason, and a change re-runs the view (and every dashboard widget).
+The Parameters dialog's number **range** has min, max and an optional **step size** (a positive number; empty is none; saved and shown again on edit).
+Deleting a parameter that a calculation reads asks first. Analytics → Reference line **Constant** can follow a number parameter instead of a typed value
+(`analytics.ref.param`); a deleted parameter falls back to the line's own value.
 
 **Filter cards** (P30). Under the title, each of the sheet's filters — and the shared ones — shows as a
 card: a **checkbox list** for `in` / `not in` (the bounded distinct values; a `not in` card is labelled "not in"), the filter's own editor otherwise. Cards

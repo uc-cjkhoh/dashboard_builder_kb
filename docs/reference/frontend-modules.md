@@ -43,7 +43,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/filter-rules.js` | pure: `aggsFor`, `checkFilter`, `statFilters`, `withCategories`, `viewCounts`, `checkAdd` (drop-time caps) — [worksheet.md](../features/worksheet.md#drop-time-limits) |
 | `Dashboard/show-me-rules.js` | pure: chart-type field rules (`CHART_NEEDS`, `chartIssue`, the shared hint texts, `roleOf`) and Show Me — `issueFor`, `bestType`, `showMeOptions`, `placeFor`, `samePlacement` — [worksheet-charts.md](../features/worksheet-charts.md#show-me) |
 | `Dashboard/toolbar-rules.js` | pure: `visibleTools(chartType, tools)` — visible row vs More — [worksheet-encodings.md](../features/worksheet-encodings.md#encodings-toolbar) |
-| `Core/parameters-model.js` | pure (P32): `checkValue` (type + allowed values), `withParamValue`, `effectiveTopN`, `paramTypeFor`, `cleanParameter` |
+| `Core/parameters-model.js` | pure (P32): `checkValue` (type + allowed values), `checkStep` (positive step size), `withParamValue`, `effectiveTopN`, `paramTypeFor`, `cleanParameter` |
 | `Workbook/parameters-dialog.js` | P32: the Parameters dialog (Workbook menu) |
 | `Core/theme-model.js` | pure (P41): accent presets + palettes (light / dark), `deriveAccent` (custom colour → contrast-checked set, or a refusal), `themeVars`, `cleanTheme` — [tokens.md](../design/tokens.md#workbook-themes-p41) |
 | `Core/scheme-model.js` | pure: `SCHEME_PREFS`, `normalizePref`, `resolveScheme(pref, osDark)` — [tokens.md](../design/tokens.md#light-and-dark) |
@@ -55,7 +55,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Rows/rows-model.js` | pure: `tableRowsRequest`, `buildRowsRequest({plan, selection, limit})` (base-table filters + the mark as a bound `=`; `notes` for what couldn't apply), `rowsSummary`, `cellText`, `rowsToCsv`, `DEFAULT_LIMIT` — [worksheet.md](../features/worksheet.md#view-data) |
 | `Rows/rows-dialog.js` | the rows dialog: `openTablePreview(db, table)` (schema browser) and `openRowsDialog({title, subtitle, request, notes, filename})` — [schema-browser.md](../features/schema-browser.md#row-preview) |
 | `Dashboard/action-model.js` | pure (P39): `templateError`, `buildActionUrl` (https-only, encoded `{value}`), `cleanAction` |
-| `Dashboard/analytics-model.js` | pure (P21): `refValue`, `trendFit` (linear / log / poly2 least squares, R²), `trendSeries` (+ forecast), `combine` (totals by aggregation) |
+| `Dashboard/analytics-model.js` | pure (P21): `refValue`, `refConstant` (a constant line's bound parameter), `trendFit` (linear / log / poly2 least squares, R²), `trendSeries` (+ forecast), `combine` (totals by aggregation) |
 | `Dashboard/history.js` | pure (P23): per-worksheet undo / redo stacks of sheet snapshots (50), keyed by tab id |
 | `Dashboard/table-calc.js` | pure (P27): `computeCalc` (running / % of total / difference / % difference / rank / moving average, partitioned by the other shelf), `applyTableCalcs` |
 | `Dashboard/cast-model.js` | pure (T02-34): `castChoices`, `effectiveCategory`, `withCasts` (adds `cast` to the plan), `syncCastCategories`, `statCastProblem` |
@@ -71,12 +71,13 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/query-runner.js` | pure: latest-wins gate, per-worksheet result cache, truncation notice — [worksheet.md](../features/worksheet.md#query-lifecycle) |
 | `Calc/calc-parser.js` | pure: `parseFormula(text, resolve)` — hand-written tokenizer + recursive descent into wire-shaped nodes (`field`, `num`, `str`, `un`, `bin`, `agg`, `cmp`, `logic`, `not`, `case`, `ifnull`, `isnull`, `fn` (the text functions); `IF`/`IIF`/`ZN` and the simple `CASE` desugar to `case`/`ifnull`/`cmp`) plus client-only `{ k: "calc", name }` |
 | `Calc/calc-types.js` | pure: `CALC_LIMITS`, the `FUNCTIONS` table, `check(ast, categoryOf)` → `{ type, isAggregate, tables }` or an error; a twin of the server's `CalcCatalog` / `CalcValidator`, tied by `tests/fixtures/calc-cases.json` |
+| `Calc/calc-params.js` | pure: `[@Name]` support — `substituteParams` (param node → `num` / `str` / `date()` literal), `paramLiteral`, `paramRefs`, `calcsUsingParam`, `calcParamNames`, `renameParamInFormulas` |
 | `Calc/calc-model.js` | pure: `expandCalcs` (replaces `{ k: "calc" }` references with their trees; cycle and size guard), `roleOfCalc` |
-| `Calc/calc-resolve.js` | pure: `catalogFromEntities`, `makeResolve`, `compileCalculation(calc, calcs, catalog)` (parse → expand → check), `calcTables` |
+| `Calc/calc-resolve.js` | pure: `catalogFromEntities`, `makeResolve`, `compileCalculation(calc, calcs, catalog, params)` (parse → expand → substitute parameters → check), `calcTables` |
 | `Calc/calc-workbook.js` | pure: `checkName`, `renameInFormulas`, `usedBy`, `cleanCalculation(s)` — the workbook list rules |
 | `Calc/calc-pill.js` | pure: the calc-pill shape (`makeCalcPill`, `isCalcPill`, `pillName`), `refusal` (E12 entry points), `pillSlots`, `syncCalcPills`, `usesCalc`, `clearCalcPills` |
 | `Calc/calc-plan.js` | pure: the worksheet plan seam — `wireDim`, `wireMeasure`, `planTables`, `calcProblem`, `measureLabel`, `topByRef` / `wireTopBy`, `resolveSortTarget` |
-| `Calc/calc-dialog-model.js` | pure: `evaluateDraft` (validation), `chipFor` (role chip), `suggest` (`[` field autocomplete and function-name autocomplete) |
+| `Calc/calc-dialog-model.js` | pure: `evaluateDraft` (validation), `chipFor` (role chip), `suggest` (`[` field, `[@` parameter and function-name autocomplete) |
 | `Calc/function-help.js` | pure: the function glossary `FUNCTION_HELP` (derived from `calc-types.js` + the logic keywords), `searchHelp`, `groupHelp`, `functionItems` — the dialog's Functions panel and name autocomplete |
 | `Calc/calc-pane-model.js` | pure: `paneState` (group items), `deleteCalcPlan`, `showUseAs` / session Use-as choice, `normaliseFormula` |
 | `Calc/calc-dialog.js` | DOM: `openCalcDialog(id?)` — the New / Edit calculated-field dialog |

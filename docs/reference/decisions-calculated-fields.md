@@ -1,6 +1,6 @@
 # Decisions — calculated fields
 
-Continues [decisions.md](decisions.md) (D1–D25). Behaviour: [calculated-fields.md](../features/calculated-fields.md).
+Continues [decisions.md](decisions.md) (D1–D25). Decisions D26–D66. Behaviour: [calculated-fields.md](../features/calculated-fields.md).
 Edit an entry in place when it changes.
 
 ### D26 — A calculated pill is a normal pill with an id
@@ -191,3 +191,19 @@ A calculation is a function of the data: caching, saved workbooks and exports as
 and `NOW` would change that, so they wait for a decision (a parameter-style "as of" value). `makeDate` returns `1970-01-01` for a
 month 13 or day 32 and rolls `2023-02-29` to 1 March, so it needs guards (and number-argument kinds) that are not worth building yet.
 
+
+### D65 — A parameter is read as `[@Name]` and becomes a literal on the client
+`[Name]` already means a calculation and `[table.column]` a field (E8, E14: names may not contain `.`), while a parameter name may hold
+anything, so parameters get their own marker: `[@Name]`, not dot-split, resolved against the workbook's parameters at parse time (an unknown
+one is a resolver error, so a deleted parameter reads like any other dangling reference, E15). The value is substituted into the expanded tree
+**before** type-checking, as `num` / `str` / `DATE(str)`: no server change, every value stays a bound literal, the request (and so the cache key)
+changes with the value, and a parameter can fill the literal-only arguments (`LEFT` length, `DATEADD` unit and amount) while keeping their range checks.
+Text parameters over 100 characters are refused rather than truncated (D54's rule). **Rejected:** a `param` node on the wire (a new server
+node, validation and cache story for no gain); bare `[Name]` falling back to a parameter (silent ambiguity when a calculation is later added).
+
+### D66 — Deleting a parameter a formula reads asks; renaming rewrites the formulas
+Like deleting a calculation a sheet uses, deleting a parameter that a formula mentions asks first, and afterwards the calculation shows the
+E15 state with its formula untouched (so re-adding the name heals it). Refusing outright would block a legitimate clean-up; silently
+rewriting would hide the damage. The scan is textual (`[@Name]` anywhere in the formula, including inside a text literal), so it can only over-ask.
+A rename rewrites `[@Old]` the way a calculation rename rewrites `[Old]`. The reference line stores a parameter id (`analytics.ref.param`) and
+falls back to its own value when the parameter is gone (the workbook open also unlinks it, with a note).

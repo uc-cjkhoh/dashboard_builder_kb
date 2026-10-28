@@ -7,7 +7,7 @@ The only place for work not yet built, grouped by topic. Built behaviour lives i
 | File | Holds |
 |---|---|
 | [dashboards.md](dashboards.md) | P24d, dashboard layout, image and spacer widgets, actions, navigation, P38, P39 remainder |
-| [calculations.md](calculations.md) | functions the engine lacks, parameters in formulas, LOD, table-calculation polish, P25 |
+| [calculations.md](calculations.md) | functions the engine lacks, LOD, table-calculation polish, P25 |
 | [data-model.md](data-model.md) | joins, union, groups, split, cast, hierarchies, P43 |
 | [charts-and-formatting.md](charts-and-formatting.md) | chart, authoring, formatting and export gaps |
 | [analytics-and-maps.md](analytics-and-maps.md) | statistics, forecasting, clustering, P42, maps |
@@ -30,7 +30,7 @@ Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5
 
 3. Small P0 gaps (cast, duplicate sheet, tooltip editor, per-member colour, exclude) — each is independent and closes Release 0.
 4. Calculation aggregations, logic, text and date functions — the engine's tree path already exists.
-5. Parameters in formulas and table-calculation polish — both build on the function set.
+5. Table-calculation polish — builds on the function set.
 7. Data-model breadth (joins, union, groups, split, hierarchies) — independent of the engine; join types come before P43.
 8. Chart gaps and formatting — client-only, ordered by priority.
 9. Actions, navigation, P38 and P39 remainder — need dashboards and, for sets, P25.

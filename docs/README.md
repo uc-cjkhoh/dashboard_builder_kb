@@ -37,7 +37,7 @@ matching whatever you're touching.
 | [reference/clickhouse-integration.md](reference/clickhouse-integration.md) | Driver, TLS, the exact SQL, identifier safety, type mapping |
 | [reference/data-model.md](reference/data-model.md) | Server and client state shapes, incl. the worksheet `sheet` |
 | [reference/frontend-modules.md](reference/frontend-modules.md) | Module map, wiring, event bus, `api.js` / `ui.js` helpers |
-| [reference/decisions.md](reference/decisions.md) | Decisions D1–D25 with rationale; [calculated fields D26–D60](reference/decisions-calculated-fields.md); [dashboards D61–D62](reference/decisions-dashboards.md); open questions |
+| [reference/decisions.md](reference/decisions.md) | Decisions D1–D25 with rationale; [calculated fields D26–D66](reference/decisions-calculated-fields.md); [dashboards D61–D62](reference/decisions-dashboards.md); open questions |
 | [reference/glossary.md](reference/glossary.md) | Domain terms |
 
 ## operations/ — build, run, deploy
@@ -66,7 +66,7 @@ Overview: [../DESIGN.md](../DESIGN.md).
 |---|---|
 | [backlog/README.md](backlog/README.md) | the only to-do list: how to read it, recommended order, spikes, guards, known unknowns |
 | [backlog/dashboards.md](backlog/dashboards.md) | P24a–d, layout, actions, navigation, P38, P39 remainder |
-| [backlog/calculations.md](backlog/calculations.md) | functions, parameters in formulas, LOD, table-calculation polish, P25 |
+| [backlog/calculations.md](backlog/calculations.md) | functions, LOD, table-calculation polish, P25 |
 | [backlog/data-model.md](backlog/data-model.md) | joins, union, groups, split, cast, hierarchies, P43 |
 | [backlog/charts-and-formatting.md](backlog/charts-and-formatting.md) | chart, authoring, formatting and export gaps |
 | [backlog/analytics-and-maps.md](backlog/analytics-and-maps.md) | statistics, forecasting, clustering, P42, maps |

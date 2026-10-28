@@ -14,7 +14,7 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
   `compare := sum [("="|"!="|"<>"|"<"|"<="|">"|">=") sum]` (no chaining); `sum := term (("+"|"-") term)*`;
   `term := factor (("*"|"/") factor)*`;
   `factor := "-" factor | number | string | "(" expr ")" | aggregate | logic | ref`; `string := "'" text "'"`; `aggregate := FN "(" expr ")" | "PERCENTILE" "(" expr "," number ")"`;
-  `ref := "[" name "]"`. Numbers are decimals with an optional exponent (`12`, `1.5`, `.5`, `1.`, `1e3`; no
+  `ref := "[" name "]" | "[@" parameter "]"` (a workbook parameter, see Parameters below). Numbers are decimals with an optional exponent (`12`, `1.5`, `.5`, `1.`, `1e3`; no
   `1,000`; a non-finite `1e999` is an error). `SUM`/`AVG`/`MEDIAN`/`STDDEV`/`VARIANCE`/`PERCENTILE` take a number; `MIN`/`MAX` a number, date or text;
   `COUNT`/`COUNTD`/`ATTR` any type; arithmetic needs numbers; an aggregate inside an aggregate is refused. A field of
   a category other than numeric, text, temporal or boolean can't be used.
@@ -89,7 +89,7 @@ in the formula**, never a field or a computed value.
   function over an aggregate (`LOWER(MAX([c.name]))`) is an aggregate; mixing with a bare row-level field is the usual error. A row-level text
   or boolean result (`LOWER`, `CONTAINS`) is a **dimension**; `LEN` is a row-level number (measure or dimension).
 - Not built: regular expressions, `FIND` / `POSITION`, `MID` / `SUBSTRING`, `LTRIM` / `RTRIM`, `STARTSWITH`/`CONTAINS` ignoring case, a length, position or separator
-  that is a field, parameter or computed value.
+  that is a field or computed value (a `[@Parameter]` works, see Parameters).
 
 ### Date functions
 
@@ -126,7 +126,29 @@ Use DATE() to turn text into a date.`); so is a number. A NULL date gives NULL f
 - **Roles:** the number functions give a row-level number (a measure or dimension, `SUM(WEEK([o.placed]))` works); `DATEADD` and `DATE`
   give a date dimension (`MIN`/`MAX` take it); `IF(MONTH([o.placed]) = 12, …)` and `DATEDIFF(…) > 30` work.
 - Not built: `TODAY()` / `NOW()` (a result would change between runs, which breaks caching), `MAKEDATE`, fiscal calendars and fiscal year start,
-  `ISOYEAR`, date-part bucketing of a calculated date, `DATENAME` / `DATETRUNC`, a unit, amount or part that is a field or parameter, `DATEPARSE` with a format, time zones.
+  `ISOYEAR`, date-part bucketing of a calculated date, `DATENAME` / `DATETRUNC`, a unit, amount or part that is a field (a `[@Parameter]` works), `DATEPARSE` with a format, time zones.
+
+### Parameters
+
+A formula reads a workbook parameter ([worksheet-encodings.md](worksheet-encodings.md#filters)) as **`[@Name]`**: `SUM([orders.amount]) * [@Tax rate]`.
+The `@` is the parameter namespace, so `[Name]` still means a calculation and `[table.column]` a field; a parameter name may hold dots
+(`[@Tax.rate]` is one name) but not `[` or `]` (such a parameter can't be referenced), and a calculation name may not start with `@`.
+- **Substitution is client-side, at compile.** `compileCalculation` parses `[@Name]` to `{ k: "param", name }`, expands calculation references,
+  then replaces each `param` node by a literal before type-checking: a number is `num` (a negative is `-` over its magnitude, the parser's own
+  shape), a text is `str` (**at most 100 characters**, the text-literal limit), a date is `DATE('YYYY-MM-DD')` (a `fn date` over a `str`, so the date rules of
+  `DATE` apply). The checked tree, the cache key and the wire hold only literals; the server never sees a parameter and its
+  limits are unchanged. Because the substitution comes before the check, a parameter can supply the literal-only arguments: `LEFT([c.name], [@N])`,
+  `DATEADD([@Unit], [@Days], d)` (still range-checked, so 2.5 or `'fortnight'` is refused as a literal would be).
+- **Types:** a text parameter in arithmetic reads `Arithmetic needs numbers — that value is text.`; `YEAR([@Region])` is `YEAR needs a date`.
+  A number parameter that isn't finite, a date that isn't a date, or a text over 100 characters is `Parameter [@X] isn't a usable number.` /
+  `isn't a date.` / `can be at most 100 characters in a formula.`
+- **Autocomplete:** typing `[@` offers only the workbook's parameters (`parameter · number`), narrowed by what follows.
+- **Changing a value** re-plans the open worksheet and every dashboard widget: the request now carries the new literal (a different request key, so a
+  fresh query, not a cached one); the sheet shows a control for each parameter its calculated pills read (the same controls as for filters).
+  Calculated pills are re-typed when a parameter's type changes.
+- **Rename and delete:** renaming a parameter rewrites `[@Old]` in every formula. Deleting one that a formula mentions **asks first** (naming the
+  calculations); if confirmed, the calculation keeps its formula and shows the E15 state `Calculation 'X' can't be computed: Parameter [@Y] was
+  deleted or doesn't exist.` (no query is sent) until a parameter with that name exists again. The workbook saves formula text only (format unchanged).
 
 ### Roles and types
 
