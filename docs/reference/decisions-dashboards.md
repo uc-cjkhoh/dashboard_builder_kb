@@ -28,10 +28,10 @@ order is the data order. The editor's old vocabulary is renamed inside (`dashboa
 - **Decision.** Only the active dashboard has live views: leaving it destroys every widget's worksheet view, and showing it rebuilds
   them. Widgets run through the **same result cache as the worksheet editor** (`sharedResults`, keyed by the exact request), so a
   widget draws what its worksheet tab just ran and a re-shown dashboard re-queries only what changed or failed. Widget positions are
-  computed in JS by the pure `board-layout.js` (not CSS grid), and below 560px of canvas width widgets stack full width in reading order.
+  computed in JS by the pure `board-layout.js` (not CSS grid), and below 720px of canvas width widgets stack full width in reading order.
 - **Why.** Twelve live charts on a hidden tab would hold queries and chart instances for nothing, and "stale" tracking would be
   extra state; rebuilding from a content-addressed cache is correct by construction. JS geometry is what pointer snapping, the ghost
-  and keyboard moves need next, and it makes the narrow-canvas rule testable. A 2-column widget on a phone-width grid is ~80px, so
+  and keyboard moves need next, and it makes the narrow-canvas rule testable. A 2-column widget on a narrow grid is ~100px, so
   stacking beats shrinking.
 - **Rejected:** keeping hidden dashboards alive (leaks); a separate cache per widget (the same query would run twice after an edit);
   CSS grid with `grid-column` (no pixel geometry to snap against).

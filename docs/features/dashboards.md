@@ -16,7 +16,7 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
   positioned from `board-layout.js` (`layoutBoard(widgets, panelWidth, { rowH, gap })` → pixel rects; `board.js` reads the row
   height and gap from the tokens). The canvas grows downward (at most 96 rows) and scrolls **inside its panel** — the page never
   scrolls (golden rule 8). Column width follows the canvas width; a `ResizeObserver` on the grid re-lays out.
-- **Narrow canvas:** below `STACK_BELOW` = 560px the grid is unusable, so widgets **stack full width in reading order** (by row,
+- **Narrow canvas:** below `STACK_BELOW` = 720px the grid is unusable, so widgets **stack full width in reading order** (by row,
   then column), each keeping its row count; the DOM order is the same reading order. At viewport width ≤ 760px the side panel
   moves above the canvas as a short scrolling list. The shell keeps its sidebar at every width, so a phone user collapses it first.
 - An empty dashboard shows "This dashboard is empty — add a worksheet or a text block from the list on the left."
@@ -29,6 +29,8 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
   dashboard is full — …") and nothing is added. A worksheet may be added more than once. The new widget scrolls into view.
 - A text widget starts with the heading "Text" and no body. Editing its text, and moving or resizing any widget, are not built yet
   ([backlog](../backlog/dashboards.md)).
+- Adding also announces "Added “name” to the dashboard." through the polite live region (`#toast-live`). A worksheet widget's loading
+  state has a **Cancel** button labelled "Cancel loading <worksheet name>".
 - **Remove** (header button, `aria-label` "Remove “name” from the dashboard") drops the widget, toasts "Removed “name”.", and moves
   focus to the next widget's Remove button (else **Add text**). Siblings are not redrawn. There is no undo yet.
 - Closing a worksheet removes its widgets from every dashboard ([tabs.md](tabs.md)); a widget whose worksheet is missing reads
@@ -53,7 +55,8 @@ Each widget is an `<article class="board-widget">` with a header — title, then
 - Queries are scoped by worksheet id and go through the **editor's result cache** (`sharedResults` in `dashboards.js`, keyed by the
   exact request), so a widget draws what its worksheet tab just ran and an unchanged sheet is served without a query. A widget
   whose request failed is not cached and runs again when shown. Up to 12 queries run in parallel; the browser queues past its
-  per-origin limit.
+  per-origin limit. Known cost: two widgets of one worksheet shown together (or a widget run while the same request is in flight)
+  each send the query — there is no in-flight de-duplication.
 
 ## Lifecycle
 
@@ -62,20 +65,28 @@ Each widget is an `<article class="board-widget">` with a header — title, then
   meanwhile draws its new sheet, an unedited one comes from the cache. (`worksheet:changed` for a widget's sheet while its dashboard
   is on screen re-runs that widget.)
 - A layout change (add, remove, a rename, `tabs:changed`) **reconciles by widget id**: existing widgets keep their view and chart.
-- `theme:changed` and `scheme:changed` re-run every live view — a cache hit, repainted in the new colours, no query.
+- `theme:changed` and `scheme:changed` re-run every live view — a cache hit, repainted in the new colours, no query. A widget that
+  showed an **error** has nothing cached, so a theme flip queries it again.
 - **Resize** re-lays out the grid and each chart re-fits through its own observer (`chart.js`); no query. After a reload a widget that
   drew a hint before its tables' columns arrived runs again once they do (`entity:loaded`).
 
 ## Full screen and print
 
-- **Full screen** shows the bar and canvas (the whole board) full screen (Fullscreen API, falling back to a fixed overlay;
+- **Full screen** (the button's text changes to "Exit full screen") shows the bar and canvas (the whole board) full screen (Fullscreen API, falling back to a fixed overlay;
   Esc / the button exits).
-- **Print** prints the canvas only: the grid is laid out at a fixed 1000px page width, with the side panel, bar buttons and widget
-  buttons hidden (`@media print` in `board.css`).
+- **Print** prints the canvas only, with the side panel, bar buttons and widget buttons hidden (`@media print` in `board.css`). On
+  `beforeprint` the board lays itself out **stacked at a fixed 1000px page width** (`layoutBoard(…, { stack: true })`) and the widgets
+  print **in flow, one column** (`position: relative`, `break-inside: avoid`) — an absolutely positioned widget could be split or
+  cropped across pages. Each worksheet widget's chart is sized to its printed cell (`sizeChart(body, { width, height })` from the cell
+  box less header and padding), overriding the worksheet print rule that fixes every chart canvas at 1000 × 560; `afterprint` restores
+  the screen layout and chart sizes. The arrangement on screen (side by side) is not kept on paper.
 - Image and CSV export, and bookmarks, stay per worksheet (reach them with **Edit**); the bookmark action is hidden on a dashboard.
 
 ## Tests
 
 `tests/js/board-layout.test.mjs` (geometry, the 96-row limit, stacking), `board-model.test.mjs` (rules and limits);
 `tests/live/board-ui.mjs` (mocked API: three widget kinds draw with their own queries, a failing widget, Remove, Edit, disposal on
-tab switch, a worksheet edit, theme flip, phone stacking, full screen, reload from autosave; light, dark and phone screenshots).
+tab switch, a worksheet edit, theme flip, phone stacking, full screen, reload from autosave, a shared filter and a parameter in a
+widget's query, a calculated field + cast + tooltip template + member colour in a widget, table paging inside a widget, the Cancel
+label and live-region announcement, and print layout checked under emulated print media with the chart-to-cell geometry; light,
+dark, phone and print screenshots). Not verified: the browser's real print dialog and PDF pages.
