@@ -118,3 +118,26 @@ NULL for fewer than two values (not NaN, which JSON cannot carry); `ATTR` is `if
 and so returns NULL where Tableau shows `*`, ignoring NULL rows. The percentile fraction is a literal in the
 formula and a `p` on the `agg` node, bound as a parameter and checked 0..1 on both sides; a plain measure has no
 fraction field, so a plain percentile is not offered (write `PERCENTILE([t.c], 0.9)`).
+
+### D49 — Logic is new node kinds on the same wire; one `case` node for IF and CASE
+`str`, `cmp`, `logic` (`and`/`or`), `not`, `case`, `ifnull`, `isnull` join `field | num | un | bin | agg` under the
+same discriminator `k` (unknown `k` stays a 400); `IF`/`IIF` are a `case` with one arm and an else, `ZN(a)` is
+`ifnull(a, 0)` and the simple `CASE x WHEN v` is a `cmp` per arm, so the server learns no more kinds than it computes.
+The shared walk is `ExprTree.Children`. They count toward the same depth and node limits.
+
+### D50 — Typing: one result type, boolean conditions, no mixed comparisons
+Every THEN and the ELSE (and both sides of `IFNULL`) must be the same type, a condition must be boolean, and a
+comparison takes two numbers, two texts or two dates — no implicit conversion, no boolean comparison (use the
+boolean directly). The error names the offending branch (`w1.t`, `else`, `r`). An IF/CASE is an aggregate when any
+part is, and the existing mixing rule applies with literals neutral.
+
+### D51 — NULL follows SQL
+A NULL condition is not true (IF takes the else, CASE the next WHEN); a comparison with NULL is NULL; `AND`/`OR`/`NOT`
+are three-valued. Chosen over "NULL is false" so `x <> 'a'` does not silently include unknown values, and because
+ClickHouse behaves this way natively (confirmed live). Division keeps `nullIf(r, 0)`; `IFNULL`/`ZN` is the explicit
+replace-NULL tool.
+
+### D52 — Text literals are bound, length-limited, and a boolean result is `Bool`
+A text literal is a `String` parameter like every number is a `Float64`, at most 100 characters (client parser, JS
+checker and server validator alike), never in SQL text. A boolean calculation is wrapped in `toBool(...)` and group
+keys of booleans read `true`/`false` (previously `True`/`False` for a Bool field), matching how cells already read.

@@ -157,7 +157,9 @@ reaches the server or SQL.
 ```
 
 - **Nodes** (discriminator `k`): `field` (`db`, `table`, `column`), `num` (`v`, finite), `un` (`op: "-"`),
-  `bin` (`op` ∈ `+ - * /`), `agg` (`fn` ∈ `sum avg min max count countd median stddev variance percentile attr`, `arg`, and `p` for
+  `bin` (`op` ∈ `+ - * /`), `str` (`v`, ≤ 100 characters, bound as a `String` parameter), `cmp` (`op` ∈ `= != < <= > >=`, `l`, `r`),
+  `logic` (`op` ∈ `and or`, `l`, `r`), `not` (`arg`), `case` (`whens`: `[{ "c": cond, "t": result }]` — at least one — and an optional
+  `else`; `IF`/`IIF` are one arm plus `else`), `ifnull` (`l`, `r`), `isnull` (`arg`), `agg` (`fn` ∈ `sum avg min max count countd median stddev variance percentile attr`, `arg`, and `p` for
   `percentile`). `count` counts non-NULL values (as `countNonNull`), `countd` distinct values. `p` is a finite
   number 0..1, required for `percentile` and refused on every other function (400 at `….calc.p`, "PERCENTILE
   needs a fraction between 0 and 1." / "SUM takes no fraction."); it is bound as a `Float64` parameter. Every referenced table must already be in the
@@ -173,6 +175,12 @@ reaches the server or SQL.
   `median` / `stddev` / `variance` need a number); a row-level tree is valid as a dimension, an
   aggregate one there is a 400; a calculated dimension takes no `datePart` (`….datePart`) and is never
   date-grouped by `dateBucket`.
+- **Logic typing** (400 at the node path; `w0.c` is the first WHEN's condition, `w1.t` the second's result, `else`):
+  a condition must be boolean ("A condition needs a boolean — orders.amount is number."), every result one type ("All
+  results must be the same type — …"), a comparison two values of one type, never boolean ("Comparison needs two values
+  of the same type — …"), `AND`/`OR`/`NOT` booleans, a text literal ≤ 100 characters ("A text value can be at most 100
+  characters."), a `case` with no arm ("A CASE needs at least one WHEN."). A boolean calculation is a dimension (keys
+  `true` / `false` / `null`) or, when it aggregates, a measure; it takes no `sum`/`avg`.
 - **Tree errors** name the node: `measures[0].calc.arg`, `rowDimensions[1].calc.l.r` — e.g. "SUM needs a
   number — orders.region is text.", "Unknown field orders.nope.", "Can't mix an aggregate with a
   row-level value in one formula.", "An aggregate can't contain another aggregate.", "That formula is too

@@ -10,12 +10,15 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
 
 ## Formulas
 
-- Grammar: `expr := term (("+"|"-") term)*`; `term := factor (("*"|"/") factor)*`;
-  `factor := "-" factor | number | "(" expr ")" | aggregate | ref`; `aggregate := FN "(" expr ")" | "PERCENTILE" "(" expr "," number ")"`;
+- Grammar: `expr := and ("OR" and)*`; `and := not ("AND" not)*`; `not := "NOT" not | compare`;
+  `compare := sum [("="|"!="|"<>"|"<"|"<="|">"|">=") sum]` (no chaining); `sum := term (("+"|"-") term)*`;
+  `term := factor (("*"|"/") factor)*`;
+  `factor := "-" factor | number | string | "(" expr ")" | aggregate | logic | ref`; `string := "'" text "'"`; `aggregate := FN "(" expr ")" | "PERCENTILE" "(" expr "," number ")"`;
   `ref := "[" name "]"`. Numbers are decimals with an optional exponent (`12`, `1.5`, `.5`, `1.`, `1e3`; no
   `1,000`; a non-finite `1e999` is an error). `SUM`/`AVG`/`MEDIAN`/`STDDEV`/`VARIANCE`/`PERCENTILE` take a number; `MIN`/`MAX` a number, date or text;
   `COUNT`/`COUNTD`/`ATTR` any type; arithmetic needs numbers; an aggregate inside an aggregate is refused. A field of
   a category other than numeric, text, temporal or boolean can't be used.
+- **Logic** ([below](#logic-functions)): comparisons, `AND` / `OR` / `NOT`, `IF` / `IIF` / `CASE`, `IFNULL`, `ISNULL`, `ZN`, text literals.
 - Operators `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`,
   `COUNTD`, `MEDIAN`, `STDDEV`, `VARIANCE`, `PERCENTILE`, `ATTR` (function names are case-insensitive). The
   function table lives in `calc-types.js`.
@@ -34,6 +37,29 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
 - A formula with no field references (`1+2`) is valid. It needs a field from a table elsewhere on the sheet
   to have anything to group or total.
 
+### Logic functions
+
+- **Text literal** `'open'`: a quote inside is doubled (`'it''s'`); at most 100 characters; it is sent as data, never
+  as SQL text. There are no date or boolean literals (compare two date fields; use a boolean field as a condition).
+- **Comparison** `= != <> < <= > >=` (`<>` is `!=`) takes two numbers, two texts or two dates, never a mix and never a
+  boolean (`Comparison needs two values of the same type — …`). Text compares exactly (case and accents count).
+  Precedence, loosest first: `OR`, `AND`, `NOT`, comparison, `+ -`, `* /`; `1 + 2 > 2` works unparenthesised.
+- **`AND` / `OR` / `NOT`** need booleans (a comparison, `ISNULL`, a boolean field) and give a boolean.
+- **`IF(cond, a, b)`** (also `IIF`) and **`CASE WHEN c THEN a [WHEN …] [ELSE d] END`**; the simple form
+  `CASE [f] WHEN 'x' THEN a … END` tests `[f] = 'x'`. Conditions are booleans; every THEN and the ELSE must have
+  **one type** (number, text, date or boolean), else `All results must be the same type — … is text, not number.` at the
+  offending branch. The first true WHEN wins. A CASE with no ELSE is empty (NULL) when nothing matches.
+- **`IFNULL(a, b)`** is `a`, or `b` when `a` is empty (same type); **`ZN(a)`** is `IFNULL(a, 0)`; **`ISNULL(a)`** is true
+  when `a` is empty. Division by zero is still empty, so `IFNULL(a / b, 0)` repairs it.
+- **NULL:** a condition that is NULL counts as not true — `IF` takes its else, `CASE` tries the next WHEN. A comparison
+  with NULL is NULL (shown as a NULL group, not `false`), `AND`/`OR`/`NOT` are three-valued (`NULL AND false` is
+  `false`, `NULL OR true` is `true`, `NOT NULL` is NULL). Aggregates still skip NULLs.
+- **Aggregate or row-level:** an `IF`, `CASE`, comparison or `IFNULL` is an aggregate calculation when any part is an
+  aggregate and every other part is an aggregate or a constant (`IF(SUM([a]) > 100, 'high', 'low')`); a row-level
+  part beside an aggregate is the usual mixing error. `SUM(IF([s] = 'open', [amount], 0))` is a conditional sum.
+- Not built: the keyword form `IF c THEN a ELSEIF … END` (write `IF(…)` or `CASE`), date and boolean literals, `NULL`
+  as a word (use `ISNULL`), `IN`, `BETWEEN`.
+
 ### Roles and types
 
 The check yields a type (number, text, date, boolean) and whether the formula is an **aggregate**:
@@ -41,16 +67,17 @@ The check yields a type (number, text, date, boolean) and whether the formula is
 | Formula | Role | Used as |
 |---|---|---|
 | contains an aggregate (`SUM([a]) / SUM([b])`) | measure | aggregated by the server, no further aggregation |
-| row-level text, date or boolean | dimension | a group key |
+| row-level text, date or boolean (`[status] = 'open'`, `CASE … 'big' …`) | dimension | a group key; a boolean shows `true` / `false` |
 | row-level number | measure **or** dimension | measure sums it per row (`SUM([price] * [qty])`); dimension groups by it |
 
-Mixing an aggregate with a bare row-level field in one formula is refused by the checker with a message.
+Mixing an aggregate with a bare row-level field in one formula is refused by the checker with a message. An aggregate
+text or boolean calculation is a measure and shows in tables and KPIs.
 
 ### Limits
 
 Read from `Core/validate.js` `LIMITS` (`calculations`, `calcFormula`, `calcName`) and `CALC_LIMITS` in
-`calc-types.js` (formula length, depth, nodes) — the server mirrors depth, nodes and name length in
-`CalcLimits`. A formula over the length limit, a tree over the depth or node limit, a name over the length
+`calc-types.js` (formula length, depth, nodes, text literal length 100) — the server mirrors depth, nodes, name length and
+literal length in `CalcLimits`. A `CASE` counts one node plus every condition and result. A formula over the length limit, a tree over the depth or node limit, a name over the length
 limit and a workbook over the calculation count are refused with a message; none is clamped.
 
 ## The dialog
@@ -66,7 +93,7 @@ limit and a workbook over the calculation count are refused with a message; none
   and over-long text give a message, never an exception.
 - **Live message** — the first problem, in plain words, with `(at character N)` and a caret mark when the
   parser knows the position. Unknown field and cycle messages name the cause.
-- **Role chip** — icon plus text, never colour alone: `Aggregate · number`, `Row-level · text`, "No
+- **Role chip** — icon plus text, never colour alone: `Aggregate · number`, `Row-level · text`, `Row-level · boolean`, "No
   formula yet", or "Can't be saved".
 - **Use as** — a Measure / Dimension choice, shown only for a **row-level number**. It is a session-only
   default for chips dragged afterwards; it is not saved in the workbook. A pill already placed keeps its

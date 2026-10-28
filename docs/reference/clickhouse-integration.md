@@ -149,9 +149,8 @@ bound parameter or a validated integer (out-of-range limits are rejected before 
   calculated measures, a calculated Top-N rank) by `tests/live/calc-smoke.mjs`.
 - **Compression:** API responses are Brotli/gzip-compressed (fastest level, `Program.cs`).
 - **Response:** `QueryResult { rowDimensions, columnDimensions, measures, rows:[{keys, values}], truncated, total?, other?, bucket? }`;
-  `values` are numbers, strings (`min` / `max` of a text or date column — read by the measure's
-  category, not `Convert.ToDouble`) or `null` (NULL, or `NaN` / `∞` from an aggregate over no rows); the
-  client pivots it ([worksheet.md](../features/worksheet.md#table-view--a-true-rows--columns-crosstab)).
+  `values` are numbers, strings (`min` / `max` of a text or date column — read by the measure's category) or `null`
+  (NULL, or `NaN` / `∞` from an aggregate over no rows); the client pivots it ([worksheet.md](../features/worksheet.md#table-view--a-true-rows--columns-crosstab)).
 - **Errors:** invalid identifier, table-not-in-query, `sum` / `avg` on a non-numeric column, or a value
   that doesn't fit its column → 400 ([api.md](api.md#errors)).
 
@@ -178,11 +177,14 @@ becomes SQL in four steps; no formula text and no literal is ever written into S
    the `sum` / `avg`-needs-a-number rule against the derived type (`CalcMeasureSql`, `CalcDimensionSql`).
 4. **Compile** (`ClickHouse/Calc/CalcCompiler.cs`): numeric columns widened with `toFloat64(...)` (no
    unsigned wrap, no integer or `Decimal` rounding); `a / b` → `(a / nullIf(b, 0))` (division by zero is
-   NULL, never `inf`); each number literal bound as `{c{n}p{m}:Float64}` — `c{n}` unique per compiled
+   NULL, never `inf`); each number literal bound as `{c{n}p{m}:Float64}` and each text literal as `{c{n}p{m}:String}` — `c{n}` unique per compiled
    calculation in the request; aggregates through the shared `AggregateSql` (table below), so a calculated
    `SUM` is scaled and a `COUNTD` estimated exactly as a plain measure is. A row-level measure is then
    wrapped by its pill aggregation; an aggregate tree is used as is; a dimension groups by its row-level
-   expression.
+   expression. Logic nodes: `(a = b)` (also `!= < <= > >=`), `and(a, b)`, `or(a, b)`, `not(a)`, `if(c, a, b)` (IF/IIF),
+   `multiIf(c1, a1, …, else)` (CASE; `NULL` last without an ELSE), `ifNull(a, b)`, `isNull(a)`; a NULL condition is
+   not true (IF takes its else, CASE the next WHEN — pinned by the live smoke). A boolean-typed calculation is
+   wrapped in `toBool(...)` so group keys read `true` / `false` (`FormatKey`).
 
 **One compile, one parameter list.** Each calculation is compiled once; its SQL string is reused in the
 page, the total (`count()` over the grouped query), the Other statement and inline in the Top-N
@@ -191,17 +193,16 @@ calculation literals `c{n}p{m}`). The auto date-grain probe reuses only the date
 `WHERE`, so it is sent just the parameters its SQL names (`ParametersUsedBy`). A calculated dimension is
 never date-grouped: `dateBucket` takes the first *real* temporal dimension wherever the calculation sits.
 The result cache key includes the tree, so two requests that differ only in a calculation never share a
-result. Tests: `CalcCompilerTests`, `CalcValidatorTests`, `CalcRulesTests`, `CalcGatewayTests`,
-`CalcJsonTests`, the shared fixture (also run by `node --test`); live: `tests/live/calc-smoke.mjs` (dev
-app + a real ClickHouse, fixture tables `test_cj.calc_smoke_*` created and dropped by the script,
-results checked against hand-written `SELECT`s).
+result. Tests: `CalcCompilerTests`, `CalcValidatorTests`, `CalcRulesTests`, `CalcGatewayTests`, `CalcJsonTests`, the
+shared fixture (also run by `node --test`); live (dev app + a real ClickHouse, tables created and dropped by the
+script, results checked against hand-written `SELECT`s or hand-computed values): `tests/live/calc-smoke.mjs`
+(`test_cj.calc_smoke_*`), `tests/live/logic-smoke.mjs` (`test_cj.bk_logic`).
 
 **Compile spikes** (`node tests/live/calc-spikes.mjs`, SELECT only, inline sources). A bound parameter inside a
-`SELECT` / `GROUP BY` expression works (`toFloat64(q) * {c0p0:Float64} AS k0 … GROUP BY k0`, and `GROUP BY` the
-full expression too). `toFloat64` over `UInt32`, `Decimal(18,2)` and `Nullable(Float64)` works: no unsigned
-wrap (`toFloat64(UInt32 2) - toFloat64(Decimal 10.00)` is `-8`), and a NULL operand makes the result NULL.
-`sum(toFloat64(x)) / nullIf(sum(toFloat64(y)), 0)` with every `y` = 0 returns JSON `null`; without `nullIf`
-`FORMAT JSON` also gives `null`, so `nullIf` keeps the SQL NULL for other writers and downstream arithmetic.
+`SELECT` / `GROUP BY` expression works (also `GROUP BY` the full expression). `toFloat64` over `UInt32`,
+`Decimal(18,2)` and `Nullable(Float64)` works: no unsigned wrap (`toFloat64(UInt32 2) - toFloat64(Decimal 10.00)` is
+`-8`), a NULL operand makes the result NULL. `sum(x) / nullIf(sum(y), 0)` with every `y` = 0 returns JSON `null`;
+`nullIf` keeps the SQL NULL for other writers and downstream arithmetic.
 
 **Aggregates, exact and approximate** (`AggregateSql` — one function for plain and calculated measures;
 "sampled" = `approximate` on a base table with a sampling key, read `SAMPLE 0.1`):
@@ -232,9 +233,8 @@ aligned on purpose. Likewise `approx.distinct` in the response ignores a `COUNTD
 
 - **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct/countNonNull/median/stddev/variance/attr`
   (`countDistinct` → `uniqExact`, `countNonNull` → `count(col)`; `median`, `stddev`, `variance` need a numeric
-  column, `attr` any column but a compound one; no plain `percentile` — it needs a fraction); calculation node kinds, operators and functions
-  (`CalcValidator`, `CalcCatalog`);
-  operators `= != > >= < <= in notin between` (plus text match and top-N).
+  column, `attr` any column but a compound one; no plain `percentile` — it needs a fraction); calculation node kinds,
+  operators and functions (`CalcValidator`, `CalcCatalog`); operators `= != > >= < <= in notin between` (plus text match and top-N).
 - **Typed bound values** (`FilterValues.Coerce`, `ClickHouse/RequestValidation.cs`): the value is
   converted to the column's category from the same `DESCRIBE` before binding — number → `{p0:Float64}`
   (plain decimal only), date / datetime → ISO text bound as `String` (a `Date` / `Date32` column rejects a

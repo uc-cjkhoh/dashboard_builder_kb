@@ -289,7 +289,7 @@ and holds only results the user could already see — no application database (D
 a 10% `SAMPLE` (counts and sums scaled by `_sample_factor`) on a base table that declares a sampling key.
 If the server refuses the sampled query it runs once more unsampled (logged).
 
-Calculated-field decisions D26–D47: [decisions-calculated-fields.md](decisions-calculated-fields.md).
+Calculated-field decisions D26–D52: [decisions-calculated-fields.md](decisions-calculated-fields.md).
 
 ## Open questions
 
