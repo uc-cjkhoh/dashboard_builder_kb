@@ -165,3 +165,27 @@ matter); the case-insensitive *filter* is unchanged. Character functions are UTF
 that exists but is empty stays `''`, so "no such piece" (NULL) and "empty piece" differ; `''` splits to one empty piece
 (confirmed live).
 
+### D57 — Date functions are rows in the same `fn` table; units and amounts are literals
+`DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY` and `DATE` are `RowFunctions` rows (new argument kinds `date`,
+`unit`, `amount`), parsed by the generic `fn` path with no grammar change. The unit is a **text literal** (`'day'`), not a bare
+keyword: it needs no parser rule and reuses text-literal parsing and its 100-character cap. The unit is checked against the fixed
+list `CalcCatalog.DateUnits` (a node test ties it to `DATE_UNITS`); `DATEDIFF` binds it as a `String` parameter, `DATEADD` picks a
+fixed function (`addDays` …) so no unit text reaches SQL. The `DATEADD` amount is a literal -100000..100000 (a bound `Int32`; a
+single leading minus is allowed), rejected out of range as in D54.
+
+### D58 — Date arguments must be dates; text goes through `DATE()`
+A date argument that is text or a number is an error that points at `DATE()`, so no function guesses a conversion. `DATE` is the one
+text-to-date path and reuses the date cast's digit-only guard (`TypeCast`, one expression for both); it parses with the wide-range
+parser and returns NULL outside what a `Date` holds, because ClickHouse would otherwise clamp `1850-01-01` to `1970-01-01`
+silently. It returns a `Date`, dropping any time of day.
+
+### D59 — `DATEDIFF` counts boundaries; `WEEK` is ISO; parts are numbers
+`dateDiff` counts calendar boundaries crossed (31 Jan to 1 Feb is one month), the ClickHouse and Tableau meaning, not elapsed
+time. `WEEK` is `toISOWeek` and `WEEKDAY` is Monday 1 to Sunday 7, while the existing week date part stays the Monday-truncated
+bucket (a different thing: a date, not a number). Parts return `toFloat64` like every calculation number. NULL in, NULL out.
+
+### D60 — No `TODAY()` / `NOW()`, no `MAKEDATE` yet
+A calculation is a function of the data: caching, saved workbooks and exports assume the same query gives the same answer. `TODAY`
+and `NOW` would change that, so they wait for a decision (a parameter-style "as of" value). `makeDate` returns `1970-01-01` for a
+month 13 or day 32 and rolls `2023-02-29` to 1 March, so it needs guards (and number-argument kinds) that are not worth building yet.
+

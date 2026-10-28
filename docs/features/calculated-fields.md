@@ -20,6 +20,7 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
   a category other than numeric, text, temporal or boolean can't be used.
 - **Logic** ([below](#logic-functions)): comparisons, `AND` / `OR` / `NOT`, `IF` / `IIF` / `CASE`, `IFNULL`, `ISNULL`, `ZN`, text literals.
 - **Text** ([below](#text-functions)): `LOWER`, `UPPER`, `TRIM`, `LEN`, `LEFT`, `RIGHT`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `SPLIT`.
+- **Date** ([below](#date-functions)): `DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY`, `DATE`.
 - Operators `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`,
   `COUNTD`, `MEDIAN`, `STDDEV`, `VARIANCE`, `PERCENTILE`, `ATTR` (function names are case-insensitive). The
   function table lives in `calc-types.js`.
@@ -89,6 +90,41 @@ in the formula**, never a field or a computed value.
   or boolean result (`LOWER`, `CONTAINS`) is a **dimension**; `LEN` is a row-level number (measure or dimension).
 - Not built: regular expressions, `FIND` / `POSITION`, `MID` / `SUBSTRING`, `LTRIM` / `RTRIM`, `STARTSWITH`/`CONTAINS` ignoring case, a length, position or separator
   that is a field, parameter or computed value.
+
+### Date functions
+
+Row-level functions over dates (same `ROW_FUNCTIONS` table and generic `fn` node as text). A *date* argument is any date or
+date-time expression: a field, `DATEADD(…)`, `DATE(…)`. A text argument is refused (`YEAR needs a date — orders.status is text.
+Use DATE() to turn text into a date.`); so is a number. A NULL date gives NULL from every function.
+
+| Function | Result | Meaning |
+|---|---|---|
+| `DATEDIFF(unit, d1, d2)` | number | `d2` minus `d1`, in whole `unit`s, counted as **calendar boundaries crossed**: `DATEDIFF('month', 31 Jan, 1 Feb)` is 1 and `DATEDIFF('year', 31 Dec, 1 Jan)` is 1; negative when `d2` is earlier; weeks start on Monday |
+| `DATEADD(unit, n, d)` | date | `d` moved by `n` units; a month or year step past the end of a shorter month lands on its last day (31 Jan + 1 month is 29 Feb 2024; 29 Feb 2024 + 1 year is 28 Feb 2025) |
+| `YEAR(d)` / `MONTH(d)` / `DAY(d)` / `QUARTER(d)` | number | the calendar year, month 1-12, day of the month 1-31, quarter 1-4 |
+| `WEEK(d)` | number | the **ISO 8601 week** 1-53 (weeks start Monday; week 1 holds the year's first Thursday, so 31 Dec 2020 and 1 Jan 2021 are week 53 and 30 Dec 2024 is week 1) |
+| `WEEKDAY(d)` | number | ISO day of the week: Monday 1 to Sunday 7 |
+| `DATE(t)` | date | the text `t` read as a calendar date (`2024-03-05`, `20240229`, `2024-03-05 10:30:00`); NULL when it is not one. The time of day is dropped |
+
+- **Unit and amount are literals written in the formula.** The unit is a **text literal** (`'day'`, any case) from `year`, `quarter`,
+  `month`, `week`, `day`, `hour`, `minute`, `second`; anything else (a field, a number, another word) is an error listing them. The
+  `DATEADD` amount is a whole number from -100000 to 100000 (`-7` is fine), never a field or computed value; out of range is an
+  error, not a clamp (as `LEFT`'s length, [D54](../reference/decisions-calculated-fields.md#d54--length-position-and-separator-are-literals-rejected-out-of-range)).
+- **Date versus date-time:** the engine's *date* type covers both. On a date-time column `DATEDIFF('hour', …)` counts hour
+  boundaries (22:30 to 01:00 next day is 3) and `DATEADD('hour', …)` keeps the time of day. On a plain date column a time unit
+  reads midnight to midnight (`DATEDIFF('hour', 1 Jan, 2 Jan)` is 24) and `DATEADD('hour', 5, d)` becomes a date-time at 05:00. A
+  date-time at midnight displays as a date, as everywhere in the app. The server's own time zone applies to date-time columns
+  without one.
+- **`DATE(t)` rules:** the same guard as the date type cast: text made only of digits, spaces, signs, commas and dots is NULL unless it is
+  `YYYYMMDD` (`'12345'` is NULL, not the 5th of this month); an impossible day (`2024-02-30`), a word, and a year outside 1970 to
+  2148 are NULL, never a clamped date.
+- **`WEEK` is not the week date part:** the date part and bucket "week" on a plain date field is the **Monday that starts the week**
+  (a date); `WEEK(d)` is the ISO week *number*. Weeks 52/53 and 1 can belong to the neighbouring ISO year, and there is no `ISOYEAR`
+  yet, so group by `YEAR` plus `WEEK` only away from the year turn.
+- **Roles:** the number functions give a row-level number (a measure or dimension, `SUM(WEEK([o.placed]))` works); `DATEADD` and `DATE`
+  give a date dimension (`MIN`/`MAX` take it); `IF(MONTH([o.placed]) = 12, …)` and `DATEDIFF(…) > 30` work.
+- Not built: `TODAY()` / `NOW()` (a result would change between runs, which breaks caching), `MAKEDATE`, fiscal calendars and fiscal year start,
+  `ISOYEAR`, `DATENAME` / `DATETRUNC`, a unit, amount or part that is a field or parameter, `DATEPARSE` with a format, time zones.
 
 ### Roles and types
 
