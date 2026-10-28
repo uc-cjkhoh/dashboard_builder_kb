@@ -160,7 +160,7 @@ gate, table pager and fresh flag, and `chart.js` keeps one chart per container, 
 member colours). The view draws through `renderWorksheet` (`worksheet-render.js`); the editor only hands it
 its state as options — `interactive`, `onSelect`, `onDrill`, `onLegend`, `legendFocus`, the tooltip and
 member-colour panels' hooks, `statusBar`, `notices` — so a view with `interactive: false` draws the same marks
-with no selection, drill, legend click or status line (the widget case; the editor's own view is interactive).
+with no selection, drill or status line and a highlight-only legend (nothing is ever hidden) (the widget case; the editor's own view is interactive).
 What happens next
 (`Dashboard/query-runner.js`, unit-tested in `tests/js/`):
 
