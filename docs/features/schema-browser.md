@@ -54,10 +54,12 @@ Sidebar, below the connection panel. Code: `Features/Schema/` (`SchemaController
 - **Field details:** Name, Type (raw ClickHouse type), Kind (the display category) and Role (*measure* for numeric,
   else *dimension* — the worksheet's rule). **Tiles:** Rows, Distinct (approx.), Null share (percent and "n of N rows"),
   and Min / Max for numeric and date columns. **Most frequent values:** up to 10, each a text label, an in-cell bar,
-  the count and its share of the rows read; NULL reads *NULL* and an empty string *(empty)* (italic), a value over 100
+  the count and its share of the rows read; NULL reads *(NULL)* and an empty string *(empty)* (italic, so neither is mistaken for the text "NULL"), a value over 100
   characters is cut with an ellipsis. Bars are neutral (red means danger); the text carries every figure.
-- Honesty: only the **first 1,000,000 rows** are read; when the table has at least that many a warning band says the
-  figures describe those rows, not the table. Distinct is an estimate. A share never rounds a partial share up to 100%
+- Honesty: only the **first 1,000,000 rows ClickHouse returns, in no particular order** are read — not a statistical
+  sample; when the table has at least that many a warning band says the figures describe those rows, not the table.
+  Values are compared by their first 100 characters (a note says so when one was cut), so values differing only later
+  count together. Distinct is an estimate. A share never rounds a partial share up to 100%
   and tiny ones read "<0.1%".
 - **Copy name** copies the column name; **Copy values** copies the plain top values, one per line (NULL, empty and cut
   values left out). Both use `navigator.clipboard` and say so in a toast, or report that the browser blocked it.

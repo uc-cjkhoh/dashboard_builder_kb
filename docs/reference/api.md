@@ -104,7 +104,7 @@ Controller: `Features/Schema/SchemaController.cs`.
 | `GET /api/databases` | list databases | `SHOW DATABASES` |
 | `GET /api/databases/{db}/tables` | list tables | `SHOW TABLES FROM {db}` |
 | `GET /api/databases/{db}/tables/{table}/columns` | columns `{name, type, category}` | `DESCRIBE TABLE` |
-| `POST /api/databases/{db}/tables/{table}/profile` | column profile; body `{ column, limit? }` → `{ column, type, category, rows, nulls, distinct, min, max, top: [{ value, count, cut }], sampled, sampleLimit }`. Reads the table's **first 1,000,000 rows** (`sampled` = it has at least that many); `distinct` is approximate (`uniq`, non-null); `min`/`max` are text, numeric and date columns only; `value` null = SQL NULL, cut at 100 characters (`cut`); ties in `top` break by value. Unknown column/table → 404 | two bounded `SELECT`s |
+| `POST /api/databases/{db}/tables/{table}/profile` | column profile; body `{ column, limit? }` → `{ column, type, category, rows, nulls, distinct, min, max, top: [{ value, count, cut }], sampled, sampleLimit }`. Reads the **first 1,000,000 rows ClickHouse returns, in no particular order** — not a statistical sample (`sampled` = the table has at least that many); `distinct` is approximate (`uniq`, non-null); `min`/`max` are text, numeric and date columns only; `value` null = SQL NULL, cut at 100 characters, counted in characters not bytes (`cut`); values that differ only after character 100 count together; ties in `top` break by value. Unknown column/table → 404 | two bounded `SELECT`s |
 | `GET /api/databases/{db}/tables/{table}/columns/{column}/distinct?limit=` | distinct values for an `in` filter / Pages (default 200, 1–1000 else 400) | `SELECT DISTINCT … LIMIT n` |
 
 ## Rows
