@@ -159,7 +159,7 @@ reaches the server or SQL.
 - **Nodes** (discriminator `k`): `field` (`db`, `table`, `column`), `num` (`v`, finite), `un` (`op: "-"`),
   `bin` (`op` ∈ `+ - * /`), `str` (`v`, ≤ 100 characters, bound as a `String` parameter), `cmp` (`op` ∈ `= != < <= > >=`, `l`, `r`),
   `logic` (`op` ∈ `and or`, `l`, `r`), `not` (`arg`), `case` (`whens`: `[{ "c": cond, "t": result }]` — at least one — and an optional
-  `else`; `IF`/`IIF` are one arm plus `else`), `ifnull` (`l`, `r`), `isnull` (`arg`), `agg` (`fn` ∈ `sum avg min max count countd median stddev variance percentile attr`, `arg`, and `p` for
+  `else`; `IF`/`IIF` are one arm plus `else`), `ifnull` (`l`, `r`), `isnull` (`arg`), `fn` (`fn` ∈ `lower upper trim len left right replace concat contains startswith endswith split`, `args`: array), `agg` (`fn` ∈ `sum avg min max count countd median stddev variance percentile attr`, `arg`, and `p` for
   `percentile`). `count` counts non-NULL values (as `countNonNull`), `countd` distinct values. `p` is a finite
   number 0..1, required for `percentile` and refused on every other function (400 at `….calc.p`, "PERCENTILE
   needs a fraction between 0 and 1." / "SUM takes no fraction."); it is bound as a `Float64` parameter. Every referenced table must already be in the
@@ -175,6 +175,10 @@ reaches the server or SQL.
   `median` / `stddev` / `variance` need a number); a row-level tree is valid as a dimension, an
   aggregate one there is a 400; a calculated dimension takes no `datePart` (`….datePart`) and is never
   date-grouped by `dateBucket`.
+- **Text-function typing** (400 at `….calc.args.<i>` or the call): a text argument must be text ("LOWER needs a text — orders.amount is number."),
+  the argument count is fixed ("LEFT takes 2 arguments.", "CONCAT takes 2 to 10 arguments."), `LEFT`/`RIGHT` length a number literal 0..1000, `SPLIT`
+  position a literal 1..1000 and separator a text literal of 1..20 characters ("SPLIT's separator must be text written in the formula, 1 to 20 characters."); an unknown
+  name is "Unknown function x.". Limits `CalcLimits.MaxCount` / `MaxSeparator` / `MaxConcat`, mirrored in `CALC_LIMITS`.
 - **Logic typing** (400 at the node path; `w0.c` is the first WHEN's condition, `w1.t` the second's result, `else`):
   a condition must be boolean ("A condition needs a boolean — orders.amount is number."), every result one type ("All
   results must be the same type — …"), a comparison two values of one type, never boolean ("Comparison needs two values

@@ -183,7 +183,7 @@ becomes SQL in four steps; no formula text and no literal is ever written into S
    wrapped by its pill aggregation; an aggregate tree is used as is; a dimension groups by its row-level
    expression. Logic nodes: `(a = b)` (also `!= < <= > >=`), `and(a, b)`, `or(a, b)`, `not(a)`, `if(c, a, b)` (IF/IIF),
    `multiIf(c1, a1, …, else)` (CASE; `NULL` last without an ELSE), `ifNull(a, b)`, `isNull(a)`; a NULL condition is
-   not true (IF takes its else, CASE the next WHEN — pinned by the live smoke). A boolean-typed calculation is
+   not true (IF takes its else, CASE the next WHEN — pinned by the live smoke). Text functions (`fn` nodes, every argument compiled once in source order): `lowerUTF8`, `upperUTF8`, `trimBoth`, `toFloat64(lengthUTF8(…))`, `leftUTF8`/`rightUTF8(t, {UInt32})`, `replaceAll`, `concat`, `(position(t, s) > 0)`, `startsWith`, `endsWith`, `if(isNull(t), NULL, arrayElementOrNull(splitByString({sep:String}, assumeNotNull(t)), {k:UInt32}))`. A boolean-typed calculation is
    wrapped in `toBool(...)`; as a dimension, `toString(...)` of it so keys read `true` / `false` (a plain Bool field keeps `True` / `False`).
 
 **One compile, one parameter list.** Each calculation is compiled once; its SQL string is reused in the
@@ -196,7 +196,7 @@ The result cache key includes the tree, so two requests that differ only in a ca
 result. Tests: `CalcCompilerTests`, `CalcValidatorTests`, `CalcRulesTests`, `CalcGatewayTests`, `CalcJsonTests`, the
 shared fixture (also run by `node --test`); live (dev app + a real ClickHouse, tables created and dropped by the
 script, results checked against hand-written `SELECT`s or hand-computed values): `tests/live/calc-smoke.mjs`
-(`test_cj.calc_smoke_*`), `tests/live/logic-smoke.mjs` (`test_cj.bk_logic`).
+(`test_cj.calc_smoke_*`), `logic-smoke.mjs` (`bk_logic`), `text-smoke.mjs` (`bk_text`).
 
 **Compile spikes** (`node tests/live/calc-spikes.mjs`, SELECT only, inline sources). A bound parameter inside a
 `SELECT` / `GROUP BY` expression works (also `GROUP BY` the full expression). `toFloat64` over `UInt32`,

@@ -142,3 +142,26 @@ A text literal is a `String` parameter like every number is a `Float64`, at most
 checker and server validator alike), never in SQL text. A boolean calculation is wrapped in `toBool(...)`; as a
 **dimension** it groups by `toString(...)` so its keys read `true`/`false`/`null`. A plain Bool field is unchanged
 (`True`/`False`), so saved filters and member colours still match.
+
+### D53 — Text functions are one generic `fn` node with a whitelisted table
+`{ k: "fn", fn, args: [...] }` carries every row-level text function; the name and its argument kinds
+(`text`, `length`, `position`, `separator`) live in one table per side (`CalcCatalog.RowFunctions`, `ROW_FUNCTIONS`;
+a node test ties them), so a later function (date functions) is a table row, not a new node kind. The client parses any
+argument count and the checker reports arity, so the message is the same on both sides. Paths are `args.0`, `args.1`, ….
+
+### D54 — Length, position and separator are literals, rejected out of range
+`LEFT`/`RIGHT` take a whole number 0..1000, `SPLIT` a position 1..1000 and a 1..20 character separator, all written in
+the formula (a number is bound as `UInt32`, a separator as `String`). A computed length would need clamp and NULL rules;
+a literal needs none, so a bad one is a 400, never a clamp (golden rule 3). Fields or parameters as lengths are a backlog item.
+
+### D55 — `CONCAT` instead of `+`; case-sensitive predicates; NULL propagates
+Text `+` stays an error (arithmetic needs numbers), so `+` never changes meaning with its operand types; `CONCAT` takes 2..10
+texts. `CONTAINS`/`STARTSWITH`/`ENDSWITH` are case-sensitive like `=` and Tableau (`LOWER` both sides when the case should not
+matter); the case-insensitive *filter* is unchanged. Character functions are UTF-8 aware (`lowerUTF8`, `leftUTF8`,
+`lengthUTF8`); `CONTAINS`/`STARTSWITH`/`ENDSWITH` compare bytes, which is exact for valid UTF-8. A NULL argument gives NULL.
+
+### D56 — `SPLIT` is NULL past the last piece
+`arrayElementOrNull(splitByString(sep, t), k)`, with a NULL `t` answered first (ClickHouse has no nullable split). A piece
+that exists but is empty stays `''`, so "no such piece" (NULL) and "empty piece" differ; `''` splits to one empty piece
+(confirmed live).
+

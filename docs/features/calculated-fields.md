@@ -19,6 +19,7 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
   `COUNT`/`COUNTD`/`ATTR` any type; arithmetic needs numbers; an aggregate inside an aggregate is refused. A field of
   a category other than numeric, text, temporal or boolean can't be used.
 - **Logic** ([below](#logic-functions)): comparisons, `AND` / `OR` / `NOT`, `IF` / `IIF` / `CASE`, `IFNULL`, `ISNULL`, `ZN`, text literals.
+- **Text** ([below](#text-functions)): `LOWER`, `UPPER`, `TRIM`, `LEN`, `LEFT`, `RIGHT`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `SPLIT`.
 - Operators `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`,
   `COUNTD`, `MEDIAN`, `STDDEV`, `VARIANCE`, `PERCENTILE`, `ATTR` (function names are case-insensitive). The
   function table lives in `calc-types.js`.
@@ -61,6 +62,34 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
 - Not built: the keyword form `IF c THEN a ELSEIF … END` (write `IF(…)` or `CASE`), date and boolean literals, `NULL`
   as a word (use `ISNULL`), `IN`, `BETWEEN`.
 
+### Text functions
+
+Row-level functions over text (names are case-insensitive; the table is `ROW_FUNCTIONS` in `calc-types.js`). Each argument
+that is text may be any text expression: a field, a literal, or another function. Every other argument is a **literal written
+in the formula**, never a field or a computed value.
+
+| Function | Result | Meaning |
+|---|---|---|
+| `LOWER(t)` / `UPPER(t)` | text | change case, accents and non-Latin letters included (`UPPER('straße')` is `STRASSE`) |
+| `TRIM(t)` | text | remove leading and trailing spaces |
+| `LEN(t)` | number | length in **characters**, not bytes (`LEN('日本語')` is 3) |
+| `LEFT(t, n)` / `RIGHT(t, n)` | text | the first / last `n` characters; `n` is a whole number 0 to 1000; longer than the text gives the whole text, 0 gives an empty text |
+| `REPLACE(t, from, to)` | text | every occurrence of `from` replaced by `to`; case-sensitive; an empty `from` changes nothing |
+| `CONCAT(a, b, …)` | text | two to ten texts joined; empty if any is empty (wrap a part in `IFNULL(x, '')` to keep the rest) |
+| `CONTAINS(t, s)` / `STARTSWITH(t, s)` / `ENDSWITH(t, s)` | boolean | **case-sensitive** match (`LOWER` both sides for a case-insensitive one); an empty `s` is always true |
+| `SPLIT(t, sep, k)` | text | the `k`-th piece (1 is the first) of `t` cut at `sep`; `sep` is text of 1 to 20 characters, `k` a whole number 1 to 1000; empty when there is no `k`-th piece; an empty text has one empty piece; two neighbouring separators leave an empty piece |
+
+- **Empty in, empty out:** a NULL text gives NULL from every function (`LEN`, `CONTAINS` too), so `IFNULL(x, …)` first when a
+  default is wanted. There is no `+` on text; use `CONCAT`. A negative, fractional, field-valued or over-limit length or
+  position is an error naming the function, not a silent clamp (`LEFT's length must be a whole number from 0 to 1000 written in the formula.`).
+- **Types:** a number or boolean where text is needed reads `LOWER needs a text — orders.amount is number.` at the argument; a wrong
+  argument count reads `LEFT takes 2 arguments.` (`CONCAT takes 2 to 10 arguments.`).
+- **Row-level, aggregates as usual:** `COUNTD(LOWER([c.name]))` and `SUM(IF(CONTAINS([c.name], 'x'), 1, 0))` work; a text
+  function over an aggregate (`LOWER(MAX([c.name]))`) is an aggregate; mixing with a bare row-level field is the usual error. A row-level text
+  or boolean result (`LOWER`, `CONTAINS`) is a **dimension**; `LEN` is a row-level number (measure or dimension).
+- Not built: regular expressions, `FIND` / `POSITION`, `MID` / `SUBSTRING`, `LTRIM` / `RTRIM`, `STARTSWITH`/`CONTAINS` ignoring case, a length, position or separator
+  that is a field, parameter or computed value.
+
 ### Roles and types
 
 The check yields a type (number, text, date, boolean) and whether the formula is an **aggregate**:
@@ -77,8 +106,8 @@ text or boolean calculation is a measure and shows in tables and KPIs.
 ### Limits
 
 Read from `Core/validate.js` `LIMITS` (`calculations`, `calcFormula`, `calcName`) and `CALC_LIMITS` in
-`calc-types.js` (formula length, depth, nodes, text literal length 100) — the server mirrors depth, nodes, name length and
-literal length in `CalcLimits`. A `CASE` counts one node plus every condition and result. A formula over the length limit, a tree over the depth or node limit, a name over the length
+`calc-types.js` (formula length, depth, nodes, text literal length 100, text-function length/position 1000, separator 20, `CONCAT` arguments 10) — the server mirrors depth, nodes, name length,
+literal length and these in `CalcLimits`. A `CASE` counts one node plus every condition and result. A formula over the length limit, a tree over the depth or node limit, a name over the length
 limit and a workbook over the calculation count are refused with a message; none is clamped.
 
 ## The dialog
