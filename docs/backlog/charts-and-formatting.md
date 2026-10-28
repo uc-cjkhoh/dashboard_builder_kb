@@ -16,7 +16,6 @@ Format: [README.md](README.md#how-to-read-an-entry). Chart types are in [workshe
 
 ## Authoring gaps
 
-- **Tooltip text editor** (IDs: T01-19; priority P0) — partial: extra tooltip fields show on hover; no tooltip text or format editor. Needs: none.
 - **Discrete/continuous pills and double-click placement** (IDs: T01-04, T01-15; priority P1) — Partial: role convert and date part only, no explicit discrete/continuous toggle; drag and plus-button placement only, no double-click. Needs: continuous axes for the toggle.
 - **Start screen and recent sources** (IDs: T01-14; priority P1) — partial: import and autosave restore; no start screen. Needs: none.
 - **Analytics pane** (IDs: T07-01; priority P1) — partial: reference lines, trend and forecast sit in a toggled card of selects, not a drag-and-drop pane. Needs: none.

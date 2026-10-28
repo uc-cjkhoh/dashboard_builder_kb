@@ -39,10 +39,24 @@ How each encoding reaches the query (`planDims` / `planMeasures`):
 | **Size** | 1 measure | extra measure | scatter bubble size |
 | **Label** | 1 field | numeric → extra measure; categorical reads an existing key | the value drawn on each mark |
 | **Detail** | dimensions | extra group-by | more marks, no visual channel |
-| **Tooltip** | fields | numeric → extra measures | custom tooltip lines (`extraTooltip`) |
+| **Tooltip** | fields | numeric → extra measures | custom tooltip lines (`extraTooltip`); with a tooltip text set, the template replaces them (below) |
 | **Shape** | 1 dimension | extra group-by (scatter family) | one series per value with a distinct symbol + legend |
 | **Path** | 1 field | numeric → extra measure | orders line/area vertices (`pathOrderedRows`) |
 | **Angle** | 1 measure | — | acknowledged for pie/donut (already measure → angle); a hint elsewhere |
+
+### Tooltip text (T01-19)
+
+The Tooltip tool panel also holds a **Tooltip text** editor: free text with `<Field>` placeholders for the
+view's fields — group-by / Tooltip fields as `table.column`, measures as named in the view — plus literal text
+(Enter = new line, max `LIMITS.tooltipText` = 300 characters, client-side only). Field chips insert a
+placeholder at the cursor; a live preview fills them from the first mark, and a note lists placeholders not in
+the view. It is stored on the sheet as `tooltipText` (`null` = the automatic tooltip) and saved with the workbook
+(`sanitizeSheet` drops over-long / non-text values with an import issue). `chart.js` `customTip` renders it for
+bar / line / area / combo (axis tooltip: every series in the hover), pie / donut and scatter-family charts;
+unknown placeholders show as literal text, values use the existing value / category formatters. All HTML is built
+in `Dashboard/tooltip-model.js` from escaped parts only (`<script>`, quotes, `&` are escaped — user text never
+becomes markup). Other chart types keep their automatic tooltip.
+
 
 - Extra measures never become chart series; with no marks set the plan is byte-identical to a plain
   shelves plan.

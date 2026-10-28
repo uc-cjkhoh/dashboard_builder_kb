@@ -89,6 +89,7 @@ letting only checked keys be endpoints ([relationships.md](../features/relations
   chartType: "bar",                   // see CHART_TYPES
   sort:      null | { by: fieldId, dir: "asc" | "desc" },
   selection: null | {...}, drill: null | {...}, pages: null | {...},
+  tooltipText: null | string,   // T01-19 tooltip template with <Field> placeholders (≤ 300; null = automatic)
   title: null | string, caption: null | string, showTitle: boolean,   // P23 (null = automatic)
   showFilterCards: boolean,                                          // P30
   analytics: null | { ref: { kind, value? }, band: { from, to } | null, trend, forecast, totals: { grand, sub } },   // P21
