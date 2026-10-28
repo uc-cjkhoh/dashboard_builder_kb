@@ -65,7 +65,9 @@ an empty body, wrong types, an oversized body, 17 filters, `limit: 0`, a text va
 
 `tests/live/calc-smoke.mjs` (calculated fields against the shared test ClickHouse server) needs credentials, so
 it is a manual check and the repo has no CI: re-run it before every deploy. `tests/live/calc-ui.mjs` needs only
-the dev app; `tests/js/calc-limits.test.mjs` keeps the three copies of the calculation limits equal.
+the dev app. `node tests/live/run-ui-all.mjs` starts the dev app once (port `UI_PORT`, default 5193; `ONLY=calc,rows` filters), runs every
+`tests/live/*-ui.mjs` browser check against it, stops the app by port and prints a pass / fail line per check; run it from the solution root
+before merging a change to the worksheet. `tests/js/calc-limits.test.mjs` keeps the three copies of the calculation limits equal.
 
 ## Build & publish
 

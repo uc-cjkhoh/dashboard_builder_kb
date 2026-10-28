@@ -80,7 +80,7 @@ each feature owns its controller, view partial, CSS and JS in one folder. Source
 | `Features/Core/` | `core.css` (tokens + shared components), `api.js`, `ui.js`, `validate.js`, `icons.js`, `menu.js`, `store.js`, `format.js`, `sheet-schema.js`, vendored ECharts |
 | `Features/Connection/`, `Schema/` | sidebar features, each with its API controller |
 | `Features/Canvas/`, `Relations/`, `Tabs/` | client-only features (no controller); pure rule modules `empty-state.js`, `relation-rules.js` |
-| `Features/Dashboard/` | the worksheet (`dashboards.js`), pure rules (`filter-rules.js`, `toolbar-rules.js`, `contrast.js`), query gate + cache (`query-runner.js`), ECharts adapter (`chart.js`), `QueryController` |
+| `Features/Dashboard/` | the worksheet editor (`dashboards.js`), the instantiable query-and-render lifecycle (`worksheet-view.js`), the pure query plan (`sheet-plan.js`), pure rules (`filter-rules.js`, `toolbar-rules.js`, `contrast.js`), query gate + cache (`query-runner.js`), ECharts adapter (`chart.js`), `QueryController` |
 | `Features/Workbook/` | auto-save, restore, Export/Import (`workbook.js`) + the file format and its validation (`workbook-model.js`) |
 | `tests/DashboardBuilder.Tests/`, `tests/js/` | xUnit suite; `node --test` suite for the pure JS modules |
 

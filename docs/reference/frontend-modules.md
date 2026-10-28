@@ -22,8 +22,10 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Relations/relation-rules.js` | pure: `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked; `JOIN_TYPES`, `normalizeJoinType`, `joinChoices`, `planJoinType`, `joinBadge` — join types |
 | `Tabs/tabs.js` | Data Model tab + dashboard tabs — [tabs.md](../features/tabs.md) |
 | `Tabs/duplicate-model.js` | pure: duplicate-worksheet naming, limit check, sheet copy (node-tested) |
-| `Dashboard/dashboards.js` | the worksheet: field pane, shelves, toolbar, plan, render — [worksheet.md](../features/worksheet.md) |
-| `Dashboard/chart.js` | the only ECharts adapter — [worksheet-charts.md](../features/worksheet-charts.md#rendering--the-echarts-adapter) |
+| `Dashboard/dashboards.js` | the worksheet editor: field pane, shelves, toolbar, and the drawing of a result (`renderChart`, tables, KPIs); owns exactly one worksheet view — [worksheet.md](../features/worksheet.md) |
+| `Dashboard/worksheet-view.js` | `createWorksheetView(container, getContext)` → `{ run, refresh, cancel, destroy }`: plan → latest-wins fetch through the shared result cache → draw into one container; owns its own gate, table pager and fresh flag. The host's `getContext()` supplies `dash`, `noticeEl`, `results`, `plan` (the `sheet-plan.js` context), `categoryOf`, `castOf`, `render(sheet, result, cmp)`, `extraNotice()`, `statusBar`, `sharedNote`. Also the single-table histogram / box plot path and the notice helpers (`joinNotices`, `periodNotice`, `speedNotice`) — [worksheet.md](../features/worksheet.md#query-lifecycle) |
+| `Dashboard/sheet-plan.js` | pure: the worksheet query plan from explicit inputs — `buildPlan(sheet, periodRange, ctx)`, `planDims`, `planMeasures`, `sortTargets`, `fieldId`, `measureName`, `periodFilters`, `toServerFilter`, drill / pages filters; `ctx = { calculations, entities, relationships, sharedFilters, parameters, metaOf, nameOf, columnType }` — [worksheet.md](../features/worksheet.md#building-the-query) |
+| `Dashboard/chart.js` | the only ECharts adapter; one chart per container element (state in a `WeakMap`), every export takes the container first — [worksheet-charts.md](../features/worksheet-charts.md#rendering--the-echarts-adapter) |
 | `Dashboard/contrast.js` | pure: WCAG `luminance`, `contrastRatio`, `pickInk` (treemap label ink) |
 | `Dashboard/filter-rules.js` | pure: `aggsFor`, `checkFilter`, `statFilters`, `withCategories`, `viewCounts`, `checkAdd` (drop-time caps) — [worksheet.md](../features/worksheet.md#drop-time-limits) |
 | `Dashboard/show-me-rules.js` | pure: chart-type field rules (`CHART_NEEDS`, `chartIssue`, the shared hint texts, `roleOf`) and Show Me — `issueFor`, `bestType`, `showMeOptions`, `placeFor`, `samePlacement` — [worksheet-charts.md](../features/worksheet-charts.md#show-me) |
@@ -53,7 +55,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/scale-model.js` | pure: `scalePlan` (limit / paging / Other / date grouping per chart type), `withOther`, `tableProgress`, `needsNextPage`, `bucketNotice` — [worksheet.md](../features/worksheet.md#table-view--a-true-rows--columns-crosstab) |
 | `Dashboard/chart-fit.js` | pure: `chartFit(spec, width, height)` — the room a chart's category axes need (min width/height, label rotation, zoom window), `markCount` (canvas vs SVG) — [worksheet-charts.md](../features/worksheet-charts.md#rendering--the-echarts-adapter) |
 | `Dashboard/viewbar-model.js` | pure: `CHART_TYPES`, `chartIcon` / `chartLabel` (the chart-type picker), `sortSummary` (what the sort picker shows) |
-| `Dashboard/query-runner.js` | pure: latest-wins gate, per-dashboard result cache, truncation notice — [worksheet.md](../features/worksheet.md#query-lifecycle) |
+| `Dashboard/query-runner.js` | pure: latest-wins gate, per-worksheet result cache, truncation notice — [worksheet.md](../features/worksheet.md#query-lifecycle) |
 | `Calc/calc-parser.js` | pure: `parseFormula(text, resolve)` — hand-written tokenizer + recursive descent into wire-shaped nodes (`field`, `num`, `str`, `un`, `bin`, `agg`, `cmp`, `logic`, `not`, `case`, `ifnull`, `isnull`, `fn` (the text functions); `IF`/`IIF`/`ZN` and the simple `CASE` desugar to `case`/`ifnull`/`cmp`) plus client-only `{ k: "calc", name }` |
 | `Calc/calc-types.js` | pure: `CALC_LIMITS`, the `FUNCTIONS` table, `check(ast, categoryOf)` → `{ type, isAggregate, tables }` or an error; a twin of the server's `CalcCatalog` / `CalcValidator`, tied by `tests/fixtures/calc-cases.json` |
 | `Calc/calc-model.js` | pure: `expandCalcs` (replaces `{ k: "calc" }` references with their trees; cycle and size guard), `roleOfCalc` |
@@ -89,7 +91,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
   **event bus** or `document` `CustomEvent`s — never by reaching into another module's nodes.
 - **Cross-feature calls:** the Workbook feature rebuilds the model through `canvas.addEntity` /
   `canvas.clearModel` and `relations.restoreRelationship` — exported functions, not DOM reach-ins.
-- **Pure modules** (`query-runner.js`, `workbook-model.js`, `validate.js`, `sheet-schema.js`,
+- **Pure modules** (`query-runner.js`, `sheet-plan.js`, `workbook-model.js`, `validate.js`, `sheet-schema.js`,
   `filter-rules.js`, `show-me-rules.js`, `toolbar-rules.js`, `contrast.js`, `relation-rules.js`, `table-filter.js`,
   `connection-rules.js`, `empty-state.js`, `api.js`'s `basePathFrom`) hold the testable logic and never
   touch the DOM; they run under `node --test` ([development.md](../operations/development.md#test)).

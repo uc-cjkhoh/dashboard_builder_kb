@@ -1,7 +1,7 @@
 # Dashboard worksheet — shelves, crosstab, sort, format, joins
 
 Each dashboard tab **is one Tableau-style worksheet**: a field pane beside shelves you drag fields onto,
-and a view that renders the result. Code: `Features/Dashboard/` (`dashboards.js`, `filter-rules.js`,
+and a view that renders the result. Code: `Features/Dashboard/` (`dashboards.js`, `worksheet-view.js`, `sheet-plan.js`, `filter-rules.js`,
 `toolbar-rules.js`, `query-runner.js`, `chart.js`, `contrast.js`, `_Dashboard.cshtml`, `dashboard.css`,
 `QueryController.cs`). Companion docs: chart types and export in
 [worksheet-charts.md](worksheet-charts.md); Marks, Filters, Date range & comparison, click-to-filter, Drill and Pages in
@@ -144,7 +144,7 @@ shared filters (≤ 4), the drill path (≤ 5), the page, the selection and the 
 
 ## Building the query
 
-`buildPlan()` turns the sheet into one `POST /api/query` request: Rows dimensions → `rowDimensions[]`,
+`buildPlan()` (`sheet-plan.js`, pure: it reads only the sheet and an explicit context) turns the sheet into one `POST /api/query` request: Rows dimensions → `rowDimensions[]`,
 Columns dimensions → `columnDimensions[]`, numeric pills → `measures[]`, plus filters and a `limit`.
 Only **valid** filters are sent (`checkFilter`); each filter's `category` (kept on the pill, back-filled
 from the column catalog for older workbooks) decides how the value is parsed. No
@@ -154,8 +154,10 @@ measures → the server adds an implicit `count()`. The canonical dimension/meas
 
 ## Query lifecycle
 
-Every shelf, encoding or format change calls `commit()` → `dashboard:changed` → `runChart()`. What
-happens next (`Dashboard/query-runner.js`, unit-tested in `tests/js/`):
+Every shelf, encoding or format change calls `commit()` → `dashboard:changed` → `runChart()`, which runs the
+editor's one worksheet view (`createWorksheetView` in `worksheet-view.js`, on `#ws-chart`; the view owns its
+gate, table pager and fresh flag, and `chart.js` keeps one chart per container). What happens next
+(`Dashboard/query-runner.js`, unit-tested in `tests/js/`):
 
 1. **Latest wins.** `runChart` takes a ticket from a gate; starting a new query **aborts** the previous
    request (the server stops it too — [clickhouse-integration.md](../reference/clickhouse-integration.md#database-level-guards))
@@ -230,7 +232,7 @@ removed, then `buildRowsRequest` (`Rows/rows-model.js`) turns it into the reques
   scrolls within 400px of its end the next 500 load (`offset`), and the crosstab redraws from all loaded
   rows. The notice line reads "Rows 1–500 of 12,345 — scroll to load more", then "12,345 rows". Loaded
   pages are kept while only presentation changes; Refresh or any plan change starts over
-  (`runTable` in `dashboards.js`; rules in `scale-model.js`).
+  (`runTable` in `worksheet-view.js`; rules in `scale-model.js`).
 
 ## Sort
 
