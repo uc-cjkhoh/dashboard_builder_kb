@@ -16,8 +16,10 @@ The builder is a two-world layout: a **left glass rail** owns connection and sch
 canvas** holds the data model, relationships and dashboard worksheets. Windows 11 Fluent structure
 (4-pt spacing, 6/10/14 px radii, 32 px controls, a soft elevation ramp) with Flat Design 2.0
 surfaces: the fixed chrome is translucent and blurs a warm background wash, while entity cards, the chart
-area, the crosstab and every overlay stay solid so text is never read through other text. Light or dark follows the OS (`prefers-color-scheme`); there is
-no manual toggle ([D22](docs/reference/decisions.md#d22--fluent-glass-design-language)).
+area, the crosstab and every overlay stay solid so text is never read through other text. Light or dark is the viewer's choice — a
+**System / Light / Dark** toggle at the right end of the tab bar, System (follow the OS) by default
+([tokens.md § Light and dark](docs/design/tokens.md#light-and-dark),
+[D22](docs/reference/decisions.md#d22--fluent-glass-design-language)).
 
 **Progressive disclosure:** a first-time user sees the few controls that matter; the rest appears when
 relevant (the connection form's Advanced section, the encodings **More** menu, the Workbook menu,

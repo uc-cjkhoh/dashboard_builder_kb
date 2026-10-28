@@ -111,9 +111,10 @@ bound parameter or a validated integer (out-of-range limits are rejected before 
 - **Paging:** `offset` adds `OFFSET m` to the same ordered query (the Table view's pages). The order ends
   with every group key, so pages never overlap or skip.
 - **Total** (`withTotal`): `SELECT count() FROM (<grouped query>)` on its own connection, alongside the page.
-- **Other** (`otherBucket`, one dimension, a truncated first page): `SELECT uniqExact(k) AS n, <measures>
+- **Other** (`otherBucket`, one dimension, a truncated first page): `SELECT uniqExact(k) + max(isNull(k)) AS n, <measures>
   FROM … WHERE … AND k NOT IN (SELECT k0 FROM (<ordered query> LIMIT n)) SETTINGS transform_null_in = 1`
-  — the same filters, the shown keys excluded exactly (a shown NULL group isn't recounted). If the server
+  — the same filters, the shown keys excluded exactly (a shown NULL group isn't recounted; a NULL group
+  past the limit is counted — `uniqExact` alone skips NULL). If the server
   refuses the setting the result comes back without `other` (logged), never an error.
 - **Date parts** (P26, `datePart` on a dimension): `toStartOfYear` / `toStartOfQuarter` / `toStartOfMonth`
   / `toMonday` / `toDate` / `toStartOfHour` (truncations) or `toQuarter` / `toMonth` / `toDayOfWeek` /
@@ -134,7 +135,8 @@ bound parameter or a validated integer (out-of-range limits are rejected before 
   password, `fresh` ignored). **Approximate** (`approximate`): `uniq` instead of `uniqExact`; when
   `system.tables.sampling_key` is set for the base table, `FROM … AS t0 SAMPLE 0.1` with `count()` →
   `sum(t0._sample_factor)` and `sum(x)` → `sum(x * t0._sample_factor)`; a refused sampled query re-runs
-  unsampled. The response's `approx` says what was done. Not yet exercised against a live server.
+  unsampled. The response's `approx` says what was done. Exercised live (a `SAMPLE BY` table, plain and
+  calculated measures, a calculated Top-N rank) by `tests/live/calc-smoke.mjs`.
 - **Compression:** API responses are Brotli/gzip-compressed (fastest level, `Program.cs`).
 - **Response:** `QueryResult { rowDimensions, columnDimensions, measures, rows:[{keys, values}], truncated, total?, other?, bucket? }`;
   `values` are numbers, strings (`min` / `max` of a text or date column — read by the measure's
@@ -143,9 +145,69 @@ bound parameter or a validated integer (out-of-range limits are rejected before 
 - **Errors:** invalid identifier, table-not-in-query, `sum` / `avg` on a non-numeric column, or a value
   that doesn't fit its column → 400 ([api.md](api.md#errors)).
 
+### Calculated fields — the compile path
+
+A `calc` tree on a dimension, measure or Top-N `topBy` ([api.md § Calculated fields](api.md#calculated-fields-calc))
+becomes SQL in four steps; no formula text and no literal is ever written into SQL.
+
+1. **Request rules** (`RequestRules.ValidateQuery`, no catalog): tree depth ≤ 12 and ≤ 200 nodes
+   (`CalcValidator.CheckLimits`), label ≤ 60, the role rules (aggregate tree ↔ `agg` null; row-level
+   measure needs a value aggregation; no aggregate in a dimension; no `datePart`; no `calc` on a join key).
+2. **Catalog** (gateway `CompileCalcAsync` → `ResolveCalcRefsAsync`): every `field` node (`CalcFields`) is
+   first checked against the tables already in the query (`from` and joins) — a field on any other table
+   is a 400 "Field references a table not in the query." whether or not the column exists, before any
+   catalog lookup, so a calculation never causes a `DESCRIBE` of a table outside the query. Then it goes
+   through `ColumnsOf` + `QualifyAsync` — `DESCRIBE`-validated (already cached for tables in the query),
+   quoted by `Identifier.cs`, aliased `t0` / `tN` — so a calculation may reference any table in the query,
+   including a left-joined one (its unmatched side is NULL under `join_use_nulls`). A column the catalog
+   doesn't know on such a table is left out, so the validator names it ("Unknown field t.c.").
+3. **Validate** (`ClickHouse/Calc/CalcValidator.cs`): types the tree bottom-up from the column categories
+   (number, text, date, boolean; anything else is refused), derives aggregate vs row-level, and rejects a bad
+   tree with a `CalcException` (a plain sentence plus the node path, `measures[0].calc.l.arg`) that the
+   gateway reports as a 400. The gateway re-checks the role and
+   the `sum` / `avg`-needs-a-number rule against the derived type (`CalcMeasureSql`, `CalcDimensionSql`).
+4. **Compile** (`ClickHouse/Calc/CalcCompiler.cs`): numeric columns widened with `toFloat64(...)` (no
+   unsigned wrap, no integer or `Decimal` rounding); `a / b` → `(a / nullIf(b, 0))` (division by zero is
+   NULL, never `inf`); each number literal bound as `{c{n}p{m}:Float64}` — `c{n}` unique per compiled
+   calculation in the request; aggregates through the shared `AggregateSql` (table below), so a calculated
+   `SUM` is scaled and a `COUNTD` estimated exactly as a plain measure is. A row-level measure is then
+   wrapped by its pill aggregation; an aggregate tree is used as is; a dimension groups by its row-level
+   expression.
+
+**One compile, one parameter list.** Each calculation is compiled once; its SQL string is reused in the
+page, the total (`count()` over the grouped query), the Other statement and inline in the Top-N
+subquery, and every statement is sent with the request's one `parameters` list (filter values `p{i}` and
+calculation literals `c{n}p{m}`). The auto date-grain probe reuses only the date expression and the
+`WHERE`, so it is sent just the parameters its SQL names (`ParametersUsedBy`). A calculated dimension is
+never date-grouped: `dateBucket` takes the first *real* temporal dimension wherever the calculation sits.
+The result cache key includes the tree, so two requests that differ only in a calculation never share a
+result. Tests: `CalcCompilerTests`, `CalcValidatorTests`, `CalcRulesTests`, `CalcGatewayTests`,
+`CalcJsonTests`, the shared fixture (also run by `node --test`); live: `tests/live/calc-smoke.mjs` (dev
+app + a real ClickHouse, fixture tables `test_cj.calc_smoke_*` created and dropped by the script,
+results checked against hand-written `SELECT`s).
+
+**Aggregates, exact and approximate** (`AggregateSql` — one function for plain and calculated measures;
+"sampled" = `approximate` on a base table with a sampling key, read `SAMPLE 0.1`):
+
+| Aggregate (formula → wire) | Exact | Sampled | Approximate, unsampled |
+|---|---|---|---|
+| `SUM` → `sum` | `sum(x)` | `sum(x * t0._sample_factor)` | `sum(x)` |
+| rows → `count` (plain measures only) | `count()` | `sum(t0._sample_factor)` | `count()` |
+| `COUNT` → `countNonNull` | `count(x)` | `sum(if(isNotNull(x), t0._sample_factor, 0))` | `count(x)` |
+| `AVG`, `MIN`, `MAX` → `avg`, `min`, `max` | as written | unscaled | as written |
+| `COUNTD` → `countDistinct` | `uniqExact(x)` | `uniq(x)` | `uniq(x)` |
+
+**Top-N rank, exact vs approximate.** A rank by a plain measure is always exact and unscaled
+(`PlainRankSql` — only the order matters). A rank by a calculation compiles through the table above, so in
+approximate mode it uses `uniq` for `COUNTD` and scaled sums on a sampled table; the two ranks are not
+aligned on purpose. Likewise `approx.distinct` in the response ignores a `COUNTD` inside a Top-N `topBy`
+(it reflects the result's measures only).
+
 ### Shared defences in the builders
 
-- **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct` (`countDistinct` → `uniqExact`);
+- **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct/countNonNull` (`countDistinct` →
+  `uniqExact`, `countNonNull` → `count(col)`); calculation node kinds, operators and functions
+  (`CalcValidator`, `CalcCatalog`);
   operators `= != > >= < <= in between`.
 - **Typed bound values** (`FilterValues.Coerce`, `ClickHouse/RequestValidation.cs`): the value is
   converted to the column's category from the same `DESCRIBE` before binding — number → `{p0:Float64}`

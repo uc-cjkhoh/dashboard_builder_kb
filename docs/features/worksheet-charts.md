@@ -121,7 +121,7 @@ multiples are not supported.
 - **Table, Text and KPI are native DOM**, not ECharts.
 - **Themed from tokens**: `chart.js` reads `--chart-*` via `getComputedStyle`; text wears ink tokens,
   marks wear the series colour ([design/tokens.md](../design/tokens.md#chart-tokens)). It re-renders the
-  active chart when `prefers-color-scheme` changes (listener in `dashboards.js`). Treemap tile labels
+  active chart on `scheme:changed` — light / dark flipped ([tokens.md § Light and dark](../design/tokens.md#light-and-dark); listener in `dashboards.js`). Treemap tile labels
   pick their ink per tile with `contrast.js`.
 - **Resize**: a `ResizeObserver` on the chart host calls `instance.resize()` (sidebar drag, window).
   The host is absolutely positioned to fill the padded `.ws-chart` pane so ECharts always has a

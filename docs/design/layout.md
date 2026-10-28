@@ -20,12 +20,12 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
 - **One 20px gutter (`--s5`) everywhere:** sidebar brand row and sections, `.canvas__bar`, `.view`
   padding, the worksheet field pane (`--ws-fields-w`, default 236px; `--s3 --s5` padding), `.ws-shelves` and the
   `.ws-chart-card` margin. So the tabs' left edge = first entity card = field-pane rows, and the
-  Workbook `···` = shelves = chart card on the right. `+`-placed entity cards start on the gutter
+  appearance toggle = shelves = chart card on the right. `+`-placed entity cards start on the gutter
   ([canvas.md](../features/canvas.md#dragging-a-table-onto-the-canvas)).
 - **Full-width lists align with their siblings:** `.table-list` keeps 2px shadow room with a matching
   `-2px` inline margin, so table chips share the search box's edges.
 - **Ghost icon buttons at a row's end overhang by their 8px glyph slack** (`margin-inline: -8px`), so
-  the glyph meets the edge: `#sidebar-toggle`, the Workbook menu, the view bar's chart picker and last
+  the glyph meets the edge: `#sidebar-toggle`, the appearance toggle (`.scheme`), the view bar's chart picker and last
   icon button, the tool-panel ✕, and both `.entity__head` buttons (chevron over the row checkboxes, ✕ flush with the
   type badges). Reset the overhang wherever the button is centred (collapsed rail).
 - **Checkboxes carry no UA margin** (`.form-check input`, `.col-row__key`: 14px, `margin: 0`); a
@@ -55,8 +55,11 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
 ## Tab bar
 
 A glass bar across the top of the content area (`.canvas__bar`): frosted-pill tabs (the active one with an accent
-fill, edge and underline), then — at the right — the quiet autosave text and the **Workbook** overflow menu
-([tabs.md](../features/tabs.md), [workbook.md](../features/workbook.md)). Its contents are vertically centred and it
+fill, edge and underline), then — at the right — the quiet autosave text, the **Workbook** overflow menu
+([tabs.md](../features/tabs.md), [workbook.md](../features/workbook.md)) and, right-most, the **appearance
+toggle** (`#scheme-btn`, `Shell/scheme-toggle.js`): an icon button whose glyph shows the current choice
+(monitor / sun / moon; label "Appearance: System") opening a System / Light / Dark radio menu
+([tokens.md § Light and dark](tokens.md#light-and-dark)). Its contents are vertically centred and it
 shares `--topbar-h` with the sidebar brand block, so the two bottom borders line up across the shell; if the
 tabs wrap, the bar grows taller than the brand.
 

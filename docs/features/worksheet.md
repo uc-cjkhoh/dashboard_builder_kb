@@ -91,6 +91,23 @@ to Columns).
   in the catalog) is **invalid**: dashed `--danger-line` border, warning icon and a tooltip with the
   reason — and it is left out of the query, never silently altered.
 
+## Calculated fields on the worksheet
+
+A calculated field ([calculated-fields.md](calculated-fields.md)) is a pill like any other on Rows, Columns,
+Color and the Size / Label / Path / Detail / Tooltip slots, and can rank a Top-N filter or be the sort target
+(a stored sort follows the pill when its aggregation changes). It is not a column: `buildPlan` hands pills to
+the pure seam `Calc/calc-plan.js` (`wireDim`, `wireMeasure`, `topByRef` / `wireTopBy`, `planTables`), which
+emits the expanded `calc` tree in place of `db` / `table` / `column`; the tables a calculation reads join the
+query's table list like any field. A calculated pill shows its live name and no field-choice switch.
+
+- A calculation that can't be computed sends no query: the chart slot (and CSV export) shows
+  `Calculation 'X' can't be computed: …` (`calcProblem`).
+- A sheet whose only pills are field-less calculations (`1+2`) shows the hint "Add a field from a table — a
+  calculation with no field in it has nothing to group or total."
+- A measure named for a calculation uses its name; a plain non-null count reads `non-null <name>`.
+- Click-to-filter is off while the primary dimension is a calculation; filters, Pages, drill, the date range,
+  shared filters, selection, Shape and Angle refuse a calculated pill.
+
 ## Drop-time limits
 
 Adding a field that would push a view over a cap is **refused with a toast naming the cap** — never

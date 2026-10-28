@@ -14,6 +14,7 @@ the allowed values it checks against are in `Core/sheet-schema.js`, the caps in 
 | each relationship: endpoints + cardinality | loaded Pages members (re-fetched on demand) |
 | each dashboard: name + full worksheet `sheet` | the connection, host credentials, **any password** |
 | which dashboard was open | |
+| the calculated fields (`calculations`) | the parsed formula tree (rebuilt on open) |
 
 Format: JSON with `"format": "dashboard-builder-workbook"` and an integer `version` (currently 1). Shapes are in
 [data-model.md](../reference/data-model.md#workbook-file).
@@ -52,7 +53,7 @@ shows its card's **failed** state with Retry, and keeps its saved keys.
 
 ## Export & Import
 
-Both live in the **Workbook** overflow menu (an icon button at the right end of the tab bar,
+Both live in the **Workbook** overflow menu (an icon button near the right end of the tab bar,
 `_Workbook.cshtml`):
 
 - **Export workbook** downloads `workbook-YYYY-MM-DD.json` of the current state ("Nothing to export yet"
@@ -66,6 +67,11 @@ Both live in the **Workbook** overflow menu (an icon button at the right end of 
   a name (unique, 1–60 characters), a type (number / text / date), the allowed values (any, a list of ≤ 50,
   or a number range) and the current value — each checked before it is kept (`Core/parameters-model.js`).
   Parameters save with the workbook; disconnecting clears them from the screen.
+- **Calculated fields** save as `calculations: [{ id, name, formula }]` — the formula text only; the tree is
+  rebuilt on open ([calculated-fields.md](calculated-fields.md)). `nextCalcId` (the next calculation number) is saved
+  beside them so deleting the highest id never lets a bookmark's old id bind to a new calculation; a file
+  without it derives the number from the highest id. A file without `calculations` opens as before, and
+  adding the fields needs no `version` bump. A Top-N filter ranked by a calculation (`topBy.calc`) round-trips.
 - **Theme…** opens the theme dialog: an accent (Crimson, Blue, Teal, Violet, Graphite or a custom colour,
   refused with the reason if it can't carry white text) and chart colours (Default, Colour-blind safe,
   Muted), as labelled swatches. Choices apply live and save with the workbook; disconnecting returns the
@@ -102,6 +108,7 @@ naming the sheet and field ("Sheet "Sales": unknown chart type "radar" — reset
 | Date part | a known part on a date pill only; else reset to Auto and reported |
 | Field choices | each a full field (db / table / column / category); ≤ 8; the shown field is added if missing; fewer than 2 → dropped |
 | Parameters | ≤ 20; id `prm<n>`, a name, a known type; allowed list / range checked; a value outside them reset and reported. A filter or Top N pointing at a parameter the file doesn't have is unlinked and reported |
+| Calculations | ≤ `LIMITS.calculations`; each `{ id: calc<n>, name, formula }` — a name of 1–`LIMITS.calcName` characters without `.`, `[`, `]`, a formula string ≤ `LIMITS.calcFormula`; a bad entry, a duplicate id or a duplicate name (case-insensitive, first kept) is skipped and reported; a non-list means none are opened. A pill `{ calc: id, category, role, … }` is valid without `db` / `table` / `column`; one pointing at a calculation the file lacks is removed from its shelf or mark slot and reported as `Sheet "X" rows: a calculated field that no longer exists was removed.` (`columns`, `color`, `filters`, `size`, `label`, `shape`, `path`, `angle`, `detail`, `tooltip` and `pages` likewise; a Top-N filter, in a sheet, a shared-filter list or a bookmark, ranked by a missing calculation is removed the same way, and bookmark sheets are cleaned like worksheets). A calculated pill is also removed from `filters`, drill levels, the date range, `pages` and shared filters, a saved `datePart` is dropped from it, and an `agg` outside sum / avg / min / max / countDistinct / countNonNull resets to sum — each reported. `nextCalcId` must be an integer 1–999999 or it is ignored and reported A calculation that fails to compute on open is kept and shows its error state |
 | Field settings | keys `db.table.column`; `alias` 1–60 characters, `agg` a known aggregation, `hidden` true; ≤ 2000; bad ones dropped and counted |
 | Bookmarks | at most 30; a name 1–60 characters and a sheet (validated like any sheet; a well-formed click selection is kept, unlike a dashboard's); shared filters as above; a dashboard index in range, else "closed" (recreated when applied) |
 | Link action | `https://` with a host and `{value}`, ≤ 500 characters; else removed and reported |

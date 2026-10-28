@@ -10,6 +10,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | Module | Owns |
 |---|---|
 | `Shell/app.js` | bootstrap — hydrates `[data-icon]` placeholders, installs the global `error` / `unhandledrejection` handlers (danger toast "Something went wrong — try again."; aborted queries and the benign `ResizeObserver loop` notice are ignored), wires every module's `init*`, listeners before the initial status check |
+| `Shell/scheme-toggle.js` | the tab bar's appearance toggle: System / Light / Dark radio menu (`Core/menu.js`), glyph + label follow the choice |
 | `Shell/sidebar.js` | resizable sidebar (`Core/resizer.js` handle → `--sidebar-w`, capped at 30vw) + collapse-to-rail toggle (remembered in `localStorage`); exports `expandSidebar()` |
 | `Connection/connection.js` | connection form, summary, pill, gating — [connection.md](../features/connection.md) |
 | `Connection/connection-rules.js` | pure: `advancedShouldOpen` (the Advanced section opens when TLS is off or the cert opt-in is on) |
@@ -29,7 +30,10 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Core/parameters-model.js` | pure (P32): `checkValue` (type + allowed values), `withParamValue`, `effectiveTopN`, `paramTypeFor`, `cleanParameter` |
 | `Workbook/parameters-dialog.js` | P32: the Parameters dialog (Workbook menu) |
 | `Core/theme-model.js` | pure (P41): accent presets + palettes (light / dark), `deriveAccent` (custom colour → contrast-checked set, or a refusal), `themeVars`, `cleanTheme` — [tokens.md](../design/tokens.md#workbook-themes-p41) |
-| `Core/theme.js` | applies the workbook theme's custom properties on `:root` (`theme:changed`, scheme flips) |
+| `Core/scheme-model.js` | pure: `SCHEME_PREFS`, `normalizePref`, `resolveScheme(pref, osDark)` — [tokens.md](../design/tokens.md#light-and-dark) |
+| `Core/scheme-boot.js` | classic `<head>` script: sets `data-scheme` before first paint (mirrors `resolveScheme`) |
+| `Core/scheme.js` | owns `<html data-scheme>`: `isDark`, `schemePref`, `setSchemePref` (`localStorage`), follows the OS while System; emits `scheme:changed` |
+| `Core/theme.js` | applies the workbook theme's custom properties on `:root` (`theme:changed`, `scheme:changed`) |
 | `Workbook/theme-dialog.js` | the Theme dialog (Workbook menu) |
 | `Workbook/bookmarks-dialog.js` | P39: Save view as bookmark…, the Bookmarks list, `applyBookmark` |
 | `Dashboard/action-model.js` | pure (P39): `templateError`, `buildActionUrl` (https-only, encoded `{value}`), `cleanAction` |
@@ -43,6 +47,19 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/chart-fit.js` | pure: `chartFit(spec, width, height)` — the room a chart's category axes need (min width/height, label rotation, zoom window), `markCount` (canvas vs SVG) — [worksheet-charts.md](../features/worksheet-charts.md#rendering--the-echarts-adapter) |
 | `Dashboard/viewbar-model.js` | pure: `CHART_TYPES`, `chartIcon` / `chartLabel` (the chart-type picker), `sortSummary` (what the sort picker shows) |
 | `Dashboard/query-runner.js` | pure: latest-wins gate, per-dashboard result cache, truncation notice — [worksheet.md](../features/worksheet.md#query-lifecycle) |
+| `Calc/calc-parser.js` | pure: `parseFormula(text, resolve)` — hand-written tokenizer + recursive descent into wire-shaped nodes (`field`, `num`, `un`, `bin`, `agg`) plus client-only `{ k: "calc", name }` |
+| `Calc/calc-types.js` | pure: `CALC_LIMITS`, the `FUNCTIONS` table, `check(ast, categoryOf)` → `{ type, isAggregate, tables }` or an error; a twin of the server's `CalcCatalog` / `CalcValidator`, tied by `tests/fixtures/calc-cases.json` |
+| `Calc/calc-model.js` | pure: `expandCalcs` (replaces `{ k: "calc" }` references with their trees; cycle and size guard), `roleOfCalc` |
+| `Calc/calc-resolve.js` | pure: `catalogFromEntities`, `makeResolve`, `compileCalculation(calc, calcs, catalog)` (parse → expand → check), `calcTables` |
+| `Calc/calc-workbook.js` | pure: `checkName`, `renameInFormulas`, `usedBy`, `cleanCalculation(s)` — the workbook list rules |
+| `Calc/calc-pill.js` | pure: the calc-pill shape (`makeCalcPill`, `isCalcPill`, `pillName`), `refusal` (E12 entry points), `pillSlots`, `syncCalcPills`, `usesCalc`, `clearCalcPills` |
+| `Calc/calc-plan.js` | pure: the worksheet plan seam — `wireDim`, `wireMeasure`, `planTables`, `calcProblem`, `measureLabel`, `topByRef` / `wireTopBy`, `resolveSortTarget` |
+| `Calc/calc-dialog-model.js` | pure: `evaluateDraft` (validation), `chipFor` (role chip), `suggest` (`[` autocomplete) |
+| `Calc/calc-pane-model.js` | pure: `paneState` (group items), `deleteCalcPlan`, `showUseAs` / session Use-as choice, `normaliseFormula` |
+| `Calc/calc-dialog.js` | DOM: `openCalcDialog(id?)` — the New / Edit calculated-field dialog |
+| `Calc/eval-order.js` | pure: `describeEvaluation` (the six stages), `evaluationInput(sheet, …)` — [calculated-fields.md](../features/calculated-fields.md#how-this-is-computed) |
+| `Calc/explain-popover.js` | DOM: `explainControl(getInput, { signal })` — the view bar's "How this is computed" button and popover |
+| `Calc/calc.css` | styles for the dialog, the role chip, the pane group and the explainer (tokens only) |
 | `Workbook/workbook.js` | auto-save, restore on connect, Export/Import — [workbook.md](../features/workbook.md) |
 | `Workbook/workbook-model.js` | pure: workbook serialize / `parseWorkbook` (full validation + issue list) / `sanitizeSheet` / storage key — [workbook.md](../features/workbook.md#validation-parseworkbook) |
 | `Core/api.js` | `fetch` helpers (JSON, errors, path base, optional `AbortSignal`) |

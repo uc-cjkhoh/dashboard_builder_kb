@@ -6,7 +6,7 @@ build **Tableau-style worksheets** — one per dashboard tab — that chart data
 
 **Status:** built and running at `https://10.168.49.20:8443/dashboardbuilder`. This directory is the
 knowledge base; the source lives at `/unified/user/cj/web_development/prototype/dashboard_builder/`
-([development.md](docs/operations/development.md)). Unbuilt work: [roadmap.md](docs/proposals/roadmap.md).
+([development.md](docs/operations/development.md)). Unbuilt work: [delivery-and-risks.md](docs/proposals/delivery-and-risks.md).
 
 ## Project statement
 
@@ -51,7 +51,7 @@ knowledge base; the source lives at `/unified/user/cj/web_development/prototype/
 |---|---|
 | Runtime | .NET 10 LTS on AlmaLinux 9 |
 | Web | ASP.NET Core MVC in **feature folders** — one Shell page + attribute-routed JSON API controllers |
-| Frontend | vanilla JS ES modules + hand-written CSS with design tokens (Flat 2.0 + glass chrome, crimson accent, light/dark by OS); no framework, no build step |
+| Frontend | vanilla JS ES modules + hand-written CSS with design tokens (Flat 2.0 + glass chrome, crimson accent, light/dark: System / Light / Dark toggle); no framework, no build step |
 | Charts | Apache ECharts, self-hosted (SVG renderer) |
 | ClickHouse driver | `ClickHouse.Client` (ADO.NET over HTTPS, port `8443`) |
 | Hosting | Kestrel under systemd, behind Apache httpd TLS at path `/dashboardbuilder` |
@@ -69,5 +69,5 @@ knowledge base; the source lives at `/unified/user/cj/web_development/prototype/
 - **Not multi-user.** No accounts, auth, sharing or saved connections; one connection per browser
   session.
 - **Not a full BI suite.** No scheduled reports, alerting, multi-worksheet dashboards or calculated
-  fields yet — see [roadmap.md](docs/proposals/roadmap.md) and
-  [competitive-analysis.md](docs/proposals/competitive-analysis.md).
+  fields yet — see [delivery-and-risks.md](docs/proposals/delivery-and-risks.md) and
+  [gap-analysis.md](docs/proposals/gap-analysis.md).

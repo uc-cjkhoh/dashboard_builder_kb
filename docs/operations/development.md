@@ -127,10 +127,11 @@ tests with no packages. They import the pure modules straight from `src/Dashboar
 | `tests/js/scale-model.test.mjs` | table paging plan + progress, Other row, date-grouping plan, zoom past 1,000 categories, canvas mark counts |
 | `tests/js/chart-fit.test.mjs` | per-category slots (grouped, horizontal, heatmap), label rotation by pane width, no minimum for pie/scatter/treemap |
 | `tests/js/relation-rules.test.mjs`, `table-filter.test.mjs`, `empty-state.test.mjs`, `icons.test.mjs`, `contrast.test.mjs`, `format.test.mjs` | the other pure modules |
-| `tests/js/tokens.test.mjs` | no retired token, no hex outside `:root`, dark block redefines the surfaces |
+| `tests/js/tokens.test.mjs` | no retired token, no hex outside `:root`, dark block redefines the surfaces, no stylesheet reads `prefers-color-scheme`, glass fallbacks cover dark |
+| `tests/js/scheme.test.mjs` | System / Light / Dark resolution against the OS, unknown stored values → System, and `scheme-boot.js` agreeing with `resolveScheme` (incl. blocked storage) |
 
-**Visual review:** there is no headless browser on the build host, so look at light **and** dark (switch
-the OS / browser colour scheme) on a spare dev port before deploying a UI change.
+**Visual review:** there is no headless browser on the build host, so look at light **and** dark (the tab
+bar's appearance toggle) on a spare dev port before deploying a UI change.
 
 **DOM behaviour:** there's no headless browser (Chromium can't launch here), but the real modules can be
 driven in **jsdom** against the rendered page and a fake API. Install jsdom into a scratch directory (not

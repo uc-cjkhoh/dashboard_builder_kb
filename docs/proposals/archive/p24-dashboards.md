@@ -9,10 +9,10 @@ A proposal, not yet built. P24 is split into four phases; this spec covers the f
 | 24c | Cross-widget filtering — a mark selected in one widget filters the others | later spec |
 | 24d | Stories — ordered, captioned snapshots | later spec |
 
-When built, the behaviour moves into a new [features/](../features/worksheet.md) file `dashboards.md` and the
-docs listed under [Docs](#docs), [roadmap.md](roadmap.md#p24--multi-worksheet-dashboards--stories) keeps
+When built, the behaviour moves into a new [features/](../../features/worksheet.md) file `dashboards.md` and the
+docs listed under [Docs](#docs), [backlog/dashboards.md](../../backlog/dashboards.md) keeps
 only 24c / 24d, and this file and its plan are deleted
-([kb-maintenance.md](../conventions/kb-maintenance.md#when-you-make-a-change)).
+([kb-maintenance.md](../../conventions/kb-maintenance.md#when-you-make-a-change)).
 
 ## Goals
 
@@ -40,7 +40,7 @@ only 24c / 24d, and this file and its plan are deleted
 | B5 | **Approach A** — extract `createWorksheetView`; `chart.js` keyed by container | one renderer (rejected: a second simplified renderer — drifts; iframes — N app copies, cross-frame 24c) |
 | B6 | Internal rename: today's `dashboard` (= one worksheet) becomes `worksheet` in code | "dashboard" must mean only the new kind |
 
-Recorded as **D26** in [decisions.md](../reference/decisions.md) when built; it answers O3.
+Recorded as **D26** in [decisions.md](../../reference/decisions.md) when built; it answers O3.
 
 ## 24a — Widget runtime (no visible change)
 

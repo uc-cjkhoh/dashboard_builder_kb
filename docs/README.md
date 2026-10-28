@@ -25,6 +25,7 @@ matching whatever you're touching.
 | [features/worksheet.md](features/worksheet.md) | Field pane, shelves, query lifecycle (latest-wins, cache, truncation), joins, crosstab, sort, format |
 | [features/worksheet-charts.md](features/worksheet-charts.md) | Chart types, orientation, ECharts adapter, export |
 | [features/worksheet-encodings.md](features/worksheet-encodings.md) | Encodings toolbar: Marks, Filters, click-to-filter, Drill, Pages |
+| [features/calculated-fields.md](features/calculated-fields.md) | Calculated fields: dialog, field-pane group, roles, refusals, error state, the explainer |
 | [features/workbook.md](features/workbook.md) | Auto-save in the browser, restore on connect, Export/Import |
 
 ## reference/ — contracts & rationale
@@ -35,7 +36,7 @@ matching whatever you're touching.
 | [reference/clickhouse-integration.md](reference/clickhouse-integration.md) | Driver, TLS, the exact SQL, identifier safety, type mapping |
 | [reference/data-model.md](reference/data-model.md) | Server and client state shapes, incl. the worksheet `sheet` |
 | [reference/frontend-modules.md](reference/frontend-modules.md) | Module map, wiring, event bus, `api.js` / `ui.js` helpers |
-| [reference/decisions.md](reference/decisions.md) | Decisions D1–D21 with rationale; open questions |
+| [reference/decisions.md](reference/decisions.md) | Decisions D1–D25 with rationale; [calculated fields D26–D32](reference/decisions-calculated-fields.md); open questions |
 | [reference/glossary.md](reference/glossary.md) | Domain terms |
 
 ## operations/ — build, run, deploy
@@ -61,10 +62,14 @@ Overview: [../DESIGN.md](../DESIGN.md).
 
 | Doc | Topic |
 |---|---|
-| [proposals/roadmap.md](proposals/roadmap.md) | every phase not built yet, in recommended order, with a coverage table against Tableau, Power BI and Looker Studio |
-| [proposals/roadmap-bi-parity.md](proposals/roadmap-bi-parity.md) | detail of the open phases from the Power BI / Looker Studio review (P35–P45 series) |
-| [proposals/p24-dashboards.md](proposals/p24-dashboards.md) | P24a + P24b spec: instantiable worksheet views, worksheet + dashboard tabs, snap-grid dashboards, workbook v2 |
-| [proposals/competitive-analysis.md](proposals/competitive-analysis.md) | Gap analysis vs. Tableau and GA4, ordered by difficulty |
+| [proposals/web-application-proposal.md](proposals/web-application-proposal.md) | the product proposal: scope, architecture, journeys, acceptance scenarios |
+| [proposals/tableau-features.md](proposals/tableau-features.md) | the 229-requirement Tableau inventory the proposal traces to; [excluded topics](proposals/tableau-features-excluded.md) |
+| [proposals/gap-analysis.md](proposals/gap-analysis.md) | the running app benchmarked against the inventory; [per-ID detail](proposals/gap-analysis-detail.md) |
+| [proposals/delivery-and-risks.md](proposals/delivery-and-risks.md) | delivery order by dependency, and risks |
+| [proposals/calculation-engine.md](proposals/calculation-engine.md) | calculated fields spec (built, not deployed) |
+| [proposals/p24c-cross-widget-filtering.md](proposals/p24c-cross-widget-filtering.md) | P24c: cross-widget filtering on dashboards; [plan](proposals/p24c-plan.md) |
+| [backlog/README.md](backlog/README.md) | the undone work in one place, grouped by topic with a recommended order |
+| [proposals/archive/](proposals/archive/) | retired specs and plans (P24a+b, P24 plans, old roadmaps) — not maintained |
 
 ## Not here
 

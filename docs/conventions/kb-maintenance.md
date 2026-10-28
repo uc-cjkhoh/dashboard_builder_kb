@@ -30,7 +30,7 @@ when adding or changing anything here.**
 - **Componentized `docs/`, kebab-case filenames.** Group by concern:
   [conventions/](golden-rules.md), [design/](../design/tokens.md), [features/](../features/worksheet.md)
   (one file per app feature folder), [reference/](../reference/data-model.md),
-  [operations/](../operations/deployment.md), [proposals/](../proposals/roadmap.md).
+  [operations/](../operations/deployment.md), [proposals/](../proposals/delivery-and-risks.md).
   `archive/` (the frozen P0–P20 build plan) is the exception — a historical artifact, kept as-is and
   not maintained.
 
@@ -42,7 +42,7 @@ when adding or changing anything here.**
 3. If a section outgrew 300 lines, split it and link.
 4. If you moved or renamed a file or heading, fix inbound links (file-level and `#anchor`-level).
 5. When a roadmap item is built, move its description out of
-   [proposals/roadmap.md](../proposals/roadmap.md) into the matching `features/` doc as current
+   [proposals/delivery-and-risks.md](../proposals/delivery-and-risks.md) into the matching `features/` doc as current
    behaviour.
 
 ## Enforcement

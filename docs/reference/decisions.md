@@ -102,7 +102,7 @@ Supersedes [D7](#d7--design-language-red--black--white-fixed-no-scroll-shell).
 Windows 11 Fluent structure with Flat Design 2.0 surfaces: **warm neutrals + one crimson accent**,
 **glass chrome** (sidebar, tab bar, worksheet header: translucent tint + backdrop blur + 1px stroke + top
 rim) over a warm background wash, **solid data surfaces and overlays** (entity cards, chart area, crosstab,
-menus, popovers, toasts, dialogs), **light and dark by OS preference**. Spec: [DESIGN.md](../../DESIGN.md),
+menus, popovers, toasts, dialogs), **light and dark** (System / Light / Dark toggle). Spec: [DESIGN.md](../../DESIGN.md),
 [tokens.md](../design/tokens.md).
 - **Red accent without red-means-error ambiguity** (the reason D7 was retired): danger is a distinct
   vermilion (`--danger-*`) and always carries an icon and words; field pills are blue / teal / violet;
@@ -115,7 +115,10 @@ menus, popovers, toasts, dialogs), **light and dark by OS preference**. Spec: [D
 - **Glass only where nothing sits beneath it but the wash.** A blurred panel over content lets the text
   underneath read through the text on top, so anything that floats (menus, popovers, toasts, dialogs) is
   solid. `@supports` and `prefers-reduced-transparency` fall back to an opaque `--surface-2`.
-- **No manual theme toggle** — `prefers-color-scheme` only; `chart.js` re-renders on change.
+- **Light / dark is a viewer preference** — System (follows `prefers-color-scheme`, the default) / Light /
+  Dark, remembered per browser and never saved in the workbook: it is how *this* viewer wants to read,
+  not part of the shared analysis. One `data-scheme` attribute drives the tokens
+  ([tokens.md § Light and dark](../design/tokens.md#light-and-dark)).
 - **Icons:** one self-hosted inline-SVG set (`Core/icons.js`) replaces Unicode glyph icons; no icon font.
 - **Calm motion:** no hover-lift transforms, shimmer or pulse; durations 150 / 200 / 250 ms, all zeroed
   under `prefers-reduced-motion`.
@@ -174,7 +177,7 @@ already in the query (a click never forces a join).
   one chart) and non-destructive.
 - **Scope:** bar/stacked/line/area/combo/pie/donut/scatter; types whose marks don't map 1:1 to a
   primary value, and null values (can't bind `= NULL`), are no-ops. The same `sheet.selection` is the
-  basis for cross-worksheet filtering ([roadmap P24](../proposals/roadmap.md#p24--multi-worksheet-dashboards--stories)).
+  basis for cross-worksheet filtering ([P24c](../proposals/p24c-cross-widget-filtering.md)).
 
 ### D17 — Drill-down is a single-table hierarchy on the bound-param path
 One hierarchy per worksheet: ≥2 ordered columns from **one table**. The current level leads the
@@ -286,10 +289,12 @@ and holds only results the user could already see — no application database (D
 a 10% `SAMPLE` (counts and sums scaled by `_sample_factor`) on a base table that declares a sampling key.
 If the server refuses the sampled query it runs once more unsampled (logged).
 
+Calculated-field decisions D26–D32: [decisions-calculated-fields.md](decisions-calculated-fields.md).
+
 ## Open questions
 
 | # | Question | Leaning |
 |---|---|---|
-| **O1** | Should workbooks persist on the server (shared across browsers/users)? | Browser persistence is decided ([D21](#d21--workbooks-persist-in-the-browser-not-on-the-server)). Server-side storage only with accounts — see [competitive-analysis.md](../proposals/competitive-analysis.md) #15. |
+| **O1** | Should workbooks persist on the server (shared across browsers/users)? | Browser persistence is decided ([D21](#d21--workbooks-persist-in-the-browser-not-on-the-server)). Server-side storage only with accounts — see [gap-analysis.md](../proposals/gap-analysis.md). |
 | **O2** | Where are multiple saved connections stored? | One active connection per session, not saved. Later: named profiles **without** persisting passwords server-side. |
-| **O3** | How far does dashboard composition go? | Today one worksheet per tab; multi-worksheet dashboards are [roadmap P24](../proposals/roadmap.md#p24--multi-worksheet-dashboards--stories) and would revisit O1. |
+| **O3** | How far does dashboard composition go? | Today one worksheet per tab; multi-worksheet dashboards are the [P24a + b spec](../proposals/archive/p24-dashboards.md) and would revisit O1. |

@@ -3,11 +3,29 @@
 Every colour, size and depth value is a CSS custom property in the `:root` block of
 `Features/Core/core.css` (loaded before every feature stylesheet). **Use the variables — never
 hardcode a hex** ([golden rule 7](../conventions/golden-rules.md#7-use-the-design-tokens--never-hardcode-a-hex)).
-The block defines the **light** theme; `@media (prefers-color-scheme: dark)` overrides the colour and
-elevation tokens (OS preference only, no manual toggle). Ink/background pairs are chosen for ≥ 4.5:1
+The block defines the **light** theme; `:root[data-scheme="dark"]` overrides the colour and
+elevation tokens ([Light and dark](#light-and-dark)). Ink/background pairs are chosen for ≥ 4.5:1
 (WCAG AA) in both themes. `tests/js/tokens.test.mjs` fails on a retired token, a hex outside `:root`, or a
 dark block that stops redefining the surfaces, or a menu / popover / toast / dialog styled as glass;
 `tests/js/contrast.test.mjs` fails on any token text pair below 4.5:1 in either theme.
+
+## Light and dark
+
+The viewer picks **System** (default — follow the OS `prefers-color-scheme`), **Light** or **Dark** from
+the toggle at the right end of the tab bar ([layout.md § Tab bar](layout.md#tab-bar)). The choice is a
+per-browser preference (`localStorage` `dashboardbuilder.scheme`), never saved in the workbook.
+
+- **One switch:** `<html data-scheme="light|dark">` is the only thing the stylesheets key off; no
+  stylesheet reads `prefers-color-scheme` (`tokens.test.mjs` enforces it). `color-scheme` follows the
+  attribute, so native controls and scrollbars match.
+- **No flash:** `Core/scheme-boot.js`, a classic script in `<head>`, sets the attribute before first paint.
+  It repeats `resolveScheme` from `Core/scheme-model.js` (pure; `tests/js/scheme.test.mjs` runs the boot
+  script against it for every stored value × OS setting). Blocked storage → System.
+- **Runtime:** `Core/scheme.js` owns the attribute — `isDark()`, `schemePref()`, `setSchemePref()`. It follows
+  OS changes only while the choice is System, and emits `scheme:changed` on the bus when the painted
+  scheme flips; the workbook theme (`Core/theme.js`) and the active chart (`dashboards.js`) re-apply on it.
+- **Specificity:** `:root[data-scheme="dark"]` outweighs a bare `:root`, so the opaque-glass fallbacks
+  (`@supports not (backdrop-filter…)`, `prefers-reduced-transparency`) also list `:root[data-scheme]`.
 
 ## Surfaces & ink
 
@@ -88,8 +106,7 @@ Inputs on focus keep a neutral `--ink-3` border plus a 2px `--accent` underline;
 ### Workbook themes (P41)
 
 A workbook may carry a **theme** (`{ accent, palette }`, Workbook → **Theme…**) that overrides the accent
-set above and `--chart-cat-1…8` — set inline on `:root` by `Core/theme.js`, re-applied when the colour
-scheme flips; the default theme sets nothing. The values live in `Core/theme-model.js`, the second token
+set above and `--chart-cat-1…8` — set inline on `:root` by `Core/theme.js`, re-applied on `scheme:changed`; the default theme sets nothing. The values live in `Core/theme-model.js`, the second token
 source after `core.css :root`:
 
 - **Accents:** Crimson (default — the values above), Blue, Teal, Violet, Graphite, each with light and dark
@@ -124,7 +141,7 @@ Dark status tints are opaque (not translucent) so their contrast is fixed. `--up
 ## Chart tokens
 
 `chart.js` reads these off `:root` (resolving one level of `var()`) at render, and re-renders the active
-chart when `prefers-color-scheme` changes, so charts follow the theme. **Text wears ink tokens; only the
+chart on `scheme:changed` (a cache hit, no query), so charts follow light / dark. **Text wears ink tokens; only the
 mark wears the series colour.**
 
 | Token | Maps to | Role |

@@ -37,4 +37,10 @@ A change is done only when every box holds.
 - [ ] The doc for the touched area is updated **in the same change**, edited in place
       ([kb-maintenance.md](kb-maintenance.md)).
 - [ ] A changed decision is updated in [decisions.md](../reference/decisions.md); a built roadmap item
-      moves from [roadmap.md](../proposals/roadmap.md) into its `features/` doc.
+      moves from [delivery-and-risks.md](../proposals/delivery-and-risks.md) into its `features/` doc.
+
+## Integration
+
+- [ ] **Always merge to `main` after tests pass or an error is fixed.** Once the suites above are green
+      (or a failing test or error has been fixed and they are green again), merge the work branch into
+      `main` locally — no waiting for a separate go-ahead — then run the suites again on the merged result.

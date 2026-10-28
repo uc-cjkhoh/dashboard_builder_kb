@@ -25,7 +25,12 @@ sentence is user-facing: no CLR type names, parser positions, stack traces or cr
 | 500 | our own bug — anything else | `{ "error": "Unexpected error (ref <traceId>)." }`; the same ref and exception type are logged |
 
 - **Order of checks:** model binding runs first, so `POST /api/query {}` is **400** "'from' is required."
-  even with no connection; a valid body without a connection is 409.
+  even with no connection; a valid body without a connection is 409. For [calculated fields](#calculated-fields-calc)
+  only a malformed tree (unknown or missing `k`, a missing or wrongly typed member, a non-finite number,
+  or nesting past MVC's JSON depth limit of 32 — about 30 levels of tree, "'measures[0].calc' has an
+  invalid value.") fails in binding; every semantic check — role, limits, label, unknown field, type — runs in
+  `RequestRules` / the gateway inside `RunAsync`, i.e. **after** the 409 gate. So does a plain measure's
+  missing `agg` ("'measures[0].agg' is required.").
 - Machinery: `ApiBehaviorOptions.InvalidModelStateResponseFactory` (`Features/ApiErrors.cs`) shapes
   binding failures (first error only); `ApiControllerBase.RunAsync` maps validation → 400, unknown
   identifier → 400/404, ClickHouse failures → 502/504 and anything else → 500; `UseExceptionHandler`
@@ -43,14 +48,15 @@ the client mirrors them in `Core/validate.js` `LIMITS` and checks first, so a va
 | Request body (JSON APIs) | 256 KB → 413 |
 | Connect `host` / `user` / `password` | ≤ 253 / 64 / 256 characters; host is a name, IPv4 or IPv6 with no scheme, port or path; `port` required, 1–65535 |
 | Row + column dimensions | ≤ 12 in total |
-| Measures | ≤ 10 |
+| Measures | ≤ 10 (calculated measures count toward it, as calculated dimensions count toward the 12) |
 | Joins | ≤ 10 |
 | Filters per query | **≤ 20** (`MaxFilters`). The client allows 8 user filters, and the worksheet appends the shared filters (≤ 4), the drill path (≤ 5), the page, the selection and the date range |
 | `in` values | ≤ 500; a filter value ≤ 1000 characters |
 | `limit` (query, box plot, distinct) | 1–5000 (default 50; [D24](decisions.md#d24--showing-all-data-bounded-requests-paging-other-date-grouping)) · CSV export 1–100,000 · distinct 1–1000 (default 200) |
 | `offset` (query) | 0–10,000,000 |
 | Filter `op` | also `contains`, `startsWith`, `endsWith` (text columns, value required) and `top` (value 1–1000 + `topBy` measure, optional `bottom`; worksheet query only — histogram / box plot reject it) |
-| `joins[].type` | `inner` (default) or `left` |
+| `joins[].type` | `inner` (default) or `left`; a join key can't carry `calc` (400, `joins[i].left.calc` / `.right.calc`) |
+| `calc` tree (dimension, measure, `topBy`) | depth ≤ 12 (root is depth 1), ≤ 200 nodes (`CalcLimits.MaxDepth`, `MaxNodes`); the label in `column` ≤ 60 characters (`CalcLimits.MaxName`, error at `….column`). Formula ≤ 500 characters and ≤ 20 calculations per workbook are client-only (`CalcLimits.MaxFormula`, `MaxCalcs`; mirrored by `LIMITS.calcFormula`, `LIMITS.calculations`, `LIMITS.calcName` in `validate.js` and by `CALC_LIMITS` in `Features/Calc/calc-types.js`) — the server never sees formula text |
 | `fresh`, `approximate` (query) | booleans — skip the result cache; approximate mode ([D25](decisions.md#d25--a-short-lived-server-result-cache-and-approximate-mode)). The response adds `cached` and `approx: { distinct, sample }` |
 | `datePart` (a row / column dimension) | `auto`, `exact`, `year`, `quarter`, `month`, `week`, `day`, `hour`, `quarterOfYear`, `monthOfYear`, `dayOfWeek`, `hourOfDay`; date columns only |
 | `dateBucket` (query) | `auto`, `hour`, `day`, `week`, `month`, `quarter`, `year` |
@@ -110,8 +116,44 @@ Controller: `Features/Dashboard/QueryController.cs`. All `POST` with a JSON body
 **Measure values** (`QueryResultRow.Values`, `IReadOnlyList<object?>`) are a JSON number, a **string**
 (`min` / `max` of a text or date column), or `null` (SQL NULL, or `NaN` / `∞` from an aggregate over no
 rows). Consumers must not assume numbers — [worksheet-charts.md](../features/worksheet-charts.md#chart-types).
-`sum` and `avg` on a non-numeric column are a 400 (`count` / `countDistinct` / `min` / `max` are fine on any
-column).
+`sum` and `avg` on a non-numeric column are a 400 (`count` / `countDistinct` / `countNonNull` / `min` /
+`max` are fine on any column). Aggregations: `count` (rows), `sum`, `avg`, `min`, `max`, `countDistinct`,
+`countNonNull` (non-NULL values of the column, `count(col)`).
+
+### Calculated fields (`calc`)
+
+A row or column dimension (`ColumnRef`), a measure (`MeasureRef`) and a Top-N `topBy` may carry a
+`calc` expression tree; the browser parses the formula and sends only the tree — no formula text
+reaches the server or SQL.
+
+```json
+{ "db": "shop", "table": "orders", "column": "Margin", "agg": null,
+  "calc": { "k": "bin", "op": "/",
+    "l": { "k": "agg", "fn": "sum", "arg": { "k": "field", "db": "shop", "table": "orders", "column": "amount" } },
+    "r": { "k": "agg", "fn": "sum", "arg": { "k": "field", "db": "shop", "table": "orders", "column": "qty" } } } }
+```
+
+- **Nodes** (discriminator `k`): `field` (`db`, `table`, `column`), `num` (`v`, finite), `un` (`op: "-"`),
+  `bin` (`op` ∈ `+ - * /`), `agg` (`fn` ∈ `sum avg min max count countd`, `arg`). `count` counts non-NULL
+  values (as `countNonNull`), `countd` distinct values. Every referenced table must already be in the
+  query (`from` or a join) — else the usual 400 "Field references a table not in the query."
+- **With `calc` set**, `db` / `table` / `column` are not used in SQL, but they must still be present
+  (an absent `column` is a binding 400, "'measures[0].column' is required.") — send empty strings when there
+  is no label. `column` is only the **display label** (≤ 60 characters; longer is a 400 at `….column`),
+  echoed in the result's `rowDimensions` / `measures`; an empty `column` falls back to `"calculation"`.
+- **Role rules** (400, field `….calc`): an **aggregate** tree (contains an `agg` node) is valid only as a
+  measure or `topBy` with `agg` absent or `null`; a **row-level** tree as a measure / `topBy` needs `agg` ∈
+  `sum`, `avg`, `min`, `max`, `countDistinct`, `countNonNull` (`count` of rows is rejected — it would
+  ignore the calculation; `sum` / `avg` need a number); a row-level tree is valid as a dimension, an
+  aggregate one there is a 400; a calculated dimension takes no `datePart` (`….datePart`) and is never
+  date-grouped by `dateBucket`.
+- **Tree errors** name the node: `measures[0].calc.arg`, `rowDimensions[1].calc.l.r` — e.g. "SUM needs a
+  number — orders.region is text.", "Unknown field orders.nope.", "Can't mix an aggregate with a
+  row-level value in one formula.", "An aggregate can't contain another aggregate.", "That formula is too
+  deep." / "too large.".
+- **Results:** a number-typed calculation's values are numbers (division by zero → `null`); `min` / `max`
+  of a text or date calculation are strings. A calculated dimension's keys are strings like any key —
+  numbers in invariant form (`"0.3333333333333333"`, `"20"`), `null` for a NULL key.
 
 The histogram and box-plot requests carry `filters` (`StatFilter`: column, op, value, values) that are
 applied with the same typed rules as the worksheet query; filters on other tables can't apply to a
