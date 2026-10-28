@@ -160,13 +160,13 @@ limit and a workbook over the calculation count are refused with a message; none
   list and not the dialog. A fresh formula text is always a string: CRLF is normalised, control characters
   and over-long text give a message, never an exception.
   Typing the start of a **function name** (a letter prefix outside `[ ]` and outside a text literal, e.g. `LO`) offers up to 12
-  matching functions in the same list, each with its signature (`LOWER(text)`); accepting inserts `LOWER(` with the caret
+  matching functions in the same list (not when the caret is inside a word; before an existing `(` no second one is added), each with its signature (`LOWER(text)`); accepting inserts `LOWER(` with the caret
   after the bracket (`AND`, `OR`, `NOT` and `CASE` insert the word and a space). Field suggestions after `[` are unchanged.
 - **Functions** — a button under the formula opens a help panel (`aria-expanded`, Esc closes the panel and not the dialog).
   A search box filters the glossary (name, group, plain-words sentence, signature); the list is grouped Aggregate, Logic,
   Text, Date. Hovering or focusing a row shows its detail: signature, what it does, what it takes, what it gives, one
   example formula and the empty-value (NULL) rule. Clicking a row inserts its signature at the caret (replacing a
-  selection); **Insert example** inserts the example formula. The dialog body scrolls so Cancel / Save stay visible. The
+  selection); **Insert example** inserts the example of the function last focused with the keyboard or clicked (hovering only previews). After an insert, focus returns to the formula box, so Esc then closes the dialog. The dialog body scrolls so Cancel / Save stay visible. The
   glossary (`function-help.js`) derives names, arity and result types from `calc-types.js`; a test fails when a function
   has no entry or an entry has no function, and that every example formula parses and type-checks. Operators
   (`+ - * / = != < <= > >=`) are not listed as functions.
