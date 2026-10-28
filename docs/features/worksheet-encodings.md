@@ -167,6 +167,26 @@ resets the descent. A hierarchy with no shelf fields renders an implicit-count
 chart of the current level. Why one table:
 [D17](../reference/decisions.md#d17--drill-down-is-a-single-table-hierarchy-on-the-bound-param-path).
 
+### Named hierarchies
+
+A **named hierarchy** (T03-29) is a reusable drill path kept on the workbook:
+`{ id, name, levels: [{ db, table, column }] }` — 2–6 levels, all from one table, no repeated column (the same rules as
+the Drill tool), at most **20** per workbook, a name of 1–60 characters unique case-insensitively. A calculated field or a
+field with a type cast can't be a level (the calc refusal text, or "A field with a type cast can't be a hierarchy level").
+They are managed in the field pane's **Hierarchies** group (above the tables): **New hierarchy** and **Hierarchies…** open the
+dialog (`Dashboard/hierarchy-dialog.js`) — a name, a table, and an ordered level list built with an "Add a level" picker and
+per-level **Up / Down / Remove** buttons (labelled, keyboard-operable; focus stays on the control just used), plus
+Edit / Delete (Delete confirms). Each hierarchy is a chip with its level count.
+
+Dragging a chip onto the **Drill** tool (its button, its open panel, or **More** while Drill is empty) — or its plus button —
+**replaces the sheet's drill** with `{ levels, depth: 0, path: [] }`, the structure a hand-built drill has (each level carries
+its column's category), so the chart, breadcrumb and click-to-drill behave identically. The sheet gets a **copy** of the levels:
+renaming, editing or deleting the hierarchy later never changes a sheet that already used it. A chip whose table isn't in the
+Data Model or whose column no longer exists is shown with a "No table" / "Missing field" badge and can't be applied; a column
+cast after the hierarchy was made refuses with the cast message. Hierarchies are client-side only (the server never sees one)
+and save with the workbook ([workbook.md](workbook.md)). Expand / collapse headers on a crosstab are not built
+([roadmap](../backlog/data-model.md)).
+
 ## Pages
 
 The **Pages** tool takes one dimension (`sheet.pages`). A page control (`.ws-pages`) below the shelves

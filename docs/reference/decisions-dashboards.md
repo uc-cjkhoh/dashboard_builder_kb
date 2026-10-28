@@ -63,3 +63,10 @@ order is the data order. The editor's old vocabulary is renamed inside (`dashboa
 - **Detail.** The dashboard selection replaces a target's own click selection only when it applies (else the widget keeps its own);
   the source's fade re-runs the view from the result cache rather than restyling the live chart.
 - **Rejected:** forcing a join to reach a widget; saving the selection; multi-select and configurable actions (T08-20..24).
+
+### D69 — A named hierarchy is a workbook list a sheet copies from, not a reference
+A hierarchy is `{ id, name, levels }` on the workbook; applying it writes a fresh `sheet.drill` (the same shape the Drill tool builds), so the drill state
+machine, bookmarks, undo and the query path are untouched and a sheet keeps working when the hierarchy is renamed, edited or deleted. A live reference would need
+a missing-hierarchy state on every sheet and bookmark. The cost: editing a hierarchy doesn't update sheets that already used it (re-apply it). Levels are plain
+columns of one table (a calculated or cast field is refused — a cast or formula could change under a stored level), the limits are client-side only, and the optional
+workbook field needs no version bump because the reader ignores unknown fields and an absent one means none. A dropped hierarchy replaces the drill rather than appending.

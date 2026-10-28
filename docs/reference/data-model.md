@@ -174,6 +174,7 @@ What [workbook.md](../features/workbook.md) saves to `localStorage` and exports 
   active:        { kind, index } | null    // null = Data Model
   fields:        { "db.table.column": { alias?, agg?, hidden?, cast?, memberAliases?: { [rawValue]: label } } }   // P28, T02-34, T02-29 — ≤ 2000
   parameters:    [{ id: "prm<n>", name, type: number|text|date, value, allowed: { kind: any|list|range, list?, min?, max?, step? } }]   // P32 — ≤ 20
+  hierarchies?:  [{ id: "hier<n>", name, levels: [{ db, table, column }] }]   // T03-29 — optional, ≤ 20, 2–6 same-table levels; a sheet's drill copies them
   bookmarks:     [{ name, worksheet: index | null, worksheetName, sheet, sharedFilters, savedAt }]   // P39 — ≤ 30
   sharedFilters: Filter[]                  // P40 — ≤ 4, applied by every worksheet where their table is in the view
   theme:         { accent: "crimson" | "blue" | "teal" | "violet" | "graphite" | "#rrggbb", palette: "default" | "okabe" | "muted" }
