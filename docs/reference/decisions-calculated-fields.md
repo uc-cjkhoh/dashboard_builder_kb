@@ -1,6 +1,6 @@
 # Decisions — calculated fields
 
-Continues [decisions.md](decisions.md) (D1–D25). Decisions D26–D68. Behaviour: [calculated-fields.md](../features/calculated-fields.md).
+Continues [decisions.md](decisions.md) (D1–D25). Decisions D26–D60 and D65–D68 (D61–D64 are dashboard decisions). Behaviour: [calculated-fields.md](../features/calculated-fields.md).
 Edit an entry in place when it changes.
 
 ### D26 — A calculated pill is a normal pill with an id

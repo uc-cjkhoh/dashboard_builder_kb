@@ -43,7 +43,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/filter-rules.js` | pure: `aggsFor`, `checkFilter`, `statFilters`, `withCategories`, `viewCounts`, `checkAdd` (drop-time caps) — [worksheet.md](../features/worksheet.md#drop-time-limits) |
 | `Dashboard/show-me-rules.js` | pure: chart-type field rules (`CHART_NEEDS`, `chartIssue`, the shared hint texts, `roleOf`) and Show Me — `issueFor`, `bestType`, `showMeOptions`, `placeFor`, `samePlacement` — [worksheet-charts.md](../features/worksheet-charts.md#show-me) |
 | `Dashboard/toolbar-rules.js` | pure: `visibleTools(chartType, tools)` — visible row vs More — [worksheet-encodings.md](../features/worksheet-encodings.md#encodings-toolbar) |
-| `Core/parameters-model.js` | pure (P32): `checkValue` (type + allowed values), `checkStep` (positive step size), `withParamValue`, `effectiveTopN`, `paramTypeFor`, `cleanParameter` |
+| `Core/parameters-model.js` | pure (P32): `checkValue` (type + allowed values), `checkStep` (positive step size), `checkParamName`, `withParamValue`, `effectiveTopN`, `paramTypeFor`, `cleanParameter` |
 | `Workbook/parameters-dialog.js` | P32: the Parameters dialog (Workbook menu) |
 | `Core/theme-model.js` | pure (P41): accent presets + palettes (light / dark), `deriveAccent` (custom colour → contrast-checked set, or a refusal), `themeVars`, `cleanTheme` — [tokens.md](../design/tokens.md#workbook-themes-p41) |
 | `Core/scheme-model.js` | pure: `SCHEME_PREFS`, `normalizePref`, `resolveScheme(pref, osDark)` — [tokens.md](../design/tokens.md#light-and-dark) |
@@ -76,7 +76,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Calc/calc-params.js` | pure: `[@Name]` support — `substituteParams` (param node → `num` / `str` / `date()` literal), `paramLiteral`, `paramRefs`, `calcsUsingParam`, `calcParamNames`, `renameParamInFormulas` |
 | `Calc/calc-model.js` | pure: `expandCalcs` (replaces `{ k: "calc" }` references with their trees; cycle and size guard), `roleOfCalc` |
 | `Calc/calc-resolve.js` | pure: `catalogFromEntities`, `makeResolve`, `compileCalculation(calc, calcs, catalog, params)` (parse → expand → substitute parameters → check), `calcTables` |
-| `Calc/calc-workbook.js` | pure: `checkName`, `renameInFormulas`, `usedBy`, `cleanCalculation(s)` — the workbook list rules |
+| `Calc/calc-workbook.js` | pure: `checkName`, `mapRefs` (rewrite refs outside text literals), `renameInFormulas`, `usedBy`, `cleanCalculation(s)` — the workbook list rules |
 | `Calc/calc-pill.js` | pure: the calc-pill shape (`makeCalcPill`, `isCalcPill`, `pillName`), `refusal` (E12 entry points), `pillSlots`, `syncCalcPills`, `usesCalc`, `clearCalcPills` |
 | `Calc/calc-plan.js` | pure: the worksheet plan seam — `wireDim`, `wireMeasure`, `planTables`, `calcProblem`, `measureLabel`, `topByRef` / `wireTopBy`, `resolveSortTarget` |
 | `Calc/calc-dialog-model.js` | pure: `evaluateDraft` (validation), `chipFor` (role chip), `suggest` (`[` field, `[@` parameter and function-name autocomplete) |

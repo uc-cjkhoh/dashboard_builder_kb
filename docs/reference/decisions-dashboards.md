@@ -1,6 +1,6 @@
 # Decisions — dashboards
 
-Continues [decisions.md](decisions.md) (D1–D25) and [decisions-calculated-fields.md](decisions-calculated-fields.md) (D26–D66).
+Continues [decisions.md](decisions.md) (D1–D25) and [decisions-calculated-fields.md](decisions-calculated-fields.md) (D26–D60, D65–D66).
 Behaviour: [tabs.md](../features/tabs.md), [workbook.md](../features/workbook.md). Edit an entry in place when it changes.
 
 ### D61 — Worksheets and dashboards are separate tab kinds; workbook format v2

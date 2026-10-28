@@ -132,7 +132,7 @@ Use DATE() to turn text into a date.`); so is a number. A NULL date gives NULL f
 
 A formula reads a workbook parameter ([worksheet-encodings.md](worksheet-encodings.md#filters)) as **`[@Name]`**: `SUM([orders.amount]) * [@Tax rate]`.
 The `@` is the parameter namespace, so `[Name]` still means a calculation and `[table.column]` a field; a parameter name may hold dots
-(`[@Tax.rate]` is one name) but not `[` or `]` (such a parameter can't be referenced), and a calculation name may not start with `@`.
+(`[@Tax.rate]` is one name) but not `[` or `]` (refused in the dialog and skipped on open), and a calculation name may not start with `@` (the name rule; an imported one is skipped with a note). A number parameter read from a hand-edited workbook must be a plain decimal (`0x10`, `1e400` are refused).
 - **Substitution is client-side, at compile.** `compileCalculation` parses `[@Name]` to `{ k: "param", name }`, expands calculation references,
   then replaces each `param` node by a literal before type-checking: a number is `num` (a negative is `-` over its magnitude, the parser's own
   shape), a text is `str` (**at most 100 characters**, the text-literal limit), a date is `DATE('YYYY-MM-DD')` (a `fn date` over a `str`, so the date rules of
@@ -146,7 +146,7 @@ The `@` is the parameter namespace, so `[Name]` still means a calculation and `[
 - **Changing a value** re-plans the open worksheet and every dashboard widget: the request now carries the new literal (a different request key, so a
   fresh query, not a cached one); the sheet shows a control for each parameter its calculated pills read (the same controls as for filters).
   Calculated pills are re-typed when a parameter's type changes.
-- **Rename and delete:** renaming a parameter rewrites `[@Old]` in every formula. Deleting one that a formula mentions **asks first** (naming the
+- **Rename and delete:** renaming a parameter rewrites `[@Old]` in every formula, and renaming a calculation `[Old]`, both outside text literals (`'[@Old]'` stays text). Deleting one that a formula mentions **asks first** (naming the
   calculations); if confirmed, the calculation keeps its formula and shows the E15 state `Calculation 'X' can't be computed: Parameter [@Y] was
   deleted or doesn't exist.` (no query is sent) until a parameter with that name exists again. The workbook saves formula text only (format unchanged).
 
