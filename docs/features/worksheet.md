@@ -172,6 +172,25 @@ Fields may come from **different tables**. The client finds a **join path** (BFS
 relationship graph) and the server builds aliased `INNER JOIN`s along it. Tables with no connecting
 relationship → a "draw a relationship" warning, never a malformed query.
 
+## View data
+
+The rows **behind** a view: the Export menu's **View data** (whole view) and the selection bar's **View data**
+(`ws-select`, beside Keep only / Exclude: the selected mark) open the rows dialog
+([schema-browser.md § Row preview](schema-browser.md#row-preview)) with the first **100** rows (server cap 1000) of the
+view's **base table** — the first table the view uses — from `POST /api/rows`
+([api.md § Rows](../reference/api.md#rows)). `viewData` in `dashboards.js` builds the usual plan with the selection
+removed, then `buildRowsRequest` (`Rows/rows-model.js`) turns it into the request:
+
+- the view's filters that sit **on the base table** (user and shared filters, drill path, page, date range) are sent,
+  already resolved (relative dates → a bound `between`, parameter values applied);
+- the **selected mark** is added as a bound `=` on its column — whatever Keep only / Exclude is set to;
+- what a single-table read **cannot** apply is left out and named in an amber note in the dialog, never silently:
+  filters on **joined** tables, a mark on a joined table, a **NULL** mark, and Top-N rankings. So for a joined view
+  the rows are the base table's, not the joined result (a decision: rows are of one table, never a join).
+- The dialog title is "Data behind this view" or "Data behind <table.column = value>"; the dialog, its truncation
+  notice ("First N rows — more exist") and its CSV export are the schema browser's. A view with no fields yet says
+  "Add fields before viewing data."; an invalid calculation shows its problem instead.
+
 ## Table view — a true Rows × Columns crosstab
 
 `crosstabTable()` pivots the flat grouped rows client-side (ClickHouse has no `PIVOT`):

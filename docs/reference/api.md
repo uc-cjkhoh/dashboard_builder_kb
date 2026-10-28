@@ -52,6 +52,7 @@ the client mirrors them in `Core/validate.js` `LIMITS` and checks first, so a va
 | Joins | ≤ 10 |
 | Filters per query | **≤ 20** (`MaxFilters`). The client allows 8 user filters, and the worksheet appends the shared filters (≤ 4), the drill path (≤ 5), the page, the selection and the date range |
 | `in` / `notin` values | ≤ 500; a filter value ≤ 1000 characters |
+| `limit` (rows) | 1–1000, default 100 (`MaxRowsLimit`, mirrored by `LIMITS.viewRows`); ≤ 200 `columns` (`MaxRowsColumns`); a cell ≤ 1000 characters (`MaxCellLength`, cut not rejected) |
 | `limit` (query, box plot, distinct) | 1–5000 (default 50; [D24](decisions.md#d24--showing-all-data-bounded-requests-paging-other-date-grouping)) · CSV export 1–100,000 · distinct 1–1000 (default 200) |
 | `offset` (query) | 0–10,000,000 |
 | Filter `op` | also `contains`, `startsWith`, `endsWith` (text columns, value required) and `top` (value 1–1000 + `topBy` measure, optional `bottom`; worksheet query only — histogram / box plot reject it) |
@@ -101,6 +102,23 @@ Controller: `Features/Schema/SchemaController.cs`.
 | `GET /api/databases/{db}/tables` | list tables | `SHOW TABLES FROM {db}` |
 | `GET /api/databases/{db}/tables/{table}/columns` | columns `{name, type, category}` | `DESCRIBE TABLE` |
 | `GET /api/databases/{db}/tables/{table}/columns/{column}/distinct?limit=` | distinct values for an `in` filter / Pages (default 200, 1–1000 else 400) | `SELECT DISTINCT … LIMIT n` |
+
+## Rows
+
+Controller: `Features/Rows/RowsController.cs`. `POST /api/rows` reads the **first rows of one table** — no
+aggregation, no `ORDER BY`, no joins.
+
+| Field | Rule |
+|---|---|
+| `db`, `table` | required; validated against the live catalog (unknown → 400) |
+| `columns` | optional, ≤ 200, each a catalog column (unknown → 400, `columns[i]` blank → 400); order kept. Default: the table's first 200 |
+| `filters` | optional `StatFilter`s (`column`, `op`, `value`, `values`) — the typed rules of the histogram / box plot ([Typed filter values](#typed-filter-values)), ≤ 20, each bound; `top` is a 400; unknown column → 400 |
+| `limit` | 1–1000, default 100; outside → 400 (`limit`), never clamped |
+
+Response `{ columns: [{name, type}], rows: [[string \| null]], truncated, limit, columnsTruncated }`: every cell is
+display text (numbers invariant, dates ISO, arrays compact) or `null` for SQL NULL; a cell is cut at 1000
+characters plus `…`. `truncated` = more rows matched than `limit`; `columnsTruncated` = the default column set was cut.
+Errors use the usual `{ error, field? }` shape: 400 rule breaks and unknown names, 409 not connected, 502 / 504 ClickHouse.
 
 ## Query
 
@@ -159,8 +177,8 @@ The histogram and box-plot requests carry `filters` (`StatFilter`: column, op, v
 applied with the same typed rules as the worksheet query; filters on other tables can't apply to a
 single-table view, so the client counts them and shows a notice.
 
-There are no single-table `aggregate`, `preview` or `count` endpoints — they were removed (a request to
-them is an unmatched route, 404).
+There are no single-table `aggregate`, `preview` or `count` routes under `/api/databases/{db}/tables/{table}/` — they
+were removed (a request to them is an unmatched route, 404). Raw rows have one home: `POST /api/rows` ([Rows](#rows)).
 
 Request/response models: `ClickHouse/QueryModels.cs`, `StatisticalModels.cs`, `SchemaModels.cs`.
 

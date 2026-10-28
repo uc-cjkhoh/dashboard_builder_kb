@@ -55,8 +55,7 @@ the view. It is stored on the sheet as `tooltipText` (`null` = the automatic too
 bar / line / area / combo (axis tooltip: every series in the hover), pie / donut and scatter-family charts;
 unknown placeholders show as literal text, values use the existing value / category formatters. All HTML is built
 in `Dashboard/tooltip-model.js` from escaped parts only (`<script>`, quotes, `&` are escaped — user text never
-becomes markup). Other chart types keep their automatic tooltip.
-
+becomes markup). The automatic tooltip is kept on Table, Text, KPI, Heatmap, Treemap, discrete-colour splits, Scatter with a Shape field and the P36 chart types. The chips offer only fields that resolve: group-by / Tooltip fields and the shelf measures (not Size / continuous-Colour measures).
 
 - Extra measures never become chart series; with no marks set the plan is byte-identical to a plain
   shelves plan.

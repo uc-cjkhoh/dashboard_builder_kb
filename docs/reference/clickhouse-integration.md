@@ -83,6 +83,7 @@ ClickHouse on `10.168.49.13` limits `default` to `127.0.0.1`, so from the app ho
 | Worksheet query | `QueryAsync` | see below |
 | Histogram | `HistogramAsync` | `WITH (SELECT min…) AS lo, (SELECT max…) AS hi, if(hi>lo,(hi-lo)/{bins},1) AS width SELECT least(toUInt32(floor(({c}-lo)/width)),{bins-1}) AS bin, … count() … GROUP BY bin … ORDER BY bin` |
 | Box plot | `BoxPlotAsync` | `SELECT [{dim} AS label,] min, quantile(0.25), quantile(0.5), quantile(0.75), max … [GROUP BY label] LIMIT n` |
+| Raw rows | `RowsAsync` | `SELECT {col}, … FROM {db}.{table} [WHERE …bound…] LIMIT n+1` — the columns are catalog-checked (default: the first 200), the filters go through `BuildSingleTableFilters`, there is **no ORDER BY**, `n` is 1..1000 (rejected outside) and the extra probe row sets `truncated`; each cell is capped at 1000 characters in the gateway |
 | CSV export | `QueryAsync` | the worksheet query, serialised by `CsvUtil` |
 
 `{db}`, `{table}`, `{col}` are **interpolated identifiers** (see below); every other variable part is a

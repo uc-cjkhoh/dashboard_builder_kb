@@ -1,7 +1,7 @@
 # Schema browser — database picker & table list
 
 Sidebar, below the connection panel. Code: `Features/Schema/` (`SchemaController.cs`,
-`_Schema.cshtml`, `schema.js`, `table-filter.js`, `schema.css`).
+`_Schema.cshtml`, `schema.js`, `table-filter.js`, `schema.css`); the preview dialog is `Features/Rows/`.
 
 ## Database picker
 
@@ -26,6 +26,23 @@ Sidebar, below the connection panel. Code: `Features/Schema/` (`SchemaController
   (always on touch) as the drag affordance; the chip's tooltip says "Drag <table> onto the canvas" and
   the `＋` button's says "Add to the canvas (or drag the table)". Chips are tier-2 glass controls
   ([tokens.md](../design/tokens.md#controls-on-glass--three-tiers-and-a-state-ladder)).
+
+## Row preview
+
+- A **preview button** (eye icon, `.table-chip__peek`, `aria-label` "Preview rows of <table>") sits on each chip, shown
+  on hover / focus like the grip. It opens the **rows dialog** (`Rows/rows-dialog.js`): the first **20** rows of the
+  table (`tableRowsRequest` in `Rows/rows-model.js` → `POST /api/rows`,
+  [api.md § Rows](../reference/api.md#rows)), with each column's **name and raw ClickHouse type** in a sticky
+  header, then the rows. Read-only; no ordering (the first rows in storage order).
+- The dialog is a native `<dialog>` labelled by its title ("<table> — first rows", the `db.table` beneath),
+  closed by **Esc**, the X or Close (which also cancels a request still in flight). The table scrolls inside the
+  dialog (max 80vh); the page never scrolls. A SQL `NULL` cell reads *NULL* in italic muted text, distinct from an
+  empty string. A cell longer than 1000 characters is cut with an ellipsis; at most the table's first 200 columns
+  show (the footer says "first N columns"). The footer states "N rows" or "First N rows — more exist".
+- **Export CSV** saves the rows shown (RFC 4180 quoting; a cell starting `= + - @` is prefixed with `'`, like the
+  server's `CsvUtil`). A failure (a 400 / 502 / 504) shows its message in the dialog and a toast; the export stays disabled.
+- The same dialog serves the worksheet's *View data* ([worksheet.md](worksheet.md#view-data)). Canvas entity cards
+  still show no rows ([canvas.md](canvas.md)).
 
 ## Safety
 

@@ -37,6 +37,8 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Core/theme.js` | applies the workbook theme's custom properties on `:root` (`theme:changed`, `scheme:changed`) |
 | `Workbook/theme-dialog.js` | the Theme dialog (Workbook menu) |
 | `Workbook/bookmarks-dialog.js` | P39: Save view as bookmark…, the Bookmarks list, `applyBookmark` |
+| `Rows/rows-model.js` | pure: `tableRowsRequest`, `buildRowsRequest({plan, selection, limit})` (base-table filters + the mark as a bound `=`; `notes` for what couldn't apply), `rowsSummary`, `cellText`, `rowsToCsv`, `DEFAULT_LIMIT` — [worksheet.md](../features/worksheet.md#view-data) |
+| `Rows/rows-dialog.js` | the rows dialog: `openTablePreview(db, table)` (schema browser) and `openRowsDialog({title, subtitle, request, notes, filename})` — [schema-browser.md](../features/schema-browser.md#row-preview) |
 | `Dashboard/action-model.js` | pure (P39): `templateError`, `buildActionUrl` (https-only, encoded `{value}`), `cleanAction` |
 | `Dashboard/analytics-model.js` | pure (P21): `refValue`, `trendFit` (linear / log / poly2 least squares, R²), `trendSeries` (+ forecast), `combine` (totals by aggregation) |
 | `Dashboard/history.js` | pure (P23): per-dashboard undo / redo stacks of sheet snapshots (50) |
