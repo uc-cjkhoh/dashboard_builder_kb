@@ -159,6 +159,17 @@ limit and a workbook over the calculation count are refused with a message; none
   calculation never offers itself); arrow keys move, Enter or Tab (after arrowing) accepts, Esc closes the
   list and not the dialog. A fresh formula text is always a string: CRLF is normalised, control characters
   and over-long text give a message, never an exception.
+  Typing the start of a **function name** (a letter prefix outside `[ ]` and outside a text literal, e.g. `LO`) offers up to 12
+  matching functions in the same list, each with its signature (`LOWER(text)`); accepting inserts `LOWER(` with the caret
+  after the bracket (`AND`, `OR`, `NOT` and `CASE` insert the word and a space). Field suggestions after `[` are unchanged.
+- **Functions** — a button under the formula opens a help panel (`aria-expanded`, Esc closes the panel and not the dialog).
+  A search box filters the glossary (name, group, plain-words sentence, signature); the list is grouped Aggregate, Logic,
+  Text, Date. Hovering or focusing a row shows its detail: signature, what it does, what it takes, what it gives, one
+  example formula and the empty-value (NULL) rule. Clicking a row inserts its signature at the caret (replacing a
+  selection); **Insert example** inserts the example formula. The dialog body scrolls so Cancel / Save stay visible. The
+  glossary (`function-help.js`) derives names, arity and result types from `calc-types.js`; a test fails when a function
+  has no entry or an entry has no function, and that every example formula parses and type-checks. Operators
+  (`+ - * / = != < <= > >=`) are not listed as functions.
 - **Live message** — the first problem, in plain words, with `(at character N)` and a caret mark when the
   parser knows the position. Unknown field and cycle messages name the cause.
 - **Role chip** — icon plus text, never colour alone: `Aggregate · number`, `Row-level · text`, `Row-level · boolean`, "No
