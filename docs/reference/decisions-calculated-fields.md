@@ -210,8 +210,7 @@ falls back to its own value when the parameter is gone (the workbook open also u
 
 ### D67 — Member labels are display-side, keyed by the raw value, positioned by the query's key order
 A member label (`memberAliases`, a field setting) changes only the text drawn: the query, groups, sort order, filters, drill path values, selections and
-member colours keep the raw value, so a label can never change what a click filters or which rows a group holds, and two members with one label stay two
-marks. The one place that draws categories is `renderWorksheet`: it wraps the category formatter as `fmtCat(key, position)` (`withMemberLabels`),
+member colours keep the raw value, so a label can never change what a click filters or which rows a group holds. **Labels are unique within a field** (not equal to another member's label or raw value; `setAlias` and the dialog refuse, the workbook open drops the later one and reports), because panels, Sankey nodes and legend items key by the drawn text and two members drawn alike would merge. CSV export carries raw values, never labels. The one place that draws categories is `renderWorksheet`: it wraps the category formatter as `fmtCat(key, position)` (`withMemberLabels`),
 where `position` is the key's index in `planDims(sheet).keyOrder`, so two fields can label the same raw value differently; callers that pass no position get
 the plain format. Maps are null-prototype and read by own key (a member can be `__proto__`); the per-field cap is 200 labels, a label 80 characters, a key 100.
 A selection chip's text is baked when the member is picked (like the drill label) and does not follow a later edit. **Rejected:** rewriting the result's keys before drawing
@@ -223,5 +222,5 @@ a value other formulas can use, and the workbook, undo, pills and query path alr
 (`groupTree`), so formula text (500 characters) does not bound it; the engine's 200-node limit does: 2 + 4 nodes per member = 49 members in all.
 It is refused at edit time with a plain message (`checkGroupSpec`), never at query time, and the server independently refuses a larger tree. Members are `str` nodes
 (bound), the OR is balanced (depth ≤ 12), and ELSE is the field itself: an ungrouped member keeps its value and NULL stays NULL (a CASE condition on NULL is false). Only text fields
-(the engine compares text with text); the remainder is in the backlog. **Rejected:** generated formula text (the 500-character limit would allow about 25 members and a
+(the engine compares text with text) whose ClickHouse type is String-like: UUID, IPv4, IPv6 and enum columns fail in ClickHouse (no common type with the text branches; `toString` in the tree was not adopted) and are refused up front. A group name equal to an ungrouped member is refused. The remainder is in the backlog. **Rejected:** generated formula text (the 500-character limit would allow about 25 members and a
 round trip through quoting); a new server `in` node (no gain until groups need more than 49 members).

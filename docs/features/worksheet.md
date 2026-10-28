@@ -59,7 +59,7 @@ A value that fails to convert is NULL, so filters on it drop it (`notin` keeps i
 
 **Member labels** (T02-29): **Edit member labels…** (not offered on date fields) opens a dialog listing the field's
 top members (the bounded distinct-values read, first 200) with one label input each (≤ 80 characters; blank or
-equal to the value = no label; **Reset all**; Enter moves down the list, Esc discards). The map is the field setting
+equal to the value = no label; labels are **unique within a field** — one equal to another member's label or raw value is refused naming that member (a file with such labels opens with the first kept and the rest dropped and reported); a value over 100 characters can't be labelled; **Reset all**; Enter moves down the list, Esc discards). The map is the field setting
 `memberAliases` (`{ [rawValue]: label }`, ≤ 200 entries, key ≤ 100 characters; `Dashboard/member-labels.js`). It is
 **display only**: queries, grouping, sorting, filters, drill and selections keep the raw value. A label replaces the
 text drawn for a member on category axes, pie slices and legends, colour-split series, heatmap / treemap / Sankey /
@@ -69,8 +69,8 @@ the same raw value differently). A filter card / `in` picker shows the label wit
 title, and ticking a member stores the raw value. A click-selection chip, the legend selection chip, the drill
 breadcrumb and the dashboard filter chip name the member by its label when it is picked (the stored label text does
 not follow a later edit). Member colours stay keyed by the raw member. Maps are null-prototype objects read with own-key
-checks, so a member called `constructor` or `__proto__` is an ordinary member. Not labelled: calculated or group
-dimensions, date-part keys, NULL, Pages, the Rows data dialog.
+checks, so a member called `constructor` or `__proto__` is an ordinary member. CSV export and View data carry raw values (and group names), never labels. Not labelled: calculated or group
+dimensions, date-part keys, bucketed numeric keys, NULL, Pages.
 
 Drag a field onto a shelf or tool, or press its **`＋`** (keyboard path: measures go to Rows, dimensions
 to Columns).

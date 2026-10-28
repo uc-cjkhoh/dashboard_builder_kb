@@ -272,8 +272,7 @@ A field's **⋯** menu has **Group…** (T02-30): a text column's members go int
 (`{ id, name: "region (groups)", formula: "", group: { field, groups: [{ name, members }] } }`). The dialog (`group-dialog.js`;
 rules in `group-model.js`) names the field, adds groups (≤ 50, 1–80 characters, unique) and puts each member (the field's top 200,
 from the distinct-values read; NULL is skipped) in a group or leaves it **not grouped**. It is an ordinary calculated dimension afterwards: a
-chip in the pane (Edit… reopens this dialog, Duplicate copies the groups), a pill, a text value in formulas (`[region (groups)]`). Number, date and true/false
-fields are refused (the engine compares text only). Compile: `compileCalculation` takes the tree straight from `groupTree`, never formula text, so
+chip in the pane (Edit… reopens this dialog, Duplicate copies the groups), a pill, a text value in formulas (`[region (groups)]`). Number, date and true/false fields, and UUID, IP address and enum columns, are refused (the engine compares text only; ClickHouse has no common type for those, pinned by `tests/live/group-smoke.mjs`). A group name equal to a member that stays ungrouped is refused (it would merge their rows). Compile: `compileCalculation` takes the tree straight from `groupTree`, never formula text, so
 the 500-character limit does not apply: `CASE WHEN member = 'a' OR … THEN 'Group' … ELSE <the field> END`, one WHEN per group, an
 OR (balanced, so shallow) of `=` against `str` literals — bound parameters, nothing quoted into SQL. A member in no group keeps its own value;
 NULL stays NULL. The **node limit (200)** bounds it: 2 + 4 nodes per member, so **49 members across all groups** (`MAX_GROUP_MEMBERS`; the dialog says
