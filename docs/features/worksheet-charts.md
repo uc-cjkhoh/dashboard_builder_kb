@@ -19,7 +19,7 @@ Y) — add a second measure"), shared with Show Me so the two never disagree.
 | Scatter | 2 measures (X, Y) | Size, continuous Colour and Shape apply |
 | Combo (dual-axis) | 2 measures | 1st as bars, 2nd as a right-axis line; always vertical |
 | Square / Circle | as scatter | scatter builder with a symbol override |
-| Heatmap | 2 dimensions + 1 measure | single-hue token colour scale; Format → **Shape** **Squares** (cells) or **Circles** (scatter marks on the same category grid, 80 % of the smaller cell side, 6–48 px, coloured by the same value legend; labels, tooltip and Reverse palette behave as for squares, the cell banding is dropped) |
+| Heatmap | 2 dimensions + 1 measure | single-hue token colour scale; Format → **Shape** **Squares** (cells) or **Circles** (scatter marks on the same category grid, 80 % of the smaller cell side, 6–48 px, re-sized with the pane; cells without a value draw no circle; coloured by the same value legend; labels, tooltip and Reverse palette behave as for squares, the cell banding is dropped) |
 | Treemap | 1–2 dimensions + 1 measure | nested rectangles sized by the measure |
 | Histogram | 1 numeric field | equal-width bins; own endpoint |
 | Box plot | 1 numeric field (+ optional group dimension) | min/Q1/median/Q3/max; own endpoint |
@@ -98,8 +98,10 @@ unit-tested); over a cut-off result the info line says "Analytics use only the r
 
 `chartOrientation(sheet)` follows Tableau: a **dimension on Rows** (and none on Columns) renders
 **horizontal** bars (category down the left, first on top); a dimension on Columns renders vertical
-(the default). Format → **Line style** (Line, Area, Combo; also the dashed comparison lines, not the trend line) draws **Straight** (point to point), **Step** (each value holds until the next category, then changes) or **Jump** (the value changes half-way between two categories) — `format.lineStyle`, ECharts `step` `end` / `middle` via `lineStep`. `buildCartesian` swaps the axes for bar/stacked/line/area. Row-dimension facets / small
+(the default). `buildCartesian` swaps the axes for bar/stacked/line/area. Row-dimension facets / small
 multiples are not supported.
+
+Format → **Line style** (Line, Area, Combo; also the dashed comparison lines, not the trend line) draws **Straight** (point to point), **Step** (each value holds until the next category, then changes) or **Step (centred)** (stored as `jump`; a connected step that changes half-way between two categories) — `format.lineStyle`, ECharts `step` `end` / `middle` via `lineStep`.
 
 ## Query paths
 
