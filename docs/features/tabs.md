@@ -12,15 +12,14 @@ why two tab kinds: [D61](../reference/decisions-dashboards.md#d61--worksheets-an
 - After it, **one ordered list** of two tab kinds, each with its kind's icon (`.tab__kind`, decoration only) and the kind in
   its accessible name (`aria-label` "Sales (worksheet)" / "Overview (dashboard)"):
   - **Worksheet** (`.tab--worksheet`, icon `chart-bar`) — one Tableau-style worksheet ([worksheet.md](worksheet.md)).
-  - **Dashboard** (`.tab--dashboard`, icon `dashboard`) — a board that composes worksheets and text. The body is a placeholder
-    (`#board-view`: the dashboard's name and "This dashboard has no worksheets yet.", or its saved widget count) until the board
-    canvas lands. A dashboard's data — widgets, limits, validation, save and open — is complete
-    ([data-model.md](../reference/data-model.md#tabs-and-dashboards)).
+  - **Dashboard** (`.tab--dashboard`, icon `dashboard`) — a board of worksheet and text widgets ([dashboards.md](dashboards.md)). Its
+    data — widgets, limits, validation, save and open — is in
+    [data-model.md](../reference/data-model.md#tabs-and-dashboards).
 - **`[+]`** (`.tab-add`, `aria-haspopup="menu"`) opens a menu **New worksheet / New dashboard** (`Core/menu.js`: arrows move, Esc
   closes and returns focus to `[+]`, Enter / Space on a focused item acts). A new tab is active and its label is focused. Default
   names are **"Worksheet N" / "Dashboard N"**, N the first number not in use by a tab of that kind.
 - **Limit:** a workbook holds at most **50 tabs of either kind** (`LIMITS.tabs`). Creating one past it toasts "A workbook holds at
-  most 50 tabs — close one first." and adds nothing; import caps it the same way ([workbook.md](workbook.md#validation-parseworkbook)).
+  most 50 tabs — close one first.", adds nothing and keeps focus on `[+]`; import caps it the same way ([workbook.md](workbook.md#validation-parseworkbook)).
 - **Rename:** double-click a label, or focus it and press `F2` (or `Enter` on the active
   tab), to edit inline (`.tab__rename`, `maxlength` 60). The name is trimmed and must be 1–60
   characters; an empty name reverts and toasts "Tab name is required." Keyboard focus returns to the
@@ -45,7 +44,7 @@ why two tab kinds: [D61](../reference/decisions-dashboards.md#d61--worksheets-an
 
 - `store.currentView()` is `{ kind: "model" }`, `{ kind: "worksheet", id }` or `{ kind: "dashboard", id }`. `canvas.js` / `relations.js`
   render `#model-view` when the model is active; `dashboards.js` renders the active worksheet into `#worksheet-view`
-  (`isWorksheetActive()`); `board.js` shows `#board-view` for a dashboard (`isDashboardActive()`).
+  (`isWorksheetActive()`); `board.js` shows `#board-view` for a dashboard (`isDashboardActive()`) and renders only the active one, destroying its views when you leave it.
 - Each module shows/hides its own view on `view:changed`; the strip redraws on `tabs:changed`. `worksheet:changed { id }` means a
   worksheet's sheet was replaced; `dashboard:changed { id }` means a dashboard's widgets changed.
 - Closing the active tab activates its right-hand neighbour (else the left one, else the Data Model).

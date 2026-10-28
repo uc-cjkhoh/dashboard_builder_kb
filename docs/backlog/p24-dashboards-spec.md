@@ -1,6 +1,6 @@
 # P24a + P24b — Worksheet views and multi-worksheet dashboards
 
-P24 is split into four phases; this spec covers the first two. 24a (the widget runtime) and the data side of 24b (tab kinds, store, limits, validation, workbook format v2) are built — [tabs.md](../features/tabs.md), [data-model.md](../reference/data-model.md#tabs-and-dashboards), [workbook.md](../features/workbook.md), [D61](../reference/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2). Still to build is the board (stages 2–3, [backlog/dashboards.md](dashboards.md)):
+P24 is split into four phases; this spec covers the first two. 24a (the widget runtime) and the data side of 24b (tab kinds, store, limits, validation, workbook format v2) are built — [tabs.md](../features/tabs.md), [data-model.md](../reference/data-model.md#tabs-and-dashboards), [workbook.md](../features/workbook.md), [D61](../reference/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2). The board renders (stage 2, [dashboards.md](../features/dashboards.md)); still to build is its editing (stage 3, [backlog/dashboards.md](dashboards.md)):
 
 | Phase | What | This spec |
 |---|---|---|
@@ -126,8 +126,8 @@ Built: [tabs.md](../features/tabs.md), [data-model.md](../reference/data-model.m
 | `Features/Dashboard/worksheet-view.js` | **new** — the query-and-render path (24a) |
 | `Features/Dashboard/sheet-plan.js` | **new** — DOM-free plan building (`buildPlan`, `planDims`, `planMeasures`, sort targets), shared by the editor and the view (24a) |
 | `Features/Dashboard/dashboards.js` | editor only; uses one view; store renames (24a) |
-| `Features/Board/` | `_Board.cshtml`, `board-model.js` (built); **to build:** `board.js` (canvas, widgets, side panel, undo), `board.css`, `board-drag.js` (pointer move / resize), `board-layout.js` (pure: snap from pixels, collide, clamp, keyboard bounds) |
-| tests | `board-layout.test.mjs` (to build); `board-model.test.mjs`, `workbook-v2.test.mjs`, `store-tabs.test.mjs` and `tests/live/tabs-ui.mjs` exist |
+| `Features/Board/` | `_Board.cshtml`, `board-model.js` (built); **built:** `board.js`, `board-widget.js`, `board-panel.js`, `board.css`, `board-layout.js` (cell → pixels, stacking); **to build:** `board-drag.js` (pointer move / resize), `board-layout.js` additions (snap from pixels, clamp, keyboard bounds) and undo |
+| tests | `board-layout.test.mjs` (geometry built; snapping to build), `tests/live/board-ui.mjs` (render built); `board-model.test.mjs`, `workbook-v2.test.mjs`, `store-tabs.test.mjs` and `tests/live/tabs-ui.mjs` exist |
 
 ## Testing
 

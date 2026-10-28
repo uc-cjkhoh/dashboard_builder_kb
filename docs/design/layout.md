@@ -96,6 +96,15 @@ Format card; new data channels become Marks tools. Every control is `--ctl-h` ta
 sets `.worksheet`'s `--ws-fields-w` (default 236px) between 180px and 40% of the worksheet — drag, or
 `←`/`→` in 16px steps; remembered in this browser (`dashboardbuilder.fields.width`).
 
+## Dashboard board
+
+The dashboard tab (`.view--board`, padding 0, no scroll of its own) is a two-column grid: a 240px side panel (the worksheet's
+field-pane slot) and the main column — a bar (name, widget count, Full screen, Print) over `#board-scroll`, which scrolls inside
+itself while the page stays fixed. The canvas is 12 columns with rows of `calc(var(--ctl-h) * 2)` and `var(--s3)` gaps; widgets are
+absolutely positioned from the pure `board-layout.js`. Below 560px of canvas width widgets stack full width in reading order; at
+viewport ≤ 760px the panel moves above the canvas (max-height 9rem, scrolling). A widget is a surface card (`--r`, `--elev-2`) with a
+`--surface-2` header. Behaviour: [dashboards.md](../features/dashboards.md).
+
 ## Phone layout (≤ 640px)
 
 The shell keeps its fixed frame; the sidebar starts on its rail (not remembered — a wide screen keeps the
