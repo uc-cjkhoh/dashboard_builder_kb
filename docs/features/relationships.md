@@ -68,12 +68,12 @@ The relationship dialog (new link and edit) has a **Check this join** button: on
 1,000,000 rows of each table and reports, in plain words: the share of each table's rows that have a match in the other
 ("94% of the rows in orders have a match in customers; 6% don't"), how often a key repeats on each side, NULL keys (never
 match), and the shape the data shows (`1:1`, `1:N`, `N:1`, `N:M`; first letter = the first table). Pure wording:
-`join-preview-model.js`. A note says so when a side hit the row bound ("Based on the first 1,000,000 rows").
+`join-preview-model.js`. **Sampled results** (a side reached the row bound): the note comes first ("Based on the first N rows of each table, in no particular order"), the shares are worded "within the sample", and nothing that needs the two slices to overlap is raised as a warning — "no keys match" becomes a neutral "can't tell from a sample" note and keys repeating on both sides becomes "may be many-to-many". A declared "one" side whose keys repeat still warns (a repeat is a fact about that table). The preview reads each table twice (its own stats, and as the other side's key set) with no `ORDER BY`, so on a table being written to the two reads can differ.
 
-**Warnings** (icon + text, amber; never block saving — the relationship stays the user's declaration): keys repeat on **both** sides
-(many-to-many fan-out, sums and counts can double-count); a side declared "one" whose keys repeat (edit dialog only — a new link has no
+**Warnings** (icon + text, amber; never block saving — the relationship stays the user's declaration): keys repeat **materially** on **both** sides
+(average at least 1.1 rows per key on each — `MATERIAL_AVG`; a lone stray duplicate is only a note; many-to-many fan-out, sums and counts can double-count; one combined warning that also names a conflicting declaration); a side declared "one" whose keys repeat (edit dialog only — a new link has no
 declaration yet, so it gets the reading instead); no keys match at all. While running, the button is disabled and a busy note shows;
-a failure (e.g. incompatible key kinds, a timeout) shows the server message with an error icon. Closing the dialog cancels the request.
+the result area is an always-present `role="status"` region; a failure (e.g. incompatible key kinds, ClickHouse refusing to compare the two types — a plain 400 — or a timeout) shows the server message with an error icon. Closing the dialog cancels the request.
 Not done: no hint on the drawn line, and nothing is saved with the relationship.
 
 ## What cardinality means

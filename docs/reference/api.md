@@ -138,7 +138,7 @@ dialog's "Check this join": bounded, read-only match and duplicate counts for on
 Response `{ from, to, sampleLimit, sampled }`; each side `{ rows, nullRows, keys, matchedKeys, matchedRows, maxDuplicates, avgDuplicates }`
 over the rows examined: `keys` = distinct non-NULL keys, `matchedKeys`/`matchedRows` = those present on the other side (NULL never
 matches), `maxDuplicates`/`avgDuplicates` = how often a key repeats within the side. `sampled` is true when a side reached the bound
-(its numbers describe the first `sampleLimit` rows). Errors: usual `{ error, field? }`; 409 not connected, 502 / 504 ClickHouse.
+(its numbers describe the first `sampleLimit` rows of each table, in no particular order — the two slices need not overlap, so match shares are only "within the sample"; each table is read twice, as its own stats and as the other side's key set, with no `ORDER BY`, so the reads can differ on a table being written to). A ClickHouse "types can't be compared" error (codes 43, 53, 70, 386) is a plain 400 at `to.column`. Errors: usual `{ error, field? }`; 409 not connected, 502 / 504 ClickHouse.
 
 ## Query
 
