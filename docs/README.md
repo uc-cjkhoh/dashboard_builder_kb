@@ -73,7 +73,6 @@ Overview: [../DESIGN.md](../DESIGN.md).
 | [backlog/platform.md](backlog/platform.md) | persistence, P45, P44, risks, workbook additions, decisions to settle |
 | [backlog/journeys-and-releases.md](backlog/journeys-and-releases.md) | journeys, acceptance scenarios, releases R0–R3, quality targets |
 | [backlog/out-of-scope.md](backlog/out-of-scope.md) | deliberately excluded topics and why |
-| [backlog/p24c-cross-widget-filtering.md](backlog/p24c-cross-widget-filtering.md) | design spec: P24c cross-widget filtering; [plan](backlog/p24c-plan.md) |
 
 ## Not here
 

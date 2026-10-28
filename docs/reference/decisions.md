@@ -176,8 +176,8 @@ already in the query (a click never forces a join).
   clicked value collapses the chart to one mark. Select-then-act keeps it useful (Exclude is handy on
   one chart) and non-destructive.
 - **Scope:** bar/stacked/line/area/combo/pie/donut/scatter; types whose marks don't map 1:1 to a
-  primary value, and null values (can't bind `= NULL`), are no-ops. The same `sheet.selection` is the
-  basis for cross-worksheet filtering ([P24c](../backlog/p24c-cross-widget-filtering.md)).
+  primary value, and null values (can't bind `= NULL`), are no-ops. The same selection-to-filter path (`selectionFilter`)
+  is the basis for cross-widget filtering on a dashboard ([D64](decisions-dashboards.md#d64--one-transient-dashboard-selection-filters-the-other-widgets)).
 
 ### D17 — Drill-down is a single-table hierarchy on the bound-param path
 One hierarchy per worksheet: ≥2 ordered columns from **one table**. The current level leads the
@@ -289,7 +289,7 @@ and holds only results the user could already see — no application database (D
 a 10% `SAMPLE` (counts and sums scaled by `_sample_factor`) on a base table that declares a sampling key.
 If the server refuses the sampled query it runs once more unsampled (logged).
 
-Calculated-field decisions D26–D60: [decisions-calculated-fields.md](decisions-calculated-fields.md). Dashboard decision D61: [decisions-dashboards.md](decisions-dashboards.md).
+Calculated-field decisions D26–D60: [decisions-calculated-fields.md](decisions-calculated-fields.md). Dashboard decisions D61–D64: [decisions-dashboards.md](decisions-dashboards.md).
 
 ## Open questions
 

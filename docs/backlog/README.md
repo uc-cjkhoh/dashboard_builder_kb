@@ -6,7 +6,7 @@ The only place for work not yet built, grouped by topic. Built behaviour lives i
 
 | File | Holds |
 |---|---|
-| [dashboards.md](dashboards.md) | P24c–d, dashboard layout, image and spacer widgets, actions, navigation, P38, P39 remainder |
+| [dashboards.md](dashboards.md) | P24d, dashboard layout, image and spacer widgets, actions, navigation, P38, P39 remainder |
 | [calculations.md](calculations.md) | functions the engine lacks, parameters in formulas, LOD, table-calculation polish, P25 |
 | [data-model.md](data-model.md) | joins, union, groups, split, cast, hierarchies, P43 |
 | [charts-and-formatting.md](charts-and-formatting.md) | chart, authoring, formatting and export gaps |
@@ -15,7 +15,6 @@ The only place for work not yet built, grouped by topic. Built behaviour lives i
 | [journeys-and-releases.md](journeys-and-releases.md) | journeys and acceptance scenarios, releases R0–R3, quality targets |
 | [out-of-scope.md](out-of-scope.md) | what is deliberately excluded, and why (not backlog) |
 | [blocked.md](blocked.md) | work that could not be built, and why |
-| [p24c-cross-widget-filtering.md](p24c-cross-widget-filtering.md), [p24c-plan.md](p24c-plan.md) | design spec and task plan for P24c |
 
 Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5S1oYsan7vXMbfpaS5USA). Update it after every backlog update ([definition-of-done.md](../conventions/definition-of-done.md#status-dashboard)).
 
@@ -29,7 +28,6 @@ Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5
 
 ## Recommended order
 
-2. Cross-widget filtering (P24c) — the last Release 0 dashboard gap, and it needs widgets.
 3. Small P0 gaps (cast, duplicate sheet, tooltip editor, per-member colour, exclude) — each is independent and closes Release 0.
 4. Calculation aggregations, logic, text and date functions — the engine's tree path already exists.
 5. Parameters in formulas and table-calculation polish — both build on the function set.
@@ -45,7 +43,7 @@ Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5
 
 1. **Calculation compile for LOD:** AST → ClickHouse SQL for one `FIXED` LOD, checked against a fixture (the ratio case is done; `CASE` and date parts are not).
 2. **Table-calculation order:** a client engine for running total, rank and moving average with addressing and partitioning, with filter-order rules written down.
-3. **Action graph:** one selection filtering two sheets with explicit field mappings ([p24c-cross-widget-filtering.md](p24c-cross-widget-filtering.md)).
+3. **Action graph:** one selection filtering two sheets with explicit field mappings (the fixed same-table form is built: [dashboards.md](../features/dashboards.md#cross-widget-filtering)).
 4. **Scale:** P95 latency of the aggregate path on a large and an unindexed table, with and without the result cache.
 
 Risks are listed in [platform.md](platform.md#open-risks).

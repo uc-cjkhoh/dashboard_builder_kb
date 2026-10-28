@@ -50,10 +50,10 @@ Each widget is an `<article class="board-widget">` with a header — title, then
 Every widget is a focusable group (`tabindex="0"`, `role="group"`, `aria-roledescription="dashboard widget"`, `aria-label` its name,
 `aria-describedby` a one-line key hint) with a visible focus ring, and has a corner grip at its bottom-right.
 
-- A worksheet widget is `createWorksheetView(body, getContext, { interactive: false })` ([worksheet.md](worksheet.md#query-lifecycle)):
+- A worksheet widget is `createWorksheetView(body, getContext, { interactive: "select", cross, onSelect })` ([worksheet.md](worksheet.md#query-lifecycle)):
   its own latest-wins gate, table pager and chart instance, so widgets never abort or overwrite each other. It reads the
   worksheet's **current** sheet on every run and applies the workbook's shared filters, parameters and calculations through the
-  same `planCtx()` as the editor. **No mark selection, drill, Pages or status bar; tooltips, table paging and the legend
+  same `planCtx()` as the editor. **A mark click selects (see [Cross-widget filtering](#cross-widget-filtering)); no drill, Pages, status bar or editor panels; tooltips, table paging and the legend
   highlight stay** ([worksheet-encodings.md](worksheet-encodings.md)). The result notice (e.g. "more rows exist") shows under the header.
 - **Failure and hint states render inside the widget**, in the worksheet's own words (a rejected query, "Drag fields onto Columns
   and Rows…", fields from unrelated tables, a calculation that can't be computed); a failing widget leaves its siblings drawn.
@@ -99,6 +99,33 @@ correction), draws the **ghost** and commits. Every committed edit is **one undo
   closed since (`restorable`). History is **in memory**: a reload or a workbook open starts empty (the layout itself is autosaved),
   and closing a dashboard forgets its history.
 
+## Cross-widget filtering
+
+A click on a mark in one worksheet widget filters the **other** worksheet widgets to that value (`Board/board.js`, pure rules in
+`Dashboard/dashboard-select.js`, [D64](../reference/decisions-dashboards.md#d64--one-transient-dashboard-selection-filters-the-other-widgets)).
+
+- **One selection per dashboard**, `{ db, table, column, value, label, sourceWidgetId }`, taken from the clicked widget's primary
+  dimension (the current level on a drill hierarchy — a widget never drills). Another click replaces it; the same mark in the same
+  widget clears it. Null marks, date-grouped or date-part first keys, calculated primary dimensions (the worksheet's refusal),
+  table and the types click-to-filter excludes ([worksheet-encodings.md](worksheet-encodings.md#click-to-filter)) select nothing.
+  Legend clicks only highlight.
+- **Targets** (every other worksheet widget, a second copy of the same worksheet included) add one bound `=` filter through the
+  same `selectionFilter` the worksheet's click selection uses, replacing that widget's own click selection — only when the selected
+  column's **table is already in the widget's query**; it never forces a join. A widget it can't reach sends no new query, keeps its
+  data and says so in its notice ("orders.region: selected on another sheet, not applied here — its table isn't in this view."); a
+  histogram or box plot (single-table endpoints) says it doesn't take it. Casts follow the plan as in the editor. Filter budget: 8 own
+  + 4 shared + 5 drill + 1 page + 1 period + 1 selection = the server's 20.
+- **The source** is never filtered. It fades the other marks (bar, stacked, pie, donut; the other types have no per-mark style) and
+  shows an outline and a header badge "Selected: <label>" (text and icon, so the fade is never the only cue).
+- **The chip** in the bar reads "Filtering by orders.region = EU" with a labelled clear button (focus returns to the source widget);
+  the polite status line announces set and clear. The value is data: always `textContent`.
+- **Transient:** in memory only, never in the workbook or autosave. It ends when the dashboard stops being shown (tab switch,
+  workbook open, reload), when its source widget is removed or its worksheet closed, and when the source's primary dimension is no
+  longer the selected column. The worksheet tab never applies it.
+- **Each widget runs on its own latest-wins gate.** `view.sync()` re-runs a widget only if the selection changed what it shows
+  (`crossSignature`); clearing is a result-cache hit. A failing target shows its own error; the others still filter.
+- Marks stay pointer-only (no keyboard mark picking); the chip's clear button is keyboard reachable.
+
 ## Lifecycle
 
 - **Only the active dashboard renders.** Leaving it (another tab, the Data Model) destroys every widget — queries aborted, chart
@@ -125,6 +152,8 @@ correction), draws the **ghost** and commits. Every committed edit is **one undo
 - Image and CSV export, and bookmarks, stay per worksheet (reach them with **Edit**); the bookmark action is hidden on a dashboard.
 
 ## Tests
+
+`tests/js/dashboard-select.test.mjs`, `selection-dim.test.mjs`, the cross-filter cases of `sheet-plan`, `worksheet-view` and `worksheet-render`; `tests/live/crossfilter-ui.mjs` (real clicks on mocked data: the bound filter and the queries sent, the source's fade and badge, the chip and its keyboard clear, an unreachable widget's note, replace / clear, a failing target, latest-wins, not saved, cleared by tab switch / source removal / dimension change / reload, a second copy, light and dark screenshots).
 
 `tests/js/board-layout.test.mjs` (geometry, the 96-row limit, stacking), `board-model.test.mjs` (rules and limits), `board-drag.test.mjs`
 (pixel → cell snapping, ghost, click threshold, every refusal, cancel, panel drop plan), `board-keys.test.mjs` (every step and refusal

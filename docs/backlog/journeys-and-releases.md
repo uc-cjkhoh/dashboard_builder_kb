@@ -4,7 +4,7 @@ What "done" means for the undone work. A release exits when its journeys pass wi
 
 ## Journeys and acceptance scenarios
 
-**A — Dashboard from ClickHouse tables (P0).** Connect → drag two tables, declare the relationship → build a bar and a line sheet with aggregates and filters → edit tooltip, labels and colours → compose a dashboard → click a mark in one sheet to filter the other (both sheets include the clicked field's table; a sheet that doesn't shows a note instead, [P24c](p24c-cross-widget-filtering.md)) → reload → Export → Import into a fresh browser and reconnect. *Acceptance:* every displayed aggregate equals the fixture's documented totals, including null handling and duplicated source rows; the imported workbook is identical.
+**A — Dashboard from ClickHouse tables (P0).** Connect → drag two tables, declare the relationship → build a bar and a line sheet with aggregates and filters → edit tooltip, labels and colours → compose a dashboard → click a mark in one sheet to filter the other (both sheets include the clicked field's table; a sheet that doesn't shows a note instead, [cross-widget filtering](../features/dashboards.md#cross-widget-filtering)) → reload → Export → Import into a fresh browser and reconnect. *Acceptance:* every displayed aggregate equals the fixture's documented totals, including null handling and duplicated source rows; the imported workbook is identical.
 
 **B — Date and KPI analysis (P1).** Date hierarchy at month/day/hour; `SUM(success)/SUM(total)`; target line from a parameter. *Acceptance:* changing a date filter or parameter only re-queries affected sheets; the weighted rate is a ratio of sums.
 
@@ -18,7 +18,7 @@ What "done" means for the undone work. A release exits when its journeys pass wi
 
 | Release | Contents | Exit |
 |---|---|---|
-| R0 | Remaining **P0** items: cross-widget filtering (P24c), type cast, duplicate sheet, tooltip editor, per-member colour, exclude | Journey A passes with exact fixture values. |
+| R0 | Remaining **P0** items: type cast, duplicate sheet, tooltip editor, per-member colour, exclude | Journey A passes with exact fixture values. |
 | R1a | Text, date and logic functions, parameters in formulas, remaining P1 chart types, PDF export | Common book examples reproduce without code. |
 | R1b | Joins and unions breadth, table-calculation polish, linked actions, floating layout, phone preview | Journeys B and C pass. |
 | R2 | LOD, maps, regression, forecast, k-means, stories, chart-in-tooltip | Journeys D and E pass. |

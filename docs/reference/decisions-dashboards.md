@@ -51,3 +51,15 @@ order is the data order. The editor's old vocabulary is renamed inside (`dashboa
 - **Rejected:** auto-pushing overlapped widgets down (unpredictable, can run past 96 rows); a CSS-grid drag library (no tokens, no node
   tests, a dependency); persisting undo; a second history implementation for the board.
 
+
+## D64 — One transient dashboard selection filters the other widgets
+
+- **Decision.** A mark click in a worksheet widget sets the dashboard's one selection; every other worksheet widget adds the same bound
+  `=` the worksheet's own click selection uses, **only when the selected table is already in its query** (never a join; otherwise a
+  note). The source is exempt and fades the other marks; a header chip clears it. In memory only; it ends with the dashboard being shown,
+  its source widget, or the source's primary dimension. Widgets run `interactive: "select"` (select, never drill).
+- **Why.** The smallest model that closes cross-sheet filtering without a join graph or an actions UI; a shared table is the same
+  requirement Tableau's filter actions have, and the filter stays within the server's 20 and golden rule 3.
+- **Detail.** The dashboard selection replaces a target's own click selection only when it applies (else the widget keeps its own);
+  the source's fade re-runs the view from the result cache rather than restyling the live chart.
+- **Rejected:** forcing a join to reach a widget; saving the selection; multi-select and configurable actions (T08-20..24).

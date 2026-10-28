@@ -143,7 +143,7 @@ Clicking a chart mark **selects** its primary-dimension value (`chart.js` forwar
 The action is a bound-parameter filter appended in `buildPlan` **only when the column's table is
 already in the query** — a click never forces a join. Exclude is a single-value `!=`; to exclude several members use a `not in` filter. Clicking the same mark again clears it. Works on
 bar, stacked, line, area, combo, pie, donut and scatter (incl. colour-split); other types and null
-values are no-ops. Why select-then-act:
+values are no-ops. On a dashboard the same click filters the other widgets at once ([dashboards.md](dashboards.md#cross-widget-filtering)). Why select-then-act:
 [D16](../reference/decisions.md#d16--click-to-filter-is-a-select-then-act-worksheet-selection).
 
 ## Drill-down

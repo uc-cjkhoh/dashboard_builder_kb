@@ -185,5 +185,5 @@ bookmarks point at worksheets by index). A v1 file (`dashboards: [{ name, sheet 
 `dashName`) is migrated on read ([workbook.md](../features/workbook.md#format-v2-and-old-files)). No connection
 details or passwords are ever included. On open, every field is validated against
 `Core/sheet-schema.js` and the `LIMITS` above; invalid parts are reset to defaults and reported
-([workbook.md § Validation](../features/workbook.md#validation-parseworkbook)). `selection` is never
+([workbook.md § Validation](../features/workbook.md#validation-parseworkbook)). The dashboard's cross-widget selection ([dashboards.md](../features/dashboards.md#cross-widget-filtering)) lives only in the board's memory. `selection` is never
 restored.
