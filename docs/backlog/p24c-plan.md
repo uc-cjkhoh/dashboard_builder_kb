@@ -8,7 +8,7 @@
 
 **Tech Stack:** vanilla ES modules, ECharts (self-hosted), `node:test`, the headless-Chromium harness in `tests/browser/` built by 24a Task 1.
 
-**Spec:** [p24c-cross-widget-filtering.md](p24c-cross-widget-filtering.md). Builds on the [24a + 24b spec](p24-dashboards-spec.md); **start after 24a and 24b are built** (`Features/Board/`, `sheet-plan.js`, `worksheet-view.js` exist).
+**Spec:** [p24c-cross-widget-filtering.md](p24c-cross-widget-filtering.md). Builds on the built board ([dashboards.md](../features/dashboards.md), [D61](../reference/decisions-dashboards.md)); **24a and 24b are built** (`Features/Board/`, `sheet-plan.js`, `worksheet-view.js` exist).
 
 ## Global Constraints
 

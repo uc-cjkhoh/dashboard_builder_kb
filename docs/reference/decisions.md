@@ -297,4 +297,4 @@ Calculated-field decisions D26–D60: [decisions-calculated-fields.md](decisions
 |---|---|---|
 | **O1** | Should workbooks persist on the server (shared across browsers/users)? | Browser persistence is decided ([D21](#d21--workbooks-persist-in-the-browser-not-on-the-server)). Server-side storage only with accounts — see [platform.md](../backlog/platform.md). |
 | **O2** | Where are multiple saved connections stored? | One active connection per session, not saved. Later: named profiles **without** persisting passwords server-side. |
-| **O3** | How far does dashboard composition go? | Worksheets and dashboards are separate tab kinds and a dashboard's data is built ([D61](decisions-dashboards.md)); the board canvas is the [P24b backlog entry](../backlog/dashboards.md) and would revisit O1 only if dashboards were shared. |
+| **O3** | How far does dashboard composition go? | Worksheets and dashboards are separate tab kinds and a dashboard's data is built ([D61](decisions-dashboards.md)); the board canvas and its editing are built ([D62](decisions-dashboards.md), [D63](decisions-dashboards.md)); composition would revisit O1 only if dashboards were shared. |

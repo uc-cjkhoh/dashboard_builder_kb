@@ -23,5 +23,5 @@ Format: [README.md](README.md#how-to-read-an-entry). Chart types are in [workshe
 ## Formatting and presentation
 
 - **Worksheet formatting** (IDs: T01-23; priority P1) — partial: number, date, legend, fit and theme; no font, alignment, shading or cell sizes. Needs: none.
-- **PDF export** (IDs: T01-28; priority P1) — partial: export is the browser print dialog on one worksheet; there is no generated PDF. Dashboard export follows the dashboard work. Needs: [dashboards.md](dashboards.md) P24b for dashboards.
+- **PDF export** (IDs: T01-28; priority P1) — partial: export is the browser print dialog on one worksheet; there is no generated PDF. A dashboard prints through the browser too (whole canvas); a generated PDF is not built. Needs: none.
 - **Phone view check** (IDs: T09-16; priority P1) — judged complete from phone and touch CSS alone; it has not been run on a device. Needs: a device run.

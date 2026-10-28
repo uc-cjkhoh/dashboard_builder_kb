@@ -99,11 +99,11 @@ sets `.worksheet`'s `--ws-fields-w` (default 236px) between 180px and 40% of the
 ## Dashboard board
 
 The dashboard tab (`.view--board`, padding 0, no scroll of its own) is a two-column grid: a 240px side panel (the worksheet's
-field-pane slot) and the main column — a bar (name, widget count, Full screen, Print) over `#board-scroll`, which scrolls inside
+field-pane slot) and the main column — a bar (name, widget count, the edit status line, Undo / Redo, Full screen, Print; the status line reserves two lines so the canvas never shifts) over `#board-scroll`, which scrolls inside
 itself while the page stays fixed. The canvas is 12 columns with rows of `calc(var(--ctl-h) * 2)` and `var(--s3)` gaps; widgets are
 absolutely positioned from the pure `board-layout.js`. Below 720px of canvas width widgets stack full width in reading order; at
 viewport ≤ 760px the panel moves above the canvas (max-height 9rem, scrolling). A widget is a surface card (`--r`, `--elev-2`) with a
-`--surface-2` header. Behaviour: [dashboards.md](../features/dashboards.md).
+`--surface-2` header (grab cursor; the page's `:focus-visible` ring on a focused widget), a 20px corner grip, and while dragging a dashed ghost (`--ink-2` border; `--danger-solid` border, `--danger-bg` label with an icon and text when refused). Behaviour: [dashboards.md](../features/dashboards.md).
 
 ## Phone layout (≤ 640px)
 

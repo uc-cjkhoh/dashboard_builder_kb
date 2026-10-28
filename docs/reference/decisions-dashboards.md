@@ -35,3 +35,19 @@ order is the data order. The editor's old vocabulary is renamed inside (`dashboa
   stacking beats shrinking.
 - **Rejected:** keeping hidden dashboards alive (leaks); a separate cache per widget (the same query would run twice after an edit);
   CSS grid with `grid-column` (no pixel geometry to snap against).
+
+## D63 — Board edits are refused, never repaired; every verdict is pure; history is in memory
+
+- **Decision.** A move, resize, keyboard step or panel drop that overlaps a widget, leaves the grid or breaks a size limit is **refused
+  with a reason and changes nothing** (the golden-rule-3 stance: reject, don't clamp) — the one verdict, `explainRefusal`, serves the
+  ghost, the drop and the keys. The only leniency is a panel drop's x, which slides left to keep the default width inside the 12 columns
+  (the pointer stays within the widget). The pointer state machine, snapping, key steps, text validation and history are DOM-free modules
+  with node tests; `board-interact.js` only turns events into points. Undo reuses the worksheet editor's `history.js` (snapshots of the
+  **widget list**, keyed by dashboard id) and is **in memory** — a reload keeps the autosaved layout but not the steps. A text widget now
+  defaults to 12 × 2 (a 1-row cell showed no body), can still be shrunk to 1 row, and opens over its neighbours while its edit form is open.
+- **Why.** A silent relocation (pushing neighbours aside, clamping into the grid) would make a drop land somewhere the user didn't aim,
+  and an exact verdict is testable. Persisting history would mean storing a stack of past layouts in the workbook for a rarely needed
+  feature, and the editor's history is not persisted either.
+- **Rejected:** auto-pushing overlapped widgets down (unpredictable, can run past 96 rows); a CSS-grid drag library (no tokens, no node
+  tests, a dependency); persisting undo; a second history implementation for the board.
+

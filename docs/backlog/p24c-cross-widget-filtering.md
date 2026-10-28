@@ -1,6 +1,6 @@
 # P24c — Cross-widget filtering on dashboards
 
-A proposal, not yet built. Third phase of P24, after [24a + 24b](p24-dashboards-spec.md) (worksheet views and
+A proposal, not yet built. Third phase of P24, after 24a + 24b ([dashboards.md](../features/dashboards.md): worksheet views and
 multi-worksheet dashboards). It closes
 inventory item **T08-19** (use a sheet as a filter), the last P0 dashboard gap
 ([dashboards.md](dashboards.md)).
