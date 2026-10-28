@@ -6,7 +6,7 @@ build **Tableau-style worksheets** — one per dashboard tab — that chart data
 
 **Status:** built and running at `https://10.168.49.20:8443/dashboardbuilder`. This directory is the
 knowledge base; the source lives at `/unified/user/cj/web_development/prototype/dashboard_builder/`
-([development.md](docs/operations/development.md)). Unbuilt work: [delivery-and-risks.md](docs/proposals/delivery-and-risks.md).
+([development.md](docs/operations/development.md)). Unbuilt work: [docs/backlog/](docs/backlog/README.md).
 
 ## Project statement
 
@@ -68,6 +68,5 @@ knowledge base; the source lives at `/unified/user/cj/web_development/prototype/
   files you export), not shared with other users or browsers.
 - **Not multi-user.** No accounts, auth, sharing or saved connections; one connection per browser
   session.
-- **Not a full BI suite.** No scheduled reports, alerting, multi-worksheet dashboards or calculated
-  fields yet — see [delivery-and-risks.md](docs/proposals/delivery-and-risks.md) and
-  [gap-analysis.md](docs/proposals/gap-analysis.md).
+- **Not a full BI suite.** No scheduled reports, alerting or multi-worksheet dashboards yet — see
+  the [backlog](docs/backlog/README.md).

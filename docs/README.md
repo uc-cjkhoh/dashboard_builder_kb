@@ -36,7 +36,7 @@ matching whatever you're touching.
 | [reference/clickhouse-integration.md](reference/clickhouse-integration.md) | Driver, TLS, the exact SQL, identifier safety, type mapping |
 | [reference/data-model.md](reference/data-model.md) | Server and client state shapes, incl. the worksheet `sheet` |
 | [reference/frontend-modules.md](reference/frontend-modules.md) | Module map, wiring, event bus, `api.js` / `ui.js` helpers |
-| [reference/decisions.md](reference/decisions.md) | Decisions D1–D25 with rationale; [calculated fields D26–D32](reference/decisions-calculated-fields.md); open questions |
+| [reference/decisions.md](reference/decisions.md) | Decisions D1–D25 with rationale; [calculated fields D26–D47](reference/decisions-calculated-fields.md); open questions |
 | [reference/glossary.md](reference/glossary.md) | Domain terms |
 
 ## operations/ — build, run, deploy
@@ -58,18 +58,21 @@ Overview: [../DESIGN.md](../DESIGN.md).
 | [design/components.md](design/components.md) | CSS class vocabulary |
 | [design/motion-accessibility.md](design/motion-accessibility.md) | Motion and accessibility posture |
 
-## proposals/ — not built yet
+## backlog/ — not built yet
 
 | Doc | Topic |
 |---|---|
-| [proposals/web-application-proposal.md](proposals/web-application-proposal.md) | the product proposal: scope, architecture, journeys, acceptance scenarios |
-| [proposals/tableau-features.md](proposals/tableau-features.md) | the 229-requirement Tableau inventory the proposal traces to; [excluded topics](proposals/tableau-features-excluded.md) |
-| [proposals/gap-analysis.md](proposals/gap-analysis.md) | the running app benchmarked against the inventory; [per-ID detail](proposals/gap-analysis-detail.md) |
-| [proposals/delivery-and-risks.md](proposals/delivery-and-risks.md) | delivery order by dependency, and risks |
-| [proposals/calculation-engine.md](proposals/calculation-engine.md) | calculated fields spec (built, not deployed) |
-| [proposals/p24c-cross-widget-filtering.md](proposals/p24c-cross-widget-filtering.md) | P24c: cross-widget filtering on dashboards; [plan](proposals/p24c-plan.md) |
-| [backlog/README.md](backlog/README.md) | the undone work in one place, grouped by topic with a recommended order |
-| [proposals/archive/](proposals/archive/) | retired specs and plans (P24a+b, P24 plans, old roadmaps) — not maintained |
+| [backlog/README.md](backlog/README.md) | the only to-do list: how to read it, recommended order, spikes, guards, known unknowns |
+| [backlog/dashboards.md](backlog/dashboards.md) | P24a–d, layout, actions, navigation, P38, P39 remainder |
+| [backlog/calculations.md](backlog/calculations.md) | functions, parameters in formulas, LOD, table-calculation polish, P25 |
+| [backlog/data-model.md](backlog/data-model.md) | joins, union, groups, split, cast, row preview, hierarchies, P43 |
+| [backlog/charts-and-formatting.md](backlog/charts-and-formatting.md) | chart, authoring, formatting and export gaps |
+| [backlog/analytics-and-maps.md](backlog/analytics-and-maps.md) | statistics, forecasting, clustering, P42, maps |
+| [backlog/platform.md](backlog/platform.md) | persistence, P45, P44, risks, workbook additions, decisions to settle |
+| [backlog/journeys-and-releases.md](backlog/journeys-and-releases.md) | journeys, acceptance scenarios, releases R0–R3, quality targets |
+| [backlog/out-of-scope.md](backlog/out-of-scope.md) | deliberately excluded topics and why |
+| [backlog/p24-dashboards-spec.md](backlog/p24-dashboards-spec.md) | design spec: P24a worksheet views, P24b multi-worksheet dashboards |
+| [backlog/p24c-cross-widget-filtering.md](backlog/p24c-cross-widget-filtering.md) | design spec: P24c cross-widget filtering; [plan](backlog/p24c-plan.md) |
 
 ## Not here
 

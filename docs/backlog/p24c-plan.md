@@ -8,7 +8,7 @@
 
 **Tech Stack:** vanilla ES modules, ECharts (self-hosted), `node:test`, the headless-Chromium harness in `tests/browser/` built by 24a Task 1.
 
-**Spec:** [p24c-cross-widget-filtering.md](p24c-cross-widget-filtering.md). Builds on the [24a + 24b spec](archive/p24-dashboards.md); **start after 24a and 24b are built** (`Features/Board/`, `sheet-plan.js`, `worksheet-view.js` exist).
+**Spec:** [p24c-cross-widget-filtering.md](p24c-cross-widget-filtering.md). Builds on the [24a + 24b spec](p24-dashboards-spec.md); **start after 24a and 24b are built** (`Features/Board/`, `sheet-plan.js`, `worksheet-view.js` exist).
 
 ## Global Constraints
 
@@ -151,9 +151,9 @@ The archived plan is frozen, so apply these in the working branch when you reach
 
 **Files:**
 - Modify (KB repo `/unified/user/cj/knowledge/web_development/dashboard_builder`): `docs/features/dashboards.md` (add "Cross-widget filtering"), `docs/reference/decisions.md` (D27; reword D16's last bullet), `docs/reference/data-model.md` (the dashboard selection is transient, never saved), `docs/reference/frontend-modules.md` (`dashboard-select.js`).
-- Delete: `docs/proposals/p24c-cross-widget-filtering.md`, `docs/proposals/p24c-plan.md`.
+- Delete: `docs/backlog/p24c-cross-widget-filtering.md`, `docs/backlog/p24c-plan.md`.
 
-- [ ] **Step 1:** Write the doc changes as current behaviour (no "was/now" wording); update `docs/proposals/web-application-proposal.md` Journey A link and `gap-analysis.md` T08-19 to built.
+- [ ] **Step 1:** Write the doc changes as current behaviour (no "was/now" wording); remove the P24c entry from `docs/backlog/dashboards.md` and update the Journey A link in `docs/backlog/journeys-and-releases.md`.
 - [ ] **Step 2:** Run `python3 .claude/hooks/kb-verify.py --all` in the KB repo; fix anything it reports for the touched files.
 - [ ] **Step 3:** Run all three suites once more and attach the browser screenshots (light + dark) for review.
 - [ ] **Step 4:** Stop and ask the owner before merging or deploying: the live service `webapps-dev.dashboardbuilder` is stop → copy → start only ([deployment.md](../operations/deployment.md)).

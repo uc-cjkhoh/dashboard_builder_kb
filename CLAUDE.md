@@ -82,7 +82,7 @@ dashboard_builder/          (this KB)
 │   ├── features/           # one file per app feature (connection … worksheet-encodings, workbook)
 │   ├── reference/          # api · clickhouse-integration · data-model · frontend-modules · decisions · glossary
 │   ├── operations/         # development · deployment (+ git-ignored credentials.local.md)
-│   └── proposals/          # roadmap (open phases) · roadmap-bi-parity · competitive-analysis
+│   └── backlog/            # undone work by topic · recommended order · design specs
 ├── archive/                # frozen P0–P20 build plan — not maintained
 └── .claude/                # kb-verify hook enforcing kb-maintenance.md
 ```

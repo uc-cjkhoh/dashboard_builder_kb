@@ -36,8 +36,8 @@ A change is done only when every box holds.
 
 - [ ] The doc for the touched area is updated **in the same change**, edited in place
       ([kb-maintenance.md](kb-maintenance.md)).
-- [ ] A changed decision is updated in [decisions.md](../reference/decisions.md); a built roadmap item
-      moves from [delivery-and-risks.md](../proposals/delivery-and-risks.md) into its `features/` doc.
+- [ ] A changed decision is updated in [decisions.md](../reference/decisions.md); a built backlog item
+      moves from `backlog/<file>` into its `features/` doc ([backlog/](../backlog/README.md)).
 
 ## Integration
 

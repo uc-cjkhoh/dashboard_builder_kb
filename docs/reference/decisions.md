@@ -177,7 +177,7 @@ already in the query (a click never forces a join).
   one chart) and non-destructive.
 - **Scope:** bar/stacked/line/area/combo/pie/donut/scatter; types whose marks don't map 1:1 to a
   primary value, and null values (can't bind `= NULL`), are no-ops. The same `sheet.selection` is the
-  basis for cross-worksheet filtering ([P24c](../proposals/p24c-cross-widget-filtering.md)).
+  basis for cross-worksheet filtering ([P24c](../backlog/p24c-cross-widget-filtering.md)).
 
 ### D17 — Drill-down is a single-table hierarchy on the bound-param path
 One hierarchy per worksheet: ≥2 ordered columns from **one table**. The current level leads the
@@ -289,12 +289,12 @@ and holds only results the user could already see — no application database (D
 a 10% `SAMPLE` (counts and sums scaled by `_sample_factor`) on a base table that declares a sampling key.
 If the server refuses the sampled query it runs once more unsampled (logged).
 
-Calculated-field decisions D26–D32: [decisions-calculated-fields.md](decisions-calculated-fields.md).
+Calculated-field decisions D26–D47: [decisions-calculated-fields.md](decisions-calculated-fields.md).
 
 ## Open questions
 
 | # | Question | Leaning |
 |---|---|---|
-| **O1** | Should workbooks persist on the server (shared across browsers/users)? | Browser persistence is decided ([D21](#d21--workbooks-persist-in-the-browser-not-on-the-server)). Server-side storage only with accounts — see [gap-analysis.md](../proposals/gap-analysis.md). |
+| **O1** | Should workbooks persist on the server (shared across browsers/users)? | Browser persistence is decided ([D21](#d21--workbooks-persist-in-the-browser-not-on-the-server)). Server-side storage only with accounts — see [platform.md](../backlog/platform.md). |
 | **O2** | Where are multiple saved connections stored? | One active connection per session, not saved. Later: named profiles **without** persisting passwords server-side. |
-| **O3** | How far does dashboard composition go? | Today one worksheet per tab; multi-worksheet dashboards are the [P24a + b spec](../proposals/archive/p24-dashboards.md) and would revisit O1. |
+| **O3** | How far does dashboard composition go? | Today one worksheet per tab; multi-worksheet dashboards are the [P24a + b spec](../backlog/p24-dashboards-spec.md) and would revisit O1. |

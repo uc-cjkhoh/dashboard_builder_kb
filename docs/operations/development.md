@@ -63,6 +63,10 @@ Error-contract smoke test (each returns the documented status and a `{ error }` 
 an empty body, wrong types, an oversized body, 17 filters, `limit: 0`, a text value on a number column,
 `POST /api/query {}` (400 "'from' is required.").
 
+`tests/live/calc-smoke.mjs` (calculated fields against the shared test ClickHouse server) needs credentials, so
+it is a manual check and the repo has no CI: re-run it before every deploy. `tests/live/calc-ui.mjs` needs only
+the dev app; `tests/js/calc-limits.test.mjs` keeps the three copies of the calculation limits equal.
+
 ## Build & publish
 
 ```bash

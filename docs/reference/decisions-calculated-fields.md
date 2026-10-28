@@ -51,3 +51,61 @@ about calculations now — they are single-table and would need the whole compil
 A Top-N filter ranked by a calculation counts as a use: the delete confirms, then keeps the filter and
 clears only its ranking, so the existing "rank by the first shelf measure" default re-applies. Dropping the
 filter instead would silently remove a user's setting.
+
+### D35 — The request carries a tree, never formula text
+The server never parses text: there is no text-to-SQL path to attack and one authoritative validator.
+
+### D36 — A dimension or measure may carry `Calc`
+`Calc` (a tree) replaces the column; the result keeps `k{n}` / `v{n}` aliases in request order, so pivot, sort,
+Top-N and charts work unchanged.
+
+### D37 — Aggregate or row-level, never both
+A tree is **aggregate** if it contains an aggregate function, else **row-level**; a formula mixing both is a
+400 (Tableau's rule; it avoids silent grain errors).
+
+### D38 — Role follows the tree
+A row-level number is a measure aggregated by the pill (default `SUM`); a row-level text, date or boolean is a
+dimension (`GROUP BY` the expression); an aggregate calculation is a measure with no further aggregation.
+
+### D39 — Division by zero is NULL
+`a / b` compiles to `a / nullIf(b, 0)`, shown as a dash: one documented rule, never `inf` or `NaN` in a chart.
+A plausible but wrong number is a failure: ratios of sums must not become sums of ratios, and an integer
+overflow must not wrap.
+
+### D40 — Numbers are widened to `Float64`
+Every numeric field inside a calculation is wrapped `toFloat64(...)`, which avoids unsigned and integer
+wrap-around and `Decimal` surprises and matches how results are read (as doubles). Values above 2^53 lose
+precision.
+
+### D41 — Workbook-level formula text
+`calculations: [{ id, name, formula }]` stores formula **text**; the tree is re-derived on open, so a grammar
+change leaves no stale trees. The workbook needs no format bump for this field alone.
+
+### D42 — Reference syntax
+Fields are `[table.column]`, or `[db.table.column]` when two databases share a table name; a calculation is
+`[Name]` (names may not contain `.`). A two-part reference matching tables in more than one database is an
+error asking for the three-part form. Columns or tables whose names contain `.`, `[` or `]` are not
+supported: autocomplete does not offer them and a typed reference is an error. Spaces inside brackets are fine.
+
+### D43 — The client expands calculation references
+A calculation may reference another; the browser expands references into one tree (cycle check there) before
+sending, so the server needs no calculation registry and the node cap bounds the cost.
+
+### D44 — One aggregate compile
+Plain and calculated measures share one function (aggregate name + SQL expression + `sampled` + `approximate`
+→ SQL). Approximate mode scales a calculated `SUM` by `_sample_factor` and uses `uniq` for `COUNTD`, exactly as
+for a plain measure ([table](clickhouse-integration.md#calculated-fields--the-compile-path)).
+
+### D45 — `countNonNull` is a whitelisted aggregation
+`count(col)` is added beside `count` (all rows), which keeps its meaning, so saved workbooks are unchanged;
+`COUNT([f])` in a formula is the same aggregate.
+
+### D46 — The server derives the role and rejects a mismatch
+An aggregate tree is valid only in a `MeasureRef` with `Agg` null; a row-level tree in a `MeasureRef` needs a
+value aggregation (`count` of rows is rejected, it would ignore the calculation); a row-level tree is valid in a
+`ColumnRef`; an aggregate tree there is a 400 naming the field. A client bug cannot produce a wrong grain.
+
+### D47 — A broken calculation stays
+A calculation whose formula points at a field no longer in the model is kept with an error state in the field
+pane and the dialog; a worksheet using it shows "Calculation 'X' can't be computed: …" and sends no query;
+import reports it as an issue. Dropping it would silently change a user's charts.

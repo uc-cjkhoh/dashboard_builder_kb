@@ -6,10 +6,16 @@ the formula text; before a query it expands and type-checks the formula into a t
 computes on the read-only, bounded path ([clickhouse-integration.md](../reference/clickhouse-integration.md#calculated-fields--the-compile-path),
 wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Features/Calc/`
 ([frontend-modules.md](../reference/frontend-modules.md)); the dialog and pane group are wired from
-`Dashboard/dashboards.js`. Rationale: [decisions.md](../reference/decisions.md) D26–D32.
+`Dashboard/dashboards.js`. Rationale: [decisions.md](../reference/decisions.md) D26–D47.
 
 ## Formulas
 
+- Grammar: `expr := term (("+"|"-") term)*`; `term := factor (("*"|"/") factor)*`;
+  `factor := "-" factor | number | "(" expr ")" | aggregate | ref`; `aggregate := FN "(" expr ")"`;
+  `ref := "[" name "]"`. Numbers are decimals with an optional exponent (`12`, `1.5`, `.5`, `1.`, `1e3`; no
+  `1,000`; a non-finite `1e999` is an error). `SUM`/`AVG` take a number; `MIN`/`MAX` a number, date or text;
+  `COUNT`/`COUNTD` any type; arithmetic needs numbers; an aggregate inside an aggregate is refused. A field of
+  a category other than numeric, text, temporal or boolean can't be used.
 - Operators `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`,
   `COUNTD` (function names are case-insensitive). The function table lives in `calc-types.js`.
 - A **reference** is `[table.column]` (`[db.table.column]` when two databases hold the same table name) or

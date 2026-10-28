@@ -1,14 +1,14 @@
 # P24c — Cross-widget filtering on dashboards
 
-A proposal, not yet built. Third phase of P24, after [24a + 24b](archive/p24-dashboards.md) (worksheet views and
+A proposal, not yet built. Third phase of P24, after [24a + 24b](p24-dashboards-spec.md) (worksheet views and
 multi-worksheet dashboards). It closes
 inventory item **T08-19** (use a sheet as a filter), the last P0 dashboard gap
-([gap-analysis.md](gap-analysis.md#p0-18-of-44-not-yet-built)).
+([dashboards.md](dashboards.md)).
 
 ## Goal
 
 On a dashboard, clicking a mark in one worksheet widget filters the other worksheet widgets to that value —
-the "one sheet filters the other" step of Journey A in the [proposal](web-application-proposal.md#7-journeys-and-acceptance-scenarios).
+the "one sheet filters the other" step of Journey A in the [journeys](journeys-and-releases.md#journeys-and-acceptance-scenarios).
 
 ## Non-goals
 
@@ -86,7 +86,7 @@ the "one sheet filters the other" step of Journey A in the [proposal](web-applic
 
 `features/dashboards.md` (from 24b) gains a "Cross-widget filtering" section; `reference/decisions.md` gets D27 and
 D16's "same selection is the basis for cross-worksheet filtering" is answered; `reference/data-model.md` notes the
-selection is transient; `proposals/` loses this file and the plan.
+selection is transient; `backlog/` loses this file and the plan.
 
 ## Done when
 

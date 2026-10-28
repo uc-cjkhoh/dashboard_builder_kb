@@ -186,6 +186,13 @@ result. Tests: `CalcCompilerTests`, `CalcValidatorTests`, `CalcRulesTests`, `Cal
 app + a real ClickHouse, fixture tables `test_cj.calc_smoke_*` created and dropped by the script,
 results checked against hand-written `SELECT`s).
 
+**Compile spikes** (`node tests/live/calc-spikes.mjs`, SELECT only, inline sources). A bound parameter inside a
+`SELECT` / `GROUP BY` expression works (`toFloat64(q) * {c0p0:Float64} AS k0 … GROUP BY k0`, and `GROUP BY` the
+full expression too). `toFloat64` over `UInt32`, `Decimal(18,2)` and `Nullable(Float64)` works: no unsigned
+wrap (`toFloat64(UInt32 2) - toFloat64(Decimal 10.00)` is `-8`), and a NULL operand makes the result NULL.
+`sum(toFloat64(x)) / nullIf(sum(toFloat64(y)), 0)` with every `y` = 0 returns JSON `null`; without `nullIf`
+`FORMAT JSON` also gives `null`, so `nullIf` keeps the SQL NULL for other writers and downstream arithmetic.
+
 **Aggregates, exact and approximate** (`AggregateSql` — one function for plain and calculated measures;
 "sampled" = `approximate` on a base table with a sampling key, read `SAMPLE 0.1`):
 
