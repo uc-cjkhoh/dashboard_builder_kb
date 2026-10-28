@@ -55,6 +55,7 @@ the client mirrors them in `Core/validate.js` `LIMITS` and checks first, so a va
 | `in` / `notin` values | ≤ 500; a filter value ≤ 1000 characters |
 | `limit` (rows) | 1–1000, default 100 (`MaxRowsLimit`, mirrored by `LIMITS.viewRows`); ≤ 200 `columns` (`MaxRowsColumns`); a cell ≤ 1000 characters (`MaxCellLength`, cut not rejected); rows × columns ≤ 50,000 (`MaxRowsCells`, `LIMITS.viewCells`) |
 | `limit` (query, box plot, distinct) | 1–5000 (default 50; [D24](decisions.md#d24--showing-all-data-bounded-requests-paging-other-date-grouping)) · CSV export 1–100,000 · distinct 1–1000 (default 200) |
+| `limit` (profile) | 1–50 top values, default 10 (`MaxProfileTop`); `column` ≤ 1000 characters (`MaxColumnName`); scan bound 1,000,000 rows (`ProfileSampleRows`), a value ≤ 100 characters (`ProfileValueLength`) — mirrored by `PROFILE_LIMITS` in `Schema/column-profile-model.js` |
 | `offset` (query) | 0–10,000,000 |
 | Filter `op` | also `contains`, `startsWith`, `endsWith` (text columns, value required) and `top` (value 1–1000 + `topBy` measure, optional `bottom`; worksheet query only — histogram / box plot reject it) |
 | `joins[].type` | `inner` (default), `left`, `right` or `full` (anything else 400, `joins[i].type`; `top` filters with right/full 400); a join key can't carry `calc` (400, `joins[i].left.calc` / `.right.calc`) |
@@ -103,6 +104,7 @@ Controller: `Features/Schema/SchemaController.cs`.
 | `GET /api/databases` | list databases | `SHOW DATABASES` |
 | `GET /api/databases/{db}/tables` | list tables | `SHOW TABLES FROM {db}` |
 | `GET /api/databases/{db}/tables/{table}/columns` | columns `{name, type, category}` | `DESCRIBE TABLE` |
+| `POST /api/databases/{db}/tables/{table}/profile` | column profile; body `{ column, limit? }` → `{ column, type, category, rows, nulls, distinct, min, max, top: [{ value, count, cut }], sampled, sampleLimit }`. Reads the table's **first 1,000,000 rows** (`sampled` = it has at least that many); `distinct` is approximate (`uniq`, non-null); `min`/`max` are text, numeric and date columns only; `value` null = SQL NULL, cut at 100 characters (`cut`); ties in `top` break by value. Unknown column/table → 404 | two bounded `SELECT`s |
 | `GET /api/databases/{db}/tables/{table}/columns/{column}/distinct?limit=` | distinct values for an `in` filter / Pages (default 200, 1–1000 else 400) | `SELECT DISTINCT … LIMIT n` |
 
 ## Rows

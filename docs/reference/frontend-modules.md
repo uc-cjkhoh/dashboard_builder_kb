@@ -15,6 +15,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Connection/connection.js` | connection form, summary, pill, gating — [connection.md](../features/connection.md) |
 | `Connection/connection-rules.js` | pure: `advancedShouldOpen` (the Advanced section opens when TLS is off or the cert opt-in is on) |
 | `Schema/schema.js` | database `<select>`, table search, table chips + drag payload — [schema-browser.md](../features/schema-browser.md) |
+| `Schema/column-profile-dialog.js`, `Schema/column-profile-model.js` | the column profile dialog (`openColumnProfile(db, table, column)`, opened from a field row on a canvas card) and its pure rules: `profileRequest`, `formatShare`, `roleOf`, `summarize` — [schema-browser.md](../features/schema-browser.md#column-profile--field-details) |
 | `Schema/table-filter.js` | pure: `matchTables(names, query)` — the table search |
 | `Canvas/canvas.js` | drop handling, entity cards, card movement, empty state — [canvas.md](../features/canvas.md) |
 | `Canvas/empty-state.js` | pure: `emptyState({connected, databaseSelected})` → the sentence, button and control to focus |
