@@ -27,6 +27,8 @@ per-browser preference (`localStorage` `dashboardbuilder.scheme`), never saved i
 - **Specificity:** `:root[data-scheme="dark"]` outweighs a bare `:root`, so the opaque-glass fallbacks
   (`@supports not (backdrop-filter…)`, `prefers-reduced-transparency`) also list `:root[data-scheme]`.
 
+Colours below are capped at HSL saturation 70 %.
+
 ## Surfaces & ink
 
 | Token | Light | Dark | Role |
@@ -95,9 +97,9 @@ wash tint, in both themes.
 
 | Token | Light | Dark | Role |
 |---|---|---|---|
-| `--accent` / `-hover` / `-pressed` | `#c4142c` / `#a8102a` / `#8c0d22` | `#d42a3c` / `#b81f30` / `#9c1828` | primary fill (white `--on-accent` ≥ 4.5:1 in every state); active tab underline, selected relationship, single chart series |
-| `--accent-ink` | `#b01229` | `#ff8f99` | accent **text** |
-| `--accent-soft` / `--accent-line` | `#fdeff1` / `#f3c3ca` | `#3a1a20` / `#6b2a33` | tint / stroke |
+| `--accent` / `-hover` / `-pressed` | `#b82035` / `#9c1c32` / `#821729` | `#d42a3c` / `#b72031` / `#991b2a` | primary fill (white `--on-accent` ≥ 4.5:1 in every state); active tab underline, selected relationship, single chart series |
+| `--accent-ink` | `#a51d31` | `#eea0a7` | accent **text** |
+| `--accent-soft` / `--accent-line` | `#fcf0f2` / `#f3c3ca` | `#3a1a20` / `#6b2a33` | tint / stroke |
 | `--focus` | `--ink` | `--ink` | focus ring — neutral, so focus never looks like an error |
 
 Inputs on focus keep a neutral `--ink-3` border plus a 2px `--accent` underline; an invalid input uses
@@ -128,12 +130,12 @@ from the crimson accent.
 
 | Token group | Light (bg / ink / line) | Dark (bg / ink / line) | Meaning |
 |---|---|---|---|
-| `--ok-*` | `#ecfdf3` / `#067647` / `#abefc6` | `#112a1d` / `#75e0a7` / `#1f5c3c` | connected, success |
-| `--warn-*` | `#fff6e6` / `#8a3a0a` / `#fbd38d` | `#2d2210` / `#fdc56b` / `#6b4a12` | connecting, loading, notices; drill breadcrumb |
-| `--danger-*` | `#fff1ee` / `#a3150c` / `#fbc5b6`, `--danger-solid` `#c2410c` | `#341a14` / `#ffa48c` / `#7a3322`, solid `#f97350` | failed, invalid, destructive |
-| `--dim-*` | `#edf4fd` / `#1f5fb8` / `#bcd5f7` | `#172235` / `#8cbcff` / `#2c4a78` | dimension pills (blue) |
-| `--meas-*` | `#e9f8f8` / `#0b6e75` / `#a6e3e6` | `#10292b` / `#6fdde3` / `#1d5a5e` | measure pills (teal) |
-| `--enc-*` | `#f3f0fe` / `#5b2fc9` / `#d6cdfc` | `#231d3a` / `#c3b5ff` / `#4b3c8a` | Marks-encoding pills (violet; an encoding tint, not a status) |
+| `--ok-*` | `#edfcf3` / `#136945` / `#abefc6` | `#112a1d` / `#75e0a7` / `#1f5c3c` | connected, success |
+| `--warn-*` | `#fbf5ea` / `#7e3d16` / `#edcf9b` | `#2d2210` / `#e9c080` / `#6a4a13` | connecting, loading, notices; drill breadcrumb |
+| `--danger-*` | `#fcf3f1` / `#95221a` / `#f3c9be`, `--danger-solid` `#af491f` | `#341a14` / `#eeae9d` / `#7a3322`, solid `#e47f65` | failed, invalid, destructive |
+| `--dim-*` | `#eef4fc` / `#205fb7` / `#bfd5f4` | `#172235` / `#9dbfee` / `#2c4a78` | dimension pills (blue) |
+| `--meas-*` | `#e9f8f8` / `#13676d` / `#a6e3e6` | `#10292b` / `#6fdde3` / `#1d5a5e` | measure pills (teal) |
+| `--enc-*` | `#f4f1fd` / `#5b2fc9` / `#d9d2f7` | `#231d3a` / `#cac0f4` / `#4b3c8a` | Marks-encoding pills (violet; an encoding tint, not a status) |
 
 Dark status tints are opaque (not translucent) so their contrast is fixed. `--up` = `--ok-ink` and
 `--down` = `--danger-ink` colour KPI deltas and sparklines.
@@ -151,7 +153,7 @@ mark wears the series colour.**
 | `--chart-grid` | `--line` | value-axis gridlines |
 | `--chart-label` | `--ink-2` | primary chart text |
 | `--chart-muted` | `--ink-3` | tick labels |
-| `--chart-cat-1..8` | light `#2a78d6` `#008300` `#e87ba4` `#eda100` `#1baf7a` `#eb6834` `#4a3aa7` `#e34948`; dark `#4d95ea` `#3ba55c` `#f08fb6` `#f5b83d` `#2ec48c` `#f2834f` `#9d8cf2` `#f26b6a` | categorical ramp, fixed order |
+| `--chart-cat-1..8` | light `#2a78d6` `#146f14` `#e87ba4` `#c99424` `#1eac79` `#de6e41` `#4a3aa7` `#df4d4c`; dark `#5696e1` `#3ba55c` `#ec93b7` `#e0b152` `#2ec48c` `#e3895e` `#a192ec` `#e77675` | categorical ramp, fixed order |
 
 - **One series** wears the accent. **≥2 series** (multiple measures, or a Colour split) draw
   `--chart-cat-*` in order, with a legend. Beyond 8 values the ramp repeats; the legend disambiguates.
@@ -163,22 +165,19 @@ mark wears the series colour.**
 ## Type scale
 
 Font (`--font`): `"Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui,
-sans-serif` — system fonts only. UI text is weight **400 / 600**. One named scale, no ad-hoc sizes.
+sans-serif` — system fonts only. UI text is weight **400 / 600**. Two content sizes and two title sizes; no ad-hoc sizes.
 
 | Token | Size | Role |
 |---|---|---|
-| `--fs-title` | 20px | page / canvas `h1` |
+| `--fs-title` | 24px | page / canvas `h1`, titles |
 | `--fs-lead` | 16px | lead text |
-| `--fs-body` | 14px | body (base) |
-| `--fs-sm` | 13px | column rows, chips, section titles (sentence case, 600) |
-| `--fs-xs` | 12px | captions, type badges |
-| `--fs-kpi` | 30px | KPI numbers |
+| `--fs-body` | 14px | everything else: body, rows, chips, captions, badges, chart text |
+| `--fs-display` | 32px | KPI numbers |
 
 ## Spacing, radius, sizing
 
-- Spacing on a 4-pt scale: `--s1` 4 · `--s2` 8 · `--s3` 12 · `--s4` 16 · `--s5` 20 · `--s6` 24 · `--s7` 32.
-- Radius: `--r-ctl` 6px (inputs, buttons) · `--r` 10px (cards, flyouts) · `--r-lg` 14px (dialogs) ·
-  `--r-pill` 999px.
+- Spacing: `--s1` 4 · `--s2` 8 · `--s4` 16 · `--s6` 24 — nothing between ([golden rule 11](../conventions/golden-rules.md#11-design-rules)).
+- Radius: one `--r` 8px for every shape, inner or outer · `--r-pill` 999px.
 - `--sidebar-w`: 264px default (resizable — [layout.md](layout.md#sidebar)).
 - `--topbar-h`: 60px — the shared `min-height` of the sidebar brand (`.sidebar__brand`) and the tab bar
   (`.canvas__bar`), so their bottom borders form one continuous line ([layout.md](layout.md#tab-bar)).

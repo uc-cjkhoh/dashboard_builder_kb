@@ -17,8 +17,8 @@ How the one page is laid out and what scrolls where. Regions and their behaviour
 
 Related items share one edge, measured on what the eye sees (glyphs and text), not on hit boxes.
 
-- **One 20px gutter (`--s5`) everywhere:** sidebar brand row and sections, `.canvas__bar`, `.view`
-  padding, the worksheet field pane (`--ws-fields-w`, default 236px; `--s3 --s5` padding), `.ws-shelves` and the
+- **One 16px gutter (`--s4`) everywhere:** sidebar brand row and sections, `.canvas__bar`, `.view`
+  padding, the worksheet field pane (`--ws-fields-w`, default 236px; `--s2 --s4` padding), `.ws-shelves` and the
   `.ws-chart-card` margin. So the tabs' left edge = first entity card = field-pane rows, and the
   appearance toggle = shelves = chart card on the right. `+`-placed entity cards start on the gutter
   ([canvas.md](../features/canvas.md#dragging-a-table-onto-the-canvas)).
@@ -46,7 +46,7 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
   (the canvas empty-state button does).
 - The brand name and subtitle are one line each (ellipsis), so the toggle never makes the brand row taller
   than `--topbar-h`.
-- Glass rail in the active theme (light or dark). Section titles are sentence case, `--fs-sm` 600.
+- Glass rail in the active theme (light or dark). Section titles are sentence case, `--fs-body` 600.
 - Contents: **Connection** (form or one-row summary — [connection.md](../features/connection.md)), the
   **Database** picker, then **Tables** with a search box ([schema-browser.md](../features/schema-browser.md)).
 - The empty Data Model shows one centred sentence + one button that focuses the control for the next
@@ -100,10 +100,10 @@ sets `.worksheet`'s `--ws-fields-w` (default 236px) between 180px and 40% of the
 
 The dashboard tab (`.view--board`, padding 0, no scroll of its own) is a two-column grid: a 240px side panel (the worksheet's
 field-pane slot) and the main column — a bar (name, widget count, the edit status line, Undo / Redo, Full screen, Print; the status line reserves two lines so the canvas never shifts) over `#board-scroll`, which scrolls inside
-itself while the page stays fixed. The canvas is 12 columns with rows of `calc(var(--ctl-h) * 2)` and `var(--s3)` gaps; widgets are
+itself while the page stays fixed. The canvas is 12 columns with rows of `calc(var(--ctl-h) * 2)` and `var(--s2)` gaps; widgets are
 absolutely positioned from the pure `board-layout.js`. Below 720px of canvas width widgets stack full width in reading order; at
 viewport ≤ 760px the panel moves above the canvas (max-height 9rem, scrolling). A widget is a surface card (`--r`, `--elev-2`) with a
-`--surface-2` header (grab cursor; the page's `:focus-visible` ring on a focused widget), a 20px corner grip, and while dragging a dashed ghost (`--ink-2` border; `--danger-solid` border, `--danger-bg` label with an icon and text when refused). Behaviour: [dashboards.md](../features/dashboards.md).
+`--surface-2` header (grab cursor; the page's `:focus-visible` ring on a focused widget), a 16px corner grip, and while dragging a dashed ghost (`--ink-2` border; `--danger-solid` border, `--danger-bg` label with an icon and text when refused). Behaviour: [dashboards.md](../features/dashboards.md).
 
 ## Phone layout (≤ 640px)
 

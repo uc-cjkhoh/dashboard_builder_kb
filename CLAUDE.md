@@ -20,6 +20,8 @@ live catalog** (ClickHouse binds values, not identifiers). Every query is bounde
 value bound. These shape every server change:
 [golden-rules.md](docs/conventions/golden-rules.md) rules 1–3.
 
+> Avoid unnecessary secondary labels and descriptions. Let the layout do the explaining.
+
 ## What this is in one screen
 
 One ASP.NET Core MVC app (Kestrel) serves **a single page** (`GET /`, composed from feature partials)
@@ -69,6 +71,22 @@ tests/js/                       # node --test, for the pure JS modules
 
 Feature assets are served at `/features/<Feature>/<file>` (`.css`/`.js` only). Map:
 [ARCHITECTURE.md § Code map](ARCHITECTURE.md#code-map).
+
+## Design rules
+
+Full text and how they map to tokens: [golden-rules.md § 11](docs/conventions/golden-rules.md#11-design-rules).
+
+1. **Optical alignment** on every element — align to what the eye reads, not the box edge.
+2. **Gaps and spacing** are only 4 / 8 / 16 / 24 px (`--s1` `--s2` `--s4` `--s6`).
+3. **One border radius** for inner and outer shapes (`--r`, 8px).
+4. **Colour saturation ≈ 70 %** by default (HSL S ≤ 70 %).
+5. **Few font sizes:** 14 / 16 px for content, 24 / 32 px for titles.
+
+## Tech stack reference
+
+Preferred stack for new projects — **reference only**: this app stays vanilla JS/CSS
+([golden rule 10](docs/conventions/golden-rules.md#10-self-hosted-framework-free-frontend)).
+UI: shadcn/ui NOVA · Icons: Lucide · Animation: Motion · Drag and drop: dnd-kit · State: Zustand.
 
 ## KB directory map
 

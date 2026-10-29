@@ -1,7 +1,7 @@
 # Golden rules
 
 The invariants every change must keep. [CLAUDE.md](../../CLAUDE.md#golden-rules-summary) carries the
-one-line summary; this is the full text. Rules 1–4 shape every server change; 5–10 every frontend one.
+one-line summary; this is the full text. Rules 1–4 shape every server change; 5–11 every frontend one.
 
 ## 1. The server is read-only against ClickHouse
 
@@ -84,3 +84,21 @@ Vanilla JS ES modules + hand-written CSS, **no SPA framework, no build step, no 
 library, ECharts, is vendored at `Features/Core/vendor/echarts.min.js`. Why:
 [D4](../reference/decisions.md#d4--vanilla-js--hand-written-css-no-spa-framework),
 [D13](../reference/decisions.md#d13--charting-via-self-hosted-apache-echarts-svg-renderer-themed-from-tokens).
+
+Preferred stack for *new* projects (shadcn/ui NOVA, Lucide, Motion, dnd-kit, Zustand) is a reference
+only — this app does not adopt it, because it is React-based.
+
+## 11. Design rules
+
+Enforced by `tests/js/tokens.test.mjs`.
+
+1. **Optical alignment.** Align elements to what the eye reads — an icon beside text, a glyph in a
+   circle, a play triangle — nudging by a pixel or two rather than trusting box edges.
+2. **Space is 4 / 8 / 16 / 24 px.** Every gap, padding and margin uses `--s1` `--s2` `--s4` `--s6`; no
+   other spacing token exists. A 1px border-compensation or optical nudge is the only exception.
+3. **One radius.** Inner and outer shapes share `--r` (8px); only `--r-pill` (pills, dots) differs.
+4. **Saturation ≈ 70 %.** Token colours cap at HSL saturation 70 %; the Okabe–Ito colour-blind palette is
+   a published standard and keeps its values.
+5. **Few font sizes.** `--fs-body` 14 / `--fs-lead` 16 for content, `--fs-title` 24 / `--fs-display` 32
+   for titles and KPI numbers. No other screen `font-size`; chart text is 14px.
+6. **Let the layout explain.** No secondary labels or descriptions that the layout already conveys.

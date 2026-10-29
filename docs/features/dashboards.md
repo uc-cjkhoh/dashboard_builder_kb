@@ -14,7 +14,7 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
   added, closed or renamed, so a button keeps focus when a widget is added.
 - **Bar** above the canvas: the dashboard's name, "n of 12 widgets", the **status line** (below), **Undo** / **Redo**, **Full screen**
   and **Print**.
-- **Canvas** (`#board-scroll`): 12 columns; row height `calc(var(--ctl-h) * 2)`, gap `var(--s3)`; widgets are absolutely
+- **Canvas** (`#board-scroll`): 12 columns; row height `calc(var(--ctl-h) * 2)`, gap `var(--s2)`; widgets are absolutely
   positioned from `board-layout.js` (`layoutBoard(widgets, panelWidth, { rowH, gap })` → pixel rects; `board.js` reads the row
   height and gap from the tokens). The canvas grows downward (at most 96 rows) and scrolls **inside its panel** — the page never
   scrolls (golden rule 8). Column width follows the canvas width; a `ResizeObserver` on the grid re-lays out.

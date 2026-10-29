@@ -15,7 +15,7 @@ the cards is [relationships.md](relationships.md).
   added twice: the existing card is scrolled into view and focused (`tabindex="-1"`) and a toast says so.
 - The `table:add` event (the chip's `＋` fallback) takes the same path. A dropped table always lands in
   the shared model — `table:add` switches to the Data Model tab first ([tabs.md](tabs.md)).
-- A `＋`-added card goes in the **first free grid slot** (300 × 300 cells from the 20px view gutter,
+- A `＋`-added card goes in the **first free grid slot** (300 × 300 cells from the 16px view gutter,
   24px gap, as many columns as fit the visible canvas), so it never covers another card's title. A dropped card lands at the drop point.
 
 ## Creating an entity

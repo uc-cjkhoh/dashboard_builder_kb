@@ -14,7 +14,7 @@ feature's own `Features/<Feature>/<feature>.css`. Keep the docs below and the st
 
 The builder is a two-world layout: a **left glass rail** owns connection and schema browsing; the **right
 canvas** holds the data model, relationships and dashboard worksheets. Windows 11 Fluent structure
-(4-pt spacing, 6/10/14 px radii, 32 px controls, a soft elevation ramp) with Flat Design 2.0
+(4/8/16/24 px spacing, one 8 px radius, 32 px controls, a soft elevation ramp) with Flat Design 2.0
 surfaces: the fixed chrome is translucent and blurs a warm background wash, while entity cards, the chart
 area, the crosstab and every overlay stay solid so text is never read through other text. Light or dark is the viewer's choice — a
 **System / Light / Dark** toggle at the right end of the tab bar, System (follow the OS) by default
@@ -35,6 +35,9 @@ collapsible field groups). Nothing is removed — an encoding that holds fields 
 - **Clickable on glass = more solid than the glass.** Controls on a glass panel are a frosted tier with a
   ≥ 3:1 edge and a full hover / pressed / selected / focus / disabled ladder
   ([tokens.md](docs/design/tokens.md#controls-on-glass--three-tiers-and-a-state-ladder)).
+- **Design rules** — optical alignment; space only 4 / 8 / 16 / 24 px; one radius for inner and outer
+  shapes; saturation ≈ 70 %; font sizes 14 / 16 (content) and 24 / 32 (titles); the layout explains, not
+  extra labels ([golden-rules.md § 11](docs/conventions/golden-rules.md#11-design-rules)).
 - **`hidden` attribute** for show/hide — never `style.display`.
 - **Fixed shell** — the page never scrolls.
 - **Never colour alone** — status is icon + text + colour.
