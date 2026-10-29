@@ -12,9 +12,9 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Shell/app.js` | bootstrap — hydrates `[data-icon]` placeholders, installs the global `error` / `unhandledrejection` handlers (danger toast "Something went wrong — try again."; aborted queries and the benign `ResizeObserver loop` notice are ignored), wires every module's `init*`, listeners before the initial status check |
 | `Shell/scheme-toggle.js` | the tab bar's appearance toggle: System / Light / Dark radio menu (`Core/menu.js`), glyph + label follow the choice |
 | `Shell/sidebar.js` | resizable sidebar (`Core/resizer.js` handle → `--sidebar-w`, capped at 30vw) + collapse-to-rail toggle (remembered in `localStorage`); exports `expandSidebar()` |
-| `Connection/connection.js` | connection form, summary, pill, gating — [connection.md](../features/connection.md) |
-| `Connection/recent-sources.js` | pure: `remember` / `forget` / `sanitize` recent connection sources (host, port, user, TLS flags — never a password), most recent first, max 5 |
-| `Connection/connection-rules.js` | pure: `advancedShouldOpen` (the Advanced section opens when TLS is off or the cert opt-in is on) |
+| `Connection/connection.js` | connection form, compact summary, gating — [connection.md](../features/connection.md) |
+| `Connection/recent-sources.js` | pure: `remember` / `forget` / `sanitize` recent connection sources (host as entered, port, user, TLS flags — never a password), most recent first, max 5; `formValues` refills the form from one |
+| `Connection/connection-rules.js` | pure: `advancedShouldOpen` (the Advanced section opens when TLS is off or the cert opt-in is on), `summaryTitle` / `summaryWarns` (compact-summary tooltip and cert warning), `formFromView` |
 | `Schema/schema.js` | database `<select>`, table search, table chips + drag payload — [schema-browser.md](../features/schema-browser.md) |
 | `Dashboard/field-copy-model.js` | `fieldCopies(field)`: the Copy items on a worksheet field's ⋯ menu (name, column name, formula) |
 | `Schema/column-profile-dialog.js`, `Schema/column-profile-model.js` | the column profile dialog (`openColumnProfile(db, table, column)`, opened from a field row on a canvas card) and its pure rules: `profileRequest`, `formatShare`, `roleOf`, `summarize` — [schema-browser.md](../features/schema-browser.md#column-profile--field-details) |
@@ -146,7 +146,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 
 - **Visibility:** `show(el)` / `hide(el)` / `toggle(el, visible)` flip the `hidden` attribute — never
   `style.display`.
-- **`setPill(el, state, text)`** — `idle | connecting | connected | failed` → `pill--muted/warn/ok/danger`
+- **`setPill(el, state, text)`** — `idle | connecting | connected | failed` → `pill--muted/warn/ok/danger` (no caller since the connection pill was removed)
   plus an icon and label; text written as a text node, never HTML.
 - **`copyText(text, what)`** — writes to the clipboard and toasts "Copied <what>." (or a danger toast when the browser blocks it).
 - **`toast(message, kind)`** — `ok | danger | info`; `info` / `ok` auto-hide after 5 s, **`danger` stays

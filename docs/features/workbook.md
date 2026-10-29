@@ -41,10 +41,10 @@ Writing is v2 only, so an older build refuses a newer file instead of silently d
   out (~100ms) and the model and every tab are cleared (`clearWorkspace`); the stored workbook is
   untouched, so reconnecting to the same server + user restores it. Reconnecting mid-fade keeps the
   workspace as it was.
-- The tab bar shows a quiet **Saved** text, or "Not saved — browser storage is unavailable. Use Export to
-  keep a copy." (private window, blocked storage).
+- There is no save-status text. When storage is unavailable (private window, blocked) a danger toast says "Not saved —
+  browser storage is unavailable. Use Export to keep a copy." once per cause, not on every autosave.
 - **Autosave never overwrites a stored workbook it couldn't read.** It is blocked for that key only when
-  no backup copy could be kept (see below); the status then says "Not saved — your previous workbook
+  no backup copy could be kept (see below); a toast then says "Not saved — your previous workbook
   couldn't be read and has been left untouched. Use Export to keep a copy." A deliberate Import replaces
   the stored entry and lifts the block.
 

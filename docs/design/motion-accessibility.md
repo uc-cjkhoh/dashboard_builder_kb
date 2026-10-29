@@ -25,7 +25,7 @@ something re-rendered on every edit.
 | Disconnect | cards and dashboard tabs fade out (`--dur-exit`) before the workspace clears |
 | Entity cards | rise in on drop; collapse by animating `max-height`; no hover lift |
 | Toasts / dialogs | toasts slide up from the bottom centre; dialogs scale in over a dimming scrim |
-| Status | the connecting / loading pill glyph spins |
+| Status | the loading pill glyph spins |
 | Controls | colour / border transitions on hover (`--dur-fast`); a picker's caret flips while its menu is open |
 | Pages shelf | autoplay steps every 1.5s |
 
@@ -49,7 +49,7 @@ never required to understand state.
   handles are `role="separator"` with `aria-valuenow/min/max`; `aria-pressed` on toggle buttons; accessible names on the aggregation and
   filter-operator selects, and on each picker button ("Chart type: Bar", "Sort: customers.name, ascending").
 - **Live regions:** one persistent visually-hidden `#toast-live` announces every toast (a `hidden`
-  container is never announced); the connection pill is `role="status"` + `aria-live="polite"`. Danger
+  container is never announced); connection and save failures arrive as toasts. Danger
   toasts stay until dismissed; others close after 5 s.
 - **Keyboard / non-drag paths:** a `＋` on each table chip adds it to the canvas; relationships are
   created click-to-click (no drag); a `＋` on each field adds it to a shelf; `F2` / `Enter` renames a

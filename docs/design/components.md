@@ -14,11 +14,11 @@ report lists or record-CRUD tables here — this is an explorer, not an admin te
 | Menu | `.menu`, `.menu__list` (solid `--surface`, never glass; `--start` anchors left), `.menu__item` (`[aria-checked]` radio items with `.menu__check`), `.menu__label`, `.menu__heading`, `.menu__sep` — wired by `Core/menu.js` |
 | Glass | `.glass` (tint + `--glass-blur` + 1px stroke + top rim) — only on chrome over the wash: sidebar, `.canvas__bar`; `.ws-shelves` uses the same tokens |
 | Inline field error | `.field-error`, `.field-error__icon` (via `ui.fieldError`) |
-| Status pill | `.pill`, `.pill--ok` (connected), `.pill--warn` (connecting/loading), `.pill--danger` (failed), `.pill--muted` (idle) |
+| Status pill | `.pill`, `.pill--warn` (loading), `.pill--danger` (failed) — the schema browser's table-load status |
 | Card / panel | `.card`, `.card--fill`, `.card__head`, `.card__body.flush`, `.card__foot` |
 | Dialog | `.dialog`, `.dialog--sm`, `.dialog__head/body/foot`, `.form-grid`, `.form-field` |
 | Cardinality picker | `.card-choice` |
-| Select | `.select`, `.select--light` |
+| Select | `.select`, `.select--light`; in the sidebar (`.sidebar .select`) it matches the text inputs — control height, edge, radius, padding, focus underline — with a token-coloured gradient chevron instead of the UA arrow |
 | Data grid | `.data`, `.num` (right-aligned numerics), `.mono`, `.cell-strong`, `.cell-sub` |
 | Empty state | `.empty` |
 | Toast | `.toast` (`.toast--ok` / `--info` / `--danger`, a coloured left rule), `.toast__text`, `.toast__close`; announced through `#toast-live` |

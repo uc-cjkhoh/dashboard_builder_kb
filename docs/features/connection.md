@@ -33,7 +33,8 @@ browser (`localStorage` key `dashboardbuilder.recent-sources`, most recent first
 host/port/user). **The password is never stored** (golden rule 4) — `recent-sources.js` copies only
 those fields and `sanitize` drops anything else on load ([D70](../reference/decisions-connection.md#d70--recent-connection-sources-are-non-secret-and-kept-in-the-browser)). The cert opt-in is remembered: picking such a source reopens Advanced with the cert warning showing, and the password is still typed. While the form is open the list (`#conn-recent`)
 sits above it; it is hidden when there are none or while the summary shows. Picking one refills the
-fields (opening Advanced if needed), clears the password and focuses it; the × on a row forgets it.
+fields with the host exactly as it was entered (`formValues`; a recent source is stored from the entered
+value, never a derived one), opening Advanced if needed, clears the password and focuses it; the × on a row forgets it.
 Blocked storage just means nothing is remembered.
 
 ## Validation
@@ -48,12 +49,16 @@ messages) and answers `400 { error, field }` — [api.md](../reference/api.md#er
 
 1. **Connect** → `POST /api/connection`. The server builds a `ClickHouse.Client` connection string,
    runs `SELECT 1`, and on success stores the connection in the session's `ConnectionRegistry`.
-2. The **indicator pill** moves idle → connecting → connected / failed (icon + label + colour), with a
-   toast. Failure messages carry no credentials.
-3. Once connected the form is replaced by a **compact summary** (`.conn-summary`): host +
-   `user · TLS · :port`, flagged `TLS ⚠ cert unverified` when the cert opt-in is on. Two icon actions:
-   - **change** (edit icon) — reopens the form with **Cancel**; the existing connection stays active
-     until a new connect succeeds.
+2. There is no status pill: **Connect** is disabled and `aria-busy` while the request runs, success shows a
+   toast, and a failure shows the field error (when the server names a field) or a danger toast. Failure
+   messages carry no credentials.
+3. Once connected the form is **collapsed by default** into a one-line **compact summary**
+   (`.conn-summary`, control height): a dot and the host, as entered. `user · TLS · :port` is the host's
+   tooltip (`summaryTitle`); a bypassed certificate check adds a warning icon (`#conn-warn`, "Certificate not
+   verified"). Two icon actions:
+   - **change** (edit icon, `aria-expanded`) — toggles the form open (with **Cancel**) and closed again; the
+     existing connection stays active until a new connect succeeds. The form always holds the active
+     connection's host, port and user (`formFromView`), also after a page reload.
    - **disconnect** (power icon) — `POST /api/connection/disconnect` with `{}` (the proxy blocks `DELETE`). The
      form returns and the workspace is cleared — cards and tabs fade out; reconnecting to the
      same server reopens them from the autosaved workbook ([workbook.md](workbook.md#auto-save)).
