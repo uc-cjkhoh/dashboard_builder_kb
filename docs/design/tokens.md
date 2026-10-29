@@ -181,7 +181,7 @@ sans-serif` — system fonts only. UI text is weight **400 / 600**. Two content 
 - `--sidebar-w`: 264px default (resizable — [layout.md](layout.md#sidebar)).
 - `--topbar-h`: 60px — the shared `min-height` of the sidebar brand (`.sidebar__brand`) and the tab bar
   (`.canvas__bar`), so their bottom borders form one continuous line ([layout.md](layout.md#tab-bar)).
-- **`--ctl-h`: 32px** — the shared control height (buttons, icon buttons, selects, the brand mark; compact pills are 24px with 16px inner controls) for inputs, selects, `.btn`, toolbar buttons and
+- **`--ctl-h`: 32px** — the shared control height for inputs, selects, `.btn`, toolbar buttons, icon buttons, the brand mark and
   shelf drop zones, so a row of mixed controls aligns on one baseline.
 
 ## Elevation & focus
