@@ -31,7 +31,7 @@ Inputs are read by element id (`conn-host`, `conn-port`, `conn-user`, `conn-pass
 After each successful connect the source (host, port, user, Secure, cert opt-in) is remembered in this
 browser (`localStorage` key `dashboardbuilder.recent-sources`, most recent first, max 5, one per
 host/port/user). **The password is never stored** (golden rule 4) — `recent-sources.js` copies only
-those fields and `sanitize` drops anything else on load. While the form is open the list (`#conn-recent`)
+those fields and `sanitize` drops anything else on load ([D70](../reference/decisions-connection.md#d70--recent-connection-sources-are-non-secret-and-kept-in-the-browser)). The cert opt-in is remembered: picking such a source reopens Advanced with the cert warning showing, and the password is still typed. While the form is open the list (`#conn-recent`)
 sits above it; it is hidden when there are none or while the summary shows. Picking one refills the
 fields (opening Advanced if needed), clears the password and focuses it; the × on a row forgets it.
 Blocked storage just means nothing is remembered.

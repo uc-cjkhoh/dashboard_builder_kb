@@ -42,7 +42,8 @@ Never hand-format an identifier at a call site. Detail and the failure it preven
 
 Never return the password to the client, never write it to logs or error messages, never put it in a
 URL or query string. `ConnectionRegistry` is session-scoped; a new session starts with no connection.
-Errors are mapped to clean messages without the connection string (`ApiControllerBase.SafeError`).
+Errors are mapped to clean messages without the connection string (`ApiControllerBase.SafeError`). Only non-secret fields (host, port, user, TLS flags) may be remembered in the
+browser as recent sources — never the password or a token ([D70](../reference/decisions-connection.md#d70--recent-connection-sources-are-non-secret-and-kept-in-the-browser)).
 
 ## 5. Relationships are logical declarations, not database facts
 
