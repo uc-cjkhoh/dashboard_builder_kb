@@ -35,7 +35,7 @@ How each encoding reaches the query (`planDims` / `planMeasures`):
 | Encoding | Accepts | Query effect | Renders as |
 |---|---|---|---|
 | **Color** (categorical) | 1 dimension | extra group-by, appended last | one coloured series per value: bar → grouped, stacked → stacked, line/area → one line each; Table → extra header level |
-| **Color** (numeric) | 1 measure | extra measure | continuous token gradient (`visualMap`) — **scatter only** |
+| **Color** (numeric) | 1 measure | extra measure | continuous token gradient (`visualMap`) — scatter and heatmap; hue and range in Format |
 | **Size** | 1 measure | extra measure | scatter bubble size |
 | **Label** | 1 field | numeric → extra measure; categorical reads an existing key | the value drawn on each mark |
 | **Detail** | dimensions | extra group-by | more marks, no visual channel |
@@ -240,6 +240,14 @@ panel says so. Rules: `Dashboard/period-model.js` (unit-tested).
 - **Contrast.** User colours are not adjusted; label inks still come from `Dashboard/contrast.js` (`pickInk`), which picks the higher-contrast ink for any hex.
 - **Reverse palette** (`format.paletteReverse`, boolean, default off) reverses the eight categorical colours' order
   and swaps the continuous ramp's ends (heatmap and scatter colour). Member colours are unaffected.
+- **Continuous colour scale** (T03-19; Format, on Scatter and Heatmap): **Colour ramp** Brand (accent soft → accent),
+  Blue, Green, Amber or Violet (the surface blended 20 % toward that categorical token, up to the token) —
+  `format.colorRamp`, default `brand`; **Colour from / to** (`format.colorMin` / `colorMax`, blank = the data's own
+  end) pin the ends of the scale, and values outside a pinned end draw in the neutral axis grey while the legend
+  shows the pinned span. A minimum not below the maximum is refused with a toast; a saved one is cleared on import and
+  reported. Reverse palette still swaps the ramp's ends. Table cell scales have their own
+  conditional-formatting colours and are unaffected. Pure logic: `Dashboard/colour-scale-model.js`
+  (`RAMP_CHOICES`, `rampColours`, `mixHex`, `colourRangeError`, `rangeOf`).
 - Pure logic: `Dashboard/colour-model.js` (`setMemberColor`, `cleanMemberColors`, `colorsByName`,
   `orderedPalette`, `rampStops`, `SWATCHES`).
 

@@ -110,7 +110,7 @@ A widget points at a worksheet by tab id; one worksheet may sit on several dashb
   sort:      null | { by: fieldId, dir: "asc" | "desc" },
   selection: null | {...}, drill: null | {...}, pages: null | {...},
   tooltipText: null | string,   // T01-19 tooltip template with <Field> placeholders (≤ 300; null = automatic)
-  memberColors: {},              // T01-20 { "table.column": { member: "#rrggbb" } } (format.paletteReverse: bool, T03-33)
+  memberColors: {},              // T01-20 { "table.column": { member: "#rrggbb" } } (format.paletteReverse: bool, T03-33; format.colorRamp brand|blue|green|amber|violet, colorMin / colorMax number|null, T03-19)
   title: null | string, caption: null | string, showTitle: boolean,   // P23 (null = automatic)
   showFilterCards: boolean,                                          // P30
   analytics: null | { ref: { kind, value? }, band: { from, to } | null, trend, forecast, totals: { grand, sub } },   // P21
