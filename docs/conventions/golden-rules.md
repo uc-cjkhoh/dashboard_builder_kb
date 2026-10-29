@@ -96,9 +96,11 @@ Enforced by `tests/js/tokens.test.mjs`.
    circle, a play triangle — nudging by a pixel or two rather than trusting box edges.
 2. **Space is 4 / 8 / 16 / 24 px.** Every gap, padding and margin uses `--s1` `--s2` `--s4` `--s6`; no
    other spacing token exists. A 1px border-compensation or optical nudge is the only exception.
-3. **One radius.** Inner and outer shapes share `--r` (8px); only `--r-pill` (pills, dots) differs.
+3. **One radius.** Inner and outer shapes share `--r` (8px), including chart bars and tooltip swatches
+   (`tokens().radius` in `chart.js`); only `--r-pill` (pills, dots) differs.
 4. **Saturation ≈ 70 %.** Token colours cap at HSL saturation 70 %; the Okabe–Ito colour-blind palette is
-   a published standard and keeps its values.
+   a published standard and keeps its values. JS fallback colours come from `Core/theme-model.js`, never a
+   second hex copy.
 5. **Few font sizes.** `--fs-body` 14 / `--fs-lead` 16 for content, `--fs-title` 24 / `--fs-display` 32
    for titles and KPI numbers. No other screen `font-size`; chart text is 14px.
 6. **Let the layout explain.** No secondary labels or descriptions that the layout already conveys.
