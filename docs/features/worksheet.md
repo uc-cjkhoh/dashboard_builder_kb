@@ -47,7 +47,7 @@ number, date, bool) rather than a coloured letter.
 *display name* shown on the field, pills, axes, legends, table headers and the sort picker; the query always
 uses the real, catalog-validated column; renamed fields read in italics), **Default aggregation** (numeric
 fields: the aggregation a new measure pill starts with) and **Hide from the field list** (with a **Show
-hidden (n)** toggle). Settings are per workbook (`fields` in the file; store `fieldMeta`).
+hidden (n)** toggle). **Copy name** (T02-28) puts the display name on the clipboard, **Copy column name** the real column when renamed; a calculated field's menu also has **Copy formula** (not for a group). Settings are per workbook (`fields` in the file; store `fieldMeta`).
 
 **Data type cast** (T02-34): the ⋯ menu also has **Data type** — *Original*, or the casts that make sense
 for the column: text → Number / Date, number or date → Text, boolean → Text / Number, anything else → Text

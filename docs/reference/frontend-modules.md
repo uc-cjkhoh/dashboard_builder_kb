@@ -15,6 +15,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Connection/connection.js` | connection form, summary, pill, gating — [connection.md](../features/connection.md) |
 | `Connection/connection-rules.js` | pure: `advancedShouldOpen` (the Advanced section opens when TLS is off or the cert opt-in is on) |
 | `Schema/schema.js` | database `<select>`, table search, table chips + drag payload — [schema-browser.md](../features/schema-browser.md) |
+| `Dashboard/field-copy-model.js` | `fieldCopies(field)`: the Copy items on a worksheet field's ⋯ menu (name, column name, formula) |
 | `Schema/column-profile-dialog.js`, `Schema/column-profile-model.js` | the column profile dialog (`openColumnProfile(db, table, column)`, opened from a field row on a canvas card) and its pure rules: `profileRequest`, `formatShare`, `roleOf`, `summarize` — [schema-browser.md](../features/schema-browser.md#column-profile--field-details) |
 | `Schema/table-filter.js` | pure: `matchTables(names, query)` — the table search |
 | `Canvas/canvas.js` | drop handling, entity cards, card movement, empty state — [canvas.md](../features/canvas.md) |
@@ -95,7 +96,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Workbook/workbook.js` | auto-save, restore on connect, Export/Import — [workbook.md](../features/workbook.md) |
 | `Workbook/workbook-model.js` | pure: workbook serialize (v2) / `parseWorkbook` (full validation + issue list; v1 files via `migrateV1`) / `sanitizeSheet` / storage keys (`storageKey`, `legacyStorageKey`) — [workbook.md](../features/workbook.md#validation-parseworkbook) |
 | `Core/api.js` | `fetch` helpers (JSON, errors, path base, optional `AbortSignal`) |
-| `Core/ui.js` | toast, pill, `show`/`hide`/`toggle`, `fieldError` / `clearFieldError` / `checkField`, `listDialog`, `confirmDialog`, `openDialog`/`closeDialog` |
+| `Core/ui.js` | toast, pill, `show`/`hide`/`toggle`, `fieldError` / `clearFieldError` / `checkField`, `listDialog`, `confirmDialog`, `openDialog`/`closeDialog`, `copyText(text, what)` (clipboard + toast) |
 | `Core/validate.js` | pure input parsers (`host`, `port`, `text`, `number`, `dateTime`, `filterValue`, `range`, `percent`, with `isFraction` / `percentLabel` for the percentile fraction) returning `{ ok, value }` or `{ ok:false, error }`, plus `LIMITS` and `HOST_MESSAGES` — mirror of the server's `ApiLimits` / `RequestRules` |
 | `Core/sheet-schema.js` | pure: the allowed values for a saved sheet (chart types, categories, filter ops, formats, Top-N) |
 | `Core/icons.js` | the inline-SVG icon set — `icon(name, {size, label})`, `PATHS`, `ICON_NAMES` |
@@ -143,6 +144,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
   `style.display`.
 - **`setPill(el, state, text)`** — `idle | connecting | connected | failed` → `pill--muted/warn/ok/danger`
   plus an icon and label; text written as a text node, never HTML.
+- **`copyText(text, what)`** — writes to the clipboard and toasts "Copied <what>." (or a danger toast when the browser blocks it).
 - **`toast(message, kind)`** — `ok | danger | info`; `info` / `ok` auto-hide after 5 s, **`danger` stays
   until dismissed** (a close button). The visible `#toast` is not a live region — messages are announced
   through the persistent visually-hidden `#toast-live`.
