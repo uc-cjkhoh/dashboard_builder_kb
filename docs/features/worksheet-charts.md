@@ -86,8 +86,10 @@ unit-tested); over a cut-off result the info line says "Analytics use only the r
   dashed and labelled "Average: 16"; a **band** shaded and labelled with its rule — typed **from / to**
   numbers, **Mean ± 1σ** / **± 2σ** (sample standard deviation, ≥ 2 values), or a percentile range **P25–P75** /
   **P10–P90** (linear interpolation). The line and band read the measure chosen in **of** (any measure on the
-  shelf; shown when there are two or more, and the label then names it, "Average (sum discount): 35"),
-  over the rows shown; with fewer values than the rule needs there is no band. The **trend** — Linear, Logarithmic (`a + b·ln(x+1)`) or Polynomial (2nd
+  shelf; shown when there are two or more, and a non-default choice is named in the label, "Average (sum
+  discount): 35"), over the rows shown with the "Other" remainder left out; a σ / percentile band's label
+  says "(shown rows)", and with too few values (or typed ends that are equal) there is no band and an info
+  line says why. Choosing Typed range draws nothing until two different numbers are typed. The **trend** — Linear, Logarithmic (`a + b·ln(x+1)`) or Polynomial (2nd
   order) least squares, on the first measure in category order — drawn dotted and named at its end with its R² ("Trend · R² 0.93"); and on Line /
   Area a **forecast** of 3, 6 or 12 steps that extends the trend (linear if none is picked) into
   "Forecast +1 …" categories.
