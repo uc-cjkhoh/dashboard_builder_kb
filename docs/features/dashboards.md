@@ -18,7 +18,7 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
   **fixed** preset (800 × 600, 1024 × 768, 1280 × 720, 1366 × 768, 1920 × 1080). A fixed board is exactly that box, never stacked: columns span the
   width and the rows in use (down to the lowest widget) stretch to share the height (`layoutBoard(…, { fixed })`, `fixedRowH`), so
   drag and resize snap to the drawn rows. The panel scrolls when the window is smaller than the box. Limits 320–3840 × 240–2400 whole
-  pixels (`sizeError`). Not part of undo / redo. A loaded size that is not a preset gets its own option in the select.
+  pixels (`sizeError`; an import outside them opens Automatic with an issue). Rows never shrink below 16px — a tall stack in a short box overflows. Not part of undo / redo. A loaded size that is not a preset gets its own option in the select.
 - **Canvas** (`#board-scroll`): 12 columns; row height `calc(var(--ctl-h) * 2)`, gap `var(--s2)`; widgets are absolutely
   positioned from `board-layout.js` (`layoutBoard(widgets, panelWidth, { rowH, gap })` → pixel rects; `board.js` reads the row
   height and gap from the tokens). The canvas grows downward (at most 96 rows) and scrolls **inside its panel** — the page never

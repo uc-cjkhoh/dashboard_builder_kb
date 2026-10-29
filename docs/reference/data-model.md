@@ -171,7 +171,7 @@ What [workbook.md](../features/workbook.md) saves to `localStorage` and exports 
   worksheets:    [ { name, sheet } ],      // sheet as above, minus pages.members
   dashboards:    [ { name, widgets: [ { kind: "sheet", sheet: worksheetIndex, x, y, w, h }
                                     | { kind: "text", heading, body, x, y, w, h } ],
-                     size?: { width, height } } ],   // fixed pixels; absent = automatic (older files). Bad shape → automatic, out of range → clamped, each with an import issue
+                     size?: { width, height } } ],   // fixed pixels; absent = automatic (older files). Anything outside the limits (not whole pixels, 320–3840 × 240–2400) → automatic with an import issue, never clamped
   tabs:          [ { kind: "worksheet" | "dashboard", index } ],   // the strip's order, ≤ 50
   active:        { kind, index } | null    // null = Data Model
   fields:        { "db.table.column": { alias?, agg?, hidden?, cast?, memberAliases?: { [rawValue]: label } } }   // P28, T02-34, T02-29 — ≤ 2000
