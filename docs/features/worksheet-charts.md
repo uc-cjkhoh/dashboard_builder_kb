@@ -22,7 +22,7 @@ Y) — add a second measure"), shared with Show Me so the two never disagree.
 | Heatmap | 2 dimensions + 1 measure | single-hue token colour scale; Format → **Shape** **Squares** (cells) or **Circles** (scatter marks on the same category grid, 80 % of the smaller cell side, 6–48 px, re-sized with the pane; cells without a value draw no circle; coloured by the same value legend; labels, tooltip and Reverse palette behave as for squares, the cell banding is dropped) |
 | Treemap | 1–2 dimensions + 1 measure | nested rectangles sized by the measure |
 | Histogram | 1 numeric field | equal-width bins; own endpoint |
-| Box plot | 1 numeric field (+ optional group dimension) | min/Q1/median/Q3/max; own endpoint |
+| Box plot | 1 numeric field (+ optional group dimension) | Q1/median/Q3, whiskers at the 1.5 IQR fences, outlier points beyond them (hollow rings, ≤ 500); own endpoint |
 | Waterfall | ≥1 dimension + 1 measure | each value a change from the running total, then a **Total** bar; increases `--chart-cat-1`, decreases `--chart-cat-6`, total muted — legend-named and each step labelled with its sign; may run below zero (drawn as a custom series) |
 | Funnel | 1 dimension + 1 measure | stages widest first, each labelled with value and % of the first; label ink picked per stage |
 | Gauge | 1 measure, no dimension | arc from 0 to Format → **Target** (else a round maximum); value and "% of target" written in the middle |

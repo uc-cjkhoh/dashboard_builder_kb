@@ -208,7 +208,7 @@ What happens next
    server reports `truncated` (more groups than the limit) and no **Other** mark shows it, an info line at
    the top of the chart card (`#ws-chart-notice`, a sibling of `#ws-chart` so re-renders never wipe it) says so: "Showing the first 50 in sort order — more
    exist. Raise Top-N in Format, or add a filter." At the 5000 cap it drops the Top-N hint ("…Add a filter
-   to narrow it."); the Table view shows its own progress instead (below). Box plots get the same notice. A date-grouped
+   to narrow it."); the Table view shows its own progress instead (below). Box plots get the same notice, plus "Showing the first 500 outliers — more exist." when outlier points were capped. A date-grouped
    axis adds "Dates grouped by month — set Group dates in Format to change."
 5. **Errors** show in the chart pane — a render error is caught and shown there too, never a blank
    view. The server's `{ error }` sentence is shown as-is. A query stopped by the server's time limit says so ("ran longer
