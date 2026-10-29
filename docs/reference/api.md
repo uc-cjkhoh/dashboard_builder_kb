@@ -124,6 +124,20 @@ display text (numbers invariant, dates ISO, arrays compact) or `null` for SQL NU
 characters plus `…` — **inside ClickHouse** (each column is selected as `if(isNull(c), NULL, left(toString(c), 1001))`), so a huge value never leaves it; arrays, tuples, maps and dates read as `toString` prints them. `truncated` = more rows matched than `limit`; `columnsTruncated` = the default column set was cut.
 Errors use the usual `{ error, field? }` shape: 400 rule breaks and unknown names, 409 not connected, 502 / 504 ClickHouse.
 
+
+### Union
+
+Controller: `Features/Rows/UnionController.cs`. `POST /api/union` stacks the **first rows of 2–5 tables of one database**
+(`UNION ALL`) and answers in the `/api/rows` shape; the first column is `Source table` (the table's name, bound as a
+parameter), then the shared columns. No ordering, no aggregation, no filters.
+
+| Field | Rule |
+|---|---|
+| `db`, `tables` | `db` required; `tables` 2–5 names (`ApiLimits.MaxUnionTables`, mirrored by `LIMITS.unionTables`), each blank → 400 (`tables[i]`), unknown → 400/404 |
+| `columns` | optional, ≤ 200. Default: the columns **every** table has with the same name **and kind** (text / number / date …), in the first table's order; none shared → 400 (`tables`). A requested column missing from a table is an unknown identifier; one whose kind differs between tables is a 400 (`columns[i]`). Types shown are the first table's |
+| `limit` | 1–1000, default 100, never clamped; (columns + 1) × rows ≤ 50,000. Every branch is cut to `limit + 1` inside ClickHouse, then the union again; `truncated` is the probe row |
+
+Cells are cut in SQL like `/api/rows`. The UI (`Union` button in the Tables header → `Rows/union-dialog.js`) shows the first 20.
 ## Relationship preview
 
 Controller: `Features/Relations/RelationsController.cs`. `POST /api/relationships/preview` — the relationship

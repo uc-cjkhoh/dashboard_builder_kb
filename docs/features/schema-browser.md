@@ -71,3 +71,11 @@ Sidebar, below the connection panel. Code: `Features/Schema/` (`SchemaController
 `{db}` is validated against `SHOW DATABASES` (ordinal match) before it is quoted into `SHOW TABLES
 FROM`; an unknown or hostile name → **404** before any SQL is built
 ([golden rule 2](../conventions/golden-rules.md#2-never-interpolate-an-identifier-you-havent-validated)).
+
+## Union
+
+The **Union** button beside the Tables heading opens a dialog listing the database's tables as checkboxes. **Show rows** is
+enabled for 2–5 ticked tables (a sixth can't be ticked; the hint reads "Pick 2 to 5 tables."). It opens the rows dialog on
+`POST /api/union` ([api.md § Union](../reference/api.md#union)): the first 20 rows of the tables stacked over their shared
+columns, `Source table` first. A refusal (no shared column, …) shows in the dialog. Union is a preview only; it is not a
+table on the canvas and no sheet can use it yet ([data-model.md](../backlog/data-model.md)).
