@@ -10,7 +10,7 @@ Dashboard tabs render and save their widgets, but the board cannot yet be edited
 - **P24d Stories** (IDs: T08-28; priority P2) — Open: no ordered, captioned snapshots or story controls (the story half of T01-12); bookmarks are not steps. Needs: none.
 - **Device preview and layouts** (IDs: T08-04, T08-05; priority P1–P2) — Open: phone/tablet/desktop preview and alternate layouts per device. Needs: none.
 - **Parameter and set actions (P39 remainder)** (IDs: T08-27; priority P3; effort S) — Open: a click sets a parameter to the mark's value (parameters exist); a click adds a member to a set (sets are in [calculations.md](calculations.md)). Both sit on the selection chip beside the link action. Needs: sets need P25.
-- **Dashboard guidance and data notes** (IDs: T08-02, T08-30, T09-12; priority P1–P2) — Open: audience/goal planning prompt, design-consistency checks. Partial: caption and print header list fields and filters, but not the last-query time, calculation definitions or data notes. Needs: none.
+- **Dashboard guidance and data notes** (IDs: T08-02, T08-30, T09-12; priority P1–P2) — Open: audience/goal planning prompt, design-consistency checks, free-text data notes. Partial: the status bar shows the last-query time and the print header lists calculation definitions and the update time, beside fields, filters and the notice; the dashboard's own print header does not. Needs: none.
 
 ## Action design
 

@@ -32,7 +32,11 @@ Data on top, view controls on the chart ([design/layout.md](../design/layout.md#
 - **Title and caption** under the view bar: click to edit, `Enter` saves, `Esc` cancels; empty = the
   automatic one (the tab name; "sum amount by customers.name · 2 filters", in italics). Printed too.
 - **Status bar** at the foot of the chart card: marks · rows × columns (Table / Text) · measures · the
-  selection.
+  selection · `Updated hh:mm:ss`, when the data was last read from ClickHouse (a cached result keeps the time it
+  was fetched; `fetchCached` stamps `queriedAt`).
+- **Print header** (`beginPrint`): title, caption, date range, filters, the notice, then each calculated field
+  the view uses as `Calculation: Name = formula` (also those it refers to; formulas cut at 200 characters,
+  `data-notes.js`), the update time and the print time.
 
 Beside them, the **field pane** (drag its right edge, or `←`/`→` on the handle, to resize it) lists each model table as a collapsible group (`<details>`, open by
 default) with small **Dimensions** / **Measures** labels inside; each field shows a type icon (text,
