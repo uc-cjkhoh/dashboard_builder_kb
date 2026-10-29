@@ -82,6 +82,13 @@ The view bar's **Analytics** button opens a card (like Format; `analyticsPanel`,
 Everything is computed in the browser over the rows returned (`Dashboard/analytics-model.js`,
 unit-tested); over a cut-off result the info line says "Analytics use only the rows shown — more exist."
 
+On Bar / Line / Area the card opens with a row of **items** — Reference line, Band, Trend line (and Forecast
+on Line / Area). **Drag** an item onto the chart, or **press** its button (keyboard): it switches on at a default
+(Average, Mean ± 1σ, Linear, 3 steps) and the selects below show and edit it. An item already on is shown
+pressed; pressing it again switches it off, and a drop on an item already on changes nothing. A drop is
+accepted only while the card is open (`analyticsDrop`). Items and defaults are `itemsFor` / `addItem` /
+`removeItem` in `analytics-model.js`; the saved `sheet.analytics` shape is unchanged.
+
 - **Bar / Line / Area**: a **reference line** — Average, Median, Minimum, Maximum or a Constant — drawn
   dashed and labelled "Average: 16"; a **band** shaded and labelled with its rule — typed **from / to**
   numbers, **Mean ± 1σ** / **± 2σ** (sample standard deviation, ≥ 2 values), or a percentile range **P25–P75** /
