@@ -252,8 +252,11 @@ panel says so. Rules: `Dashboard/period-model.js` (unit-tested).
 - **Table look** (T01-23, Format → Align · Row height · Shading, Table and Text views only; stored as
   `format.tableAlign` `auto` | `left` | `center` | `right`, `tableDensity` `standard` | `compact` | `roomy`,
   `tableShade` `none` | `banded` | `header` | `both`). Align sets the value cells and measure headers (Auto keeps numbers
-  right); Row height steps cell padding 0 / 4 / 8 px vertically (Roomy also 16 px sideways); Banded shades even body
-  rows and Header the header cells with `--surface-2`. All three are classes on the table (`xt-a-*`, `xt-d-*`,
+  right; the "Total" header follows too); Row height sets cell padding: Compact 0 vertical (the one deliberate step
+  outside 4 / 8 / 16 / 24, golden-rule 2), Standard 4 / 8, Roomy 8 / 16. Banded shades even body rows (subtotal and
+  grand-total rows count in the alternation) and Header the header cells, both with `--surface-3`, a step that reads
+  in light and dark. Banding skips cells carrying a rule or scale (`.xt-cf`) so their tone wins; header shading keeps
+  each header's own ink. All three are classes on the table (`xt-a-*`, `xt-d-*`,
   `xt-s-*`, defaults add none); there is no free font, size or colour. Pure logic: `Dashboard/table-style-model.js`
   (`tableStyleClasses`, `TABLE_*_CHOICES`).
 - Pure logic: `Dashboard/colour-model.js` (`setMemberColor`, `cleanMemberColors`, `colorsByName`,

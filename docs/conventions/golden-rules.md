@@ -96,7 +96,7 @@ Enforced by `tests/js/tokens.test.mjs`.
 1. **Optical alignment.** Align elements to what the eye reads — an icon beside text, a glyph in a
    circle, a play triangle — nudging by a pixel or two rather than trusting box edges.
 2. **Space is 4 / 8 / 16 / 24 px.** Every gap, padding and margin uses `--s1` `--s2` `--s4` `--s6`; no
-   other spacing token exists. A 1px border-compensation or optical nudge is the only exception.
+   other spacing token exists. A 1px border-compensation or optical nudge is the only exception, plus table Row height → Compact (0 vertical padding).
 3. **One radius.** Inner and outer shapes share `--r` (8px), including chart bars and tooltip swatches
    (`tokens().radius` in `chart.js`); only `--r-pill` (pills, dots) differs.
 4. **Saturation ≈ 70 %.** Token colours cap at HSL saturation 70 %; the Okabe–Ito colour-blind palette is
