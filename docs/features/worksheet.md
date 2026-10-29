@@ -35,7 +35,7 @@ Data on top, view controls on the chart ([design/layout.md](../design/layout.md#
   selection · `Updated hh:mm:ss`, when the data was last read from ClickHouse (a cached result keeps the time it
   was fetched; `fetchCached` stamps `queriedAt`).
 - **Print header** (`beginPrint`): title, caption, date range, filters, the notice, then each calculated field
-  the view uses as `Calculation: Name = formula` (also those it refers to; formulas cut at 200 characters,
+  the view uses (shelves, marks, sheet or applied shared Top-N filters) as `Calculation: Name = formula` (also those it refers to; formulas cut at 200 characters,
   `data-notes.js`), the update time and the print time.
 
 Beside them, the **field pane** (drag its right edge, or `←`/`→` on the handle, to resize it) lists each model table as a collapsible group (`<details>`, open by
