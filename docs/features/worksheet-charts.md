@@ -82,10 +82,13 @@ The view bar's **Analytics** button opens a card (like Format; `analyticsPanel`,
 Everything is computed in the browser over the rows returned (`Dashboard/analytics-model.js`,
 unit-tested); over a cut-off result the info line says "Analytics use only the rows shown — more exist."
 
-- **Bar / Line / Area**, on the first measure in category order: a **reference line** — Average, Median,
-  Minimum, Maximum or a Constant — drawn dashed and labelled "Average: 16"; a **band** between two
-  constants, shaded and labelled; a **trend** — Linear, Logarithmic (`a + b·ln(x+1)`) or Polynomial (2nd
-  order) least squares — drawn dotted and named at its end with its R² ("Trend · R² 0.93"); and on Line /
+- **Bar / Line / Area**: a **reference line** — Average, Median, Minimum, Maximum or a Constant — drawn
+  dashed and labelled "Average: 16"; a **band** shaded and labelled with its rule — typed **from / to**
+  numbers, **Mean ± 1σ** / **± 2σ** (sample standard deviation, ≥ 2 values), or a percentile range **P25–P75** /
+  **P10–P90** (linear interpolation). The line and band read the measure chosen in **of** (any measure on the
+  shelf; shown when there are two or more, and the label then names it, "Average (sum discount): 35"),
+  over the rows shown; with fewer values than the rule needs there is no band. The **trend** — Linear, Logarithmic (`a + b·ln(x+1)`) or Polynomial (2nd
+  order) least squares, on the first measure in category order — drawn dotted and named at its end with its R² ("Trend · R² 0.93"); and on Line /
   Area a **forecast** of 3, 6 or 12 steps that extends the trend (linear if none is picked) into
   "Forecast +1 …" categories.
 - **Table / Text**: **Grand totals** (a Total column when Columns has dimensions, a Grand total row when

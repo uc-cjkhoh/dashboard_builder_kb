@@ -113,7 +113,7 @@ A widget points at a worksheet by tab id; one worksheet may sit on several dashb
   memberColors: {},              // T01-20 { "table.column": { member: "#rrggbb" } } (format.paletteReverse: bool, T03-33; format.colorRamp brand|blue|green|amber|violet, colorMin / colorMax number|null, T03-19)
   title: null | string, caption: null | string, showTitle: boolean,   // P23 (null = automatic)
   showFilterCards: boolean,                                          // P30
-  analytics: null | { ref: { kind, value? }, band: { from, to } | null, trend, forecast, totals: { grand, sub } },   // P21
+  analytics: null | { ref: { kind, value?, param?, measure? }, band: { from, to } | { kind: "stddev", k: 1|2|3 } | { kind: "percentile", lo, hi } | null, trend, forecast, totals: { grand, sub } },   // P21
   urlAction: null | { label, template },   // P39 link action — https:// with {value}
   period: null | { db, table, column, category: "temporal", preset, from, to, compare, compareFrom, compareTo },
   marks:  { size, label, detail: [], tooltip: [], shape, path, angle },
