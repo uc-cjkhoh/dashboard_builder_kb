@@ -12,8 +12,13 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
 - **Side panel** (left, 240px; the worksheet's field-pane slot): the workbook's worksheets, each with an **Add** button
   (`aria-label` "Add the worksheet “Sales” to the dashboard"), then **Add text**. The list redraws only when a worksheet is
   added, closed or renamed, so a button keeps focus when a widget is added.
-- **Bar** above the canvas: the dashboard's name, "n of 12 widgets", the **status line** (below), **Undo** / **Redo**, **Full screen**
-  and **Print**.
+- **Bar** above the canvas: the dashboard's name, "n of 12 widgets", the **status line** (below), the **Size** select, **Undo** / **Redo**,
+  **Full screen** and **Print**.
+- **Size** (`Board/board-size.js`, per dashboard): **Automatic** (default; the canvas fills its panel and stacks when narrow, as below) or a
+  **fixed** preset (800 × 600, 1024 × 768, 1280 × 720, 1366 × 768, 1920 × 1080). A fixed board is exactly that box, never stacked: columns span the
+  width and the rows in use (down to the lowest widget) stretch to share the height (`layoutBoard(…, { fixed })`, `fixedRowH`), so
+  drag and resize snap to the drawn rows. The panel scrolls when the window is smaller than the box. Limits 320–3840 × 240–2400 whole
+  pixels (`sizeError`). Not part of undo / redo. A loaded size that is not a preset gets its own option in the select.
 - **Canvas** (`#board-scroll`): 12 columns; row height `calc(var(--ctl-h) * 2)`, gap `var(--s2)`; widgets are absolutely
   positioned from `board-layout.js` (`layoutBoard(widgets, panelWidth, { rowH, gap })` → pixel rects; `board.js` reads the row
   height and gap from the tokens). The canvas grows downward (at most 96 rows) and scrolls **inside its panel** — the page never
@@ -148,7 +153,8 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
   print **in flow, one column** (`position: relative`, `break-inside: avoid`) — an absolutely positioned widget could be split or
   cropped across pages. Each worksheet widget's chart is sized to its printed cell (`sizeChart(body, { width, height })` from the cell
   box less header and padding), overriding the worksheet print rule that fixes every chart canvas at 1000 × 560; `afterprint` restores
-  the screen layout and chart sizes. The arrangement on screen (side by side) is not kept on paper.
+  the screen layout and chart sizes. The arrangement on screen (side by side) is not kept on paper. A **fixed-size** dashboard instead
+  prints its box with the on-screen arrangement kept, absolutely positioned and scaled down proportionally to the 1000px page width (never up).
 - Image and CSV export, and bookmarks, stay per worksheet (reach them with **Edit**); the bookmark action is hidden on a dashboard.
 
 ## Tests
