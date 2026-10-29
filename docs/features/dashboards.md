@@ -21,7 +21,7 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
 - **Narrow canvas:** below `STACK_BELOW` = 720px the grid is unusable, so widgets **stack full width in reading order** (by row,
   then column), each keeping its row count; the DOM order is the same reading order. At viewport width ≤ 760px the side panel
   moves above the canvas as a short scrolling list. The shell keeps its sidebar at every width, so a phone user collapses it first.
-- An empty dashboard shows "This dashboard is empty — add a worksheet or a text block from the list on the left."
+- An empty dashboard shows "Empty dashboard" with an icon — the field list beside it is the way to add widgets
 
 ## Adding and removing
 

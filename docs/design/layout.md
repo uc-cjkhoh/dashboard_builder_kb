@@ -44,7 +44,7 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
   state is remembered in this browser (`localStorage` `dashboardbuilder.sidebar.collapsed`, read/write
   wrapped in `try`). Anything that focuses a sidebar control first calls `expandSidebar()`
   (the canvas empty-state button does).
-- The brand name and subtitle are one line each (ellipsis), so the toggle never makes the brand row taller
+- The brand name is one line (ellipsis), so the toggle never makes the brand row taller
   than `--topbar-h`.
 - Glass rail in the active theme (light or dark). Section titles are sentence case, `--fs-body` 600.
 - Contents: **Connection** (form or one-row summary — [connection.md](../features/connection.md)), the
@@ -76,7 +76,7 @@ Data controls sit in the glass header; view controls sit on the chart card they 
 ([features/worksheet.md](../features/worksheet.md#layout)):
 
 1. **Data header** (`.ws-shelves`, glass) — **Columns**, **Rows** and **Marks** lanes, each a fixed
-   label column + zone (`72px 1fr`) so every lane starts at the same x. Pills are 22px (18px inner
+   label column + zone (`72px 1fr`) so every lane starts at the same x. Pills are 24px (16px inner
    controls), so a filled lane stays as tall as an empty one. The Marks lane holds the encodings
    toolbar (`.ws-toolbar`: a visible row of icon+text tools plus **More** —
    [which tools show where](../features/worksheet-encodings.md#encodings-toolbar)); a tool's box starts
