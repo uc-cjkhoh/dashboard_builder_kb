@@ -46,8 +46,11 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/chart.js` | the only ECharts adapter; one chart per container element (state in a `WeakMap`), every export takes the container first — [worksheet-charts.md](../features/worksheet-charts.md#rendering--the-echarts-adapter) |
 | `Dashboard/contrast.js` | pure: WCAG `luminance`, `contrastRatio`, `pickInk` (treemap label ink) |
 | `Dashboard/filter-rules.js` | pure: `aggsFor`, `checkFilter`, `statFilters`, `withCategories`, `viewCounts`, `checkAdd` (drop-time caps) — [worksheet.md](../features/worksheet.md#drop-time-limits) |
-| `Dashboard/show-me-rules.js` | pure: chart-type field rules (`CHART_NEEDS`, `chartIssue`, the shared hint texts, `roleOf`) and Show Me — `issueFor`, `bestType`, `showMeOptions`, `placeFor`, `samePlacement` — [worksheet-charts.md](../features/worksheet-charts.md#show-me) |
-| `Dashboard/toolbar-rules.js` | pure: `visibleTools(chartType, tools)` — visible row vs More — [worksheet-encodings.md](../features/worksheet-encodings.md#encodings-toolbar) |
+| `Dashboard/show-me-rules.js` | pure: chart-type field rules (`CHART_NEEDS`, `chartIssue`, the shared hint texts, `roleOf`) and the chart-type menu's cues — `issueFor`, `bestType`, `showMeOptions` — [worksheet-charts.md](../features/worksheet-charts.md#chart-type-control) |
+| `Dashboard/toolbar-rules.js` | pure: `visibleTools(chartType, tools)` — which Marks slots are quiet — [worksheet-encodings.md](../features/worksheet-encodings.md#marks-slots) |
+| `Dashboard/pill-options.js` | pure: `fieldPillOptions` / `filterPillOptions` (the entries of a pill's context popup), `filterSummary`, `markGrid` (Marks slots in rows of three) |
+| `Dashboard/field-group.js` | the one collapsible `<details class="ws-group">` of the field pane (Calculated fields, Hierarchies, Marks, tables) |
+| `Dashboard/fields-pane-model.js` | pure: the field pane's hide / show state (`fieldsPaneView`, `readCollapsed`, storage key) |
 | `Core/parameters-model.js` | pure (P32): `checkValue` (type + allowed values), `checkStep` (positive step size), `checkParamName`, `withParamValue`, `effectiveTopN`, `paramTypeFor`, `cleanParameter` |
 | `Dashboard/hierarchy-model.js` | pure (T03-29): `checkHierarchyName`, `checkLevels` (2–6, one table, no calc / cast), `checkHierarchy`, `cleanHierarchies` (import clean-up), `hierarchyStatus` (dangling columns), `drillFromHierarchy` (→ `sheet.drill`), `CAST_REFUSAL` |
 | `Dashboard/hierarchy-group.js` / `hierarchy-dialog.js` | T03-29: the field pane's Hierarchies group (chips, `HIERARCHY_MIME` drag, plus button) and the Hierarchies dialog; `store.js` holds `hierarchies` + `setHierarchies` / `addHierarchy` / `updateHierarchy` / `removeHierarchy` (`hierarchies:changed`) |
@@ -104,7 +107,8 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Core/validate.js` | pure input parsers (`host`, `port`, `text`, `number`, `dateTime`, `filterValue`, `range`, `percent`, with `isFraction` / `percentLabel` for the percentile fraction) returning `{ ok, value }` or `{ ok:false, error }`, plus `LIMITS` and `HOST_MESSAGES` — mirror of the server's `ApiLimits` / `RequestRules` |
 | `Core/sheet-schema.js` | pure: the allowed values for a saved sheet (chart types, categories, filter ops, formats, Top-N) |
 | `Core/icons.js` | the inline-SVG icon set — `icon(name, {size, label})`, `PATHS`, `ICON_NAMES` |
-| `Core/menu.js` | `wireMenu(button, list)` — keyboard-operable popover menu (`menuitem` / `menuitemradio` items); animated open/close via `motion.js` |
+| `Core/menu.js` | `wireMenu(button, list)` — keyboard-operable popover menu (`menuitem` / `menuitemradio` items); `openContextMenu` / `wireContextMenu` — the context popup (right-click, ContextMenu key, `Shift+F10`, `Enter`); animated open/close via `motion.js` |
+| `Core/context-menu-model.js` | pure: `placeMenu` (keep a popup in the viewport), `opensContext` (which keydown opens it), `nextFocus` |
 | `Core/motion.js` | `enter` / `exit` (WAAPI, opacity + transform, Fluent timing) and `reducedMotion()`; no-ops under reduced motion — [motion-accessibility.md](../design/motion-accessibility.md#motion) |
 | `Core/resizer.js` | `wireResizer(handle, …)` — drag / arrow-key width handle (`role="separator"`) used by the sidebar and the field pane; pure `clampWidth` |
 | `Core/store.js` | shared model + the ordered worksheet / dashboard tabs + active view + event bus — [data-model.md](data-model.md#client-side--featurescorestorejs) |
@@ -119,7 +123,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 - **Cross-feature calls:** the Workbook feature rebuilds the model through `canvas.addEntity` /
   `canvas.clearModel` and `relations.restoreRelationship` — exported functions, not DOM reach-ins.
 - **Pure modules** (`query-runner.js`, `sheet-plan.js`, `result-model.js`, `grid-model.js`, `notices.js`, `workbook-model.js`, `board-model.js`, `validate.js`, `sheet-schema.js`,
-  `filter-rules.js`, `show-me-rules.js`, `toolbar-rules.js`, `contrast.js`, `relation-rules.js`, `table-filter.js`,
+  `filter-rules.js`, `show-me-rules.js`, `toolbar-rules.js`, `pill-options.js`, `fields-pane-model.js`, `context-menu-model.js`, `contrast.js`, `relation-rules.js`, `table-filter.js`,
   `connection-rules.js`, `empty-state.js`, `api.js`'s `basePathFrom`) hold the testable logic and never
   touch the DOM; they run under `node --test` ([development.md](../operations/development.md#test)).
 - **Document events:** `connection:changed` (connection.js → schema.js, workbook.js), `table:add` `{db, table}`

@@ -6,9 +6,9 @@ encodings in [worksheet-encodings.md](worksheet-encodings.md).
 ## Chart types
 
 Picked from the view bar's **Chart** picker (`CHART_TYPES` in `Dashboard/viewbar-model.js`, 23 types) or from
-[Show Me](#show-me). An invalid field mapping shows a friendly **hint**, never an error — the rules live in
+[the chart-type control](#chart-type-control). An invalid field mapping shows a friendly **hint**, never an error — the rules live in
 `Dashboard/show-me-rules.js` (`CHART_NEEDS` / `chartIssue()`, e.g. "A point chart plots two measures (X and
-Y) — add a second measure"), shared with Show Me so the two never disagree.
+Y) — add a second measure"), shared with the chart-type menu so the two never disagree.
 
 | Type | Needs | Notes |
 |---|---|---|
@@ -46,35 +46,20 @@ aren't click-to-filter targets.
 No dimensions at all → KPI tiles. Scatter/combo/stacked read the first two measure pills — a shelf
 already holds any number of measures, so there is no separate 2nd-measure shelf.
 
-## Show Me
+## Chart type control
 
-The view bar's **Show Me** button (beside the Chart picker) opens a card — one card at a time with Format /
-Analytics — listing every chart type for the fields **already on the sheet** (no field selection). Rules:
-`Dashboard/show-me-rules.js` (pure, unit-tested); counts per candidate type: `showMeCounts` in `dashboards.js`.
+One control picks the chart type: the view bar's picker (icon + name, e.g. **KPI**) opens a two-column menu of every type. Show Me's cues are folded into it
+(rules: `Dashboard/show-me-rules.js`, pure, unit-tested; counts per candidate type: `showMeCounts` in `dashboards.js`), for the fields **already on the sheet**:
 
-- **Greyed** tile (`aria-disabled`, still focusable): the type can't draw these fields; the reason is its
-  tooltip, and activating it writes the reason to the card's status line. Checked in order, first hit wins:
+- A type the fields can't draw is **dimmed** with the reason as its tooltip (still pickable — the chart then shows the hint). First hit wins:
   Min/Max of a text or date value → only Table / Text / KPI; a discrete Colour split on bar / stacked /
   line / area needs exactly one measure — and with one it is valid, since the split renders before the rule
   table; histogram / box plot need a numeric field; then `CHART_NEEDS`.
-- **Recommended** tile: accent outline + "Recommended" text, only if valid and Columns / Rows aren't empty. From the dimensions on Columns /
+- The **best fit** carries the Show Me icon (tooltip "Best fit for these fields"), only if valid and Columns / Rows aren't empty. From the dimensions on Columns /
   Rows (plus a drill level) — encodings don't steer it: none → nothing; text Min/Max → Table; ≥ 3 dims →
   Table; 0 dims → Scatter at 2 measures, else KPI; a date dimension → Line; 1 dim → Bar; 2 dims + 1
   measure → Heatmap; otherwise Table.
-- **Current** tile: pressed, with a check icon. No fields → "Add fields to Columns or Rows to see
-  suggestions."; Esc closes the card and returns focus to the button.
-- **A click** sets the type and re-lays **only Columns / Rows** (`placeFor`) in one commit — one undo step;
-  re-picking a layout already in place commits nothing. Dimensions keep group-by order (Rows, then
-  Columns); measures keep series order; no pill is added or dropped.
-
-| Family | Types | Columns | Rows |
-|---|---|---|---|
-| Horizontal bars (kept when only Rows has dims) | bar, stacked | measures | dimensions |
-| Category × measure | bar, stacked, waterfall, funnel, bullet, kpi, pie, donut, treemap, gauge, histogram, boxplot | dimensions | measures |
-| Time series | line, area, combo | dimensions, dates first | measures |
-| Measure × measure | scatter, square, circle | dimensions, then measure 1 | the other measures |
-| Two dimensions | heatmap, sankey, multiples | the other dimensions, then measures | the first dimension |
-| Text table | table, text | measures | dimensions |
+- The current type is ticked. Picking sets the type in one commit (one undo step); Columns / Rows stay where they are.
 
 ## Analytics (P21)
 

@@ -76,15 +76,13 @@ Data controls sit in the glass header; view controls sit on the chart card they 
 ([features/worksheet.md](../features/worksheet.md#layout)):
 
 1. **Data header** (`.ws-shelves`, glass) — **Columns**, **Rows** and **Marks** lanes, each a fixed
-   label column + zone (`72px 1fr`) so every lane starts at the same x. Pills are 24px (16px inner
-   controls), so a filled lane stays as tall as an empty one. The Marks lane holds the encodings
-   toolbar (`.ws-toolbar`: a visible row of icon+text tools plus **More** —
-   [which tools show where](../features/worksheet-encodings.md#encodings-toolbar)); a tool's box starts
-   on the zones' edge. One editor panel (`.ws-toolpanel`) opens under the lanes at a time.
+   label column + zone (`72px 1fr`) so every lane starts at the same x. Pills are 24px, so a filled lane
+   stays as tall as an empty one. The Marks slots sit in the field pane
+   ([Marks slots](../features/worksheet-encodings.md#marks-slots)); one editor panel (`.ws-toolpanel`) opens under the lanes at a time.
 2. **Chart card** (`.ws-chart-card`, solid) — a head (`.ws-chart-head`) with the **view bar**
-   (`.ws-viewbar`): the chart-type picker and undo / redo on the left; the sort picker and a tight icon group
+   (`.ws-viewbar`): the field-pane toggle, the chart-type picker and undo / redo on the left; the sort picker and a tight icon group
    (**Format** · **Analytics** · **Export** · **Refresh** · **⋯ sheet actions** · **Full screen**, 4px apart) on the right. Then the Format card when open, the
-   result notice, and the chart pane. The card isn't overflow-clipped, so its menus can extend past it.
+   result notice, and the chart pane. The card has no margin or radius and isn't overflow-clipped, so its menus can extend past it.
 
 **Pickers** (`.ws-pick`) are ghost buttons whose label *is* the current value — no field captions:
 chart type shows its icon + name (`▮ Bar ⌄`) and opens a two-column grid of every type; sort shows
@@ -149,3 +147,7 @@ import / restore issue reports.
 `.menu__list`, `.menu__item`) into a keyboard-operable popover: click toggles it, arrow keys move focus,
 `Esc` / outside click / focus leaving / choosing an item close it, and opening one menu closes the
 others. Visibility is the `hidden` attribute.
+
+The **context popup** (`openContextMenu` / `wireContextMenu`) is the same list with no button: it opens at the pointer on right-click, or under the element on the
+ContextMenu key, `Shift+F10` or `Enter`; it sits on `<body>` (`.ctx-menu`, fixed, kept inside the viewport), holds items, radio / tick rows and custom rows (a filter's value editor),
+and `Esc`, `Tab`, an outside click, scroll or resize close it (`Esc` returns focus to the element).

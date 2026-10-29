@@ -6,27 +6,16 @@ query and the bound-parameter filter path — no encoding adds a server query sh
 Base worksheet: [worksheet.md](worksheet.md). State shapes:
 [data-model.md](../reference/data-model.md#marks-pages-selection-drill).
 
-## Encodings toolbar
+## Marks slots
 
-One wrapping row of compact **icon + text** buttons (`buildTools` / `toolButton`, `.ws-toolbar`) plus a
-**More** menu. `visibleTools(chartType, tools)` (`Dashboard/toolbar-rules.js`, pure) decides where each
-tool sits:
+The Marks group of the field pane (after Hierarchies; `.ws-shelf--marks`, collapsible like the others) is a grid of **three columns** of slots — Color, Size, Label, Detail,
+Tooltip, Shape, Path, Angle, Filters, Date range, Drill, Pages (`buildTools` / `toolButton`; `markGrid` in `Dashboard/pill-options.js` chunks them into rows of three).
+Every tool is always reachable (there is no More menu): `visibleTools(chartType, tools)` (`Dashboard/toolbar-rules.js`, pure) only decides which are **quiet** — the
+tools the chart type doesn't use (Size / Shape: scatter, square, circle; Path: line, area; Angle: pie, donut; Detail, Drill, Pages by default) are dimmed unless they hold fields.
+Icons come from `Core/icons.js`.
 
-| Tool | In the visible row when | Otherwise |
-|---|---|---|
-| Filters, Date range, Color, Label, Tooltip | always | — |
-| Size, Shape | chart type is `scatter`, `square` or `circle` | More |
-| Path | `line` or `area` | More |
-| Angle | `pie` or `donut` | More |
-| Detail, Drill, Pages | never by default | More |
-
-**In-use override:** a tool that holds fields (count > 0) is always in the visible row with its count
-badge, whatever the chart type — no state hides behind More. Choosing a tool from More opens its
-editor like any other tool. Icons come from `Core/icons.js`.
-
-Each visible button shows a **count badge** when it holds fields, is a **drop target** (drag a field straight
-onto it), and on click opens **one** editor panel (`toolPanel`, `.ws-toolpanel`) with its pills over a
-drop zone. At most one editor is open at a time.
+A slot is an icon over its name, shows a **count badge** when it holds fields, is a **drop target** (drag a field straight onto it), and on click opens **one**
+editor panel (`toolPanel`, `.ws-toolpanel`, in the data header) with its pills over a drop zone. At most one editor is open at a time.
 
 ## Marks
 
@@ -91,7 +80,7 @@ by the server's `FilterValues.Coerce`):
 | compound / other | can't be filtered |
 
 A value that doesn't fit makes the pill **invalid** (dashed border, warning icon, tooltip) with the
-reason inline in the filter editor ("'abc' is not a number for column amount."); an inverted range says
+reason inline in the filter's value editor (in its context popup) ("'abc' is not a number for column amount."); an inverted range says
 "From must be less than or equal to To". An invalid filter is **not applied** — it is never sent.
 An empty `in` / `not in` or a blank filter is a no-op (never `IN ()`); a half-filled range is invalid. When the
 distinct list has more than 200 values the editor says "Showing the first 200 values — more exist."
@@ -113,9 +102,9 @@ card: a **checkbox list** for `in` / `not in` (the bounded distinct values; a `n
 and the Filters tool edit the same objects, so they always agree; ⋯ → **Show filter cards** hides them
 (`sheet.showFilterCards`). The operator list follows the field type (`opsFor`).
 
-**Shared filters** (P40). A filter pill's **link** button moves it to the workbook's shared list
+**Shared filters** (P40). A filter's **Apply on every dashboard** tick (its context popup) moves it to the workbook's shared list
 (`sharedFilters`, at most **4**) — it then shows on every dashboard's Filters tool with an **All
-dashboards** badge, and editing it anywhere changes it everywhere; the link button again moves it back to
+dashboards** badge, and editing it anywhere changes it everywhere; unticking moves it back to
 this dashboard. A shared filter applies wherever **its table is already in the view** (it never forces a
 join); where it isn't, the tool and the chart card's info line say so ("customers.country: shared, but not
 applied here — its table isn't in this view."). Histogram and box plot don't apply shared filters.
@@ -178,7 +167,7 @@ dialog (`Dashboard/hierarchy-dialog.js`) — a name, a table, and an ordered lev
 per-level **Up / Down / Remove** buttons (labelled, keyboard-operable; focus stays on the control just used), plus
 Edit / Delete (Delete confirms). Each hierarchy is a chip with its level count.
 
-Dragging a chip onto the **Drill** tool (its button, its open panel, or **More** while Drill is empty) — or its plus button —
+Dragging a chip onto the **Drill** tool (its slot or its open panel) — or its plus button —
 **replaces the sheet's drill** with `{ levels, depth: 0, path: [] }`, the structure a hand-built drill has (each level carries
 its column's category), so the chart, breadcrumb and click-to-drill behave identically. The sheet gets a **copy** of the levels:
 renaming, editing or deleting the hierarchy later never changes a sheet that already used it. A chip whose table isn't in the

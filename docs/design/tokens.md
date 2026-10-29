@@ -59,7 +59,7 @@ multi-layer `background` shorthand — the whole declaration would be dropped).
 | `--ctl-edge` | `#8f8487` | `#7d7377` | outline of a control on glass — ≥ 3:1 against the panel and the control fill (WCAG 1.4.11) |
 
 **Where glass is allowed — only where nothing but the wash is beneath it:** the sidebar, the tab bar
-(`.canvas__bar`) and the worksheet header (`.ws-shelves`). **Never** on menus, popovers (More, Export),
+(`.canvas__bar`) and the worksheet header (`.ws-shelves`). **Never** on menus, popovers (Export, the context popup),
 toasts or dialogs: they float over content, and blurred text behind would read through the text on top.
 The tint stays ≥ 70 % so text on glass keeps AA contrast whatever the wash does beneath it. No
 `backdrop-filter`, or `prefers-reduced-transparency: reduce` → `--glass` becomes the opaque `--surface-2`

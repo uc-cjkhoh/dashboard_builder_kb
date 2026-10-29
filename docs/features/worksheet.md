@@ -12,10 +12,9 @@ and a view that renders the result. Code: `Features/Dashboard/` (`dashboards.js`
 
 Data on top, view controls on the chart ([design/layout.md](../design/layout.md#worksheet--data-header-and-chart-card)):
 
-1. **Data header** — **Columns** and **Rows** shelves (full-width lanes, always visible), then the
-   **Marks** lane: a visible row of encodings plus a **More** menu — Color, Size, Label, Detail,
-   Tooltip, Shape, Path, Angle, Filters, Drill, Pages ([worksheet-encodings.md](worksheet-encodings.md#encodings-toolbar)).
-2. **Chart card** — its head is the **view bar**: chart-type picker (`chartTypePicker`) · sort picker ·
+1. **Data header** — **Columns** and **Rows** shelves (full-width lanes, always visible) and the open
+   Marks editor panel. The Marks slots themselves live in the field pane ([worksheet-encodings.md](worksheet-encodings.md#marks-slots)).
+2. **Chart card** (flush: no margin, no radius) — its head is the **view bar**: field-pane toggle · the one chart-type control (`chartTypePicker`, [worksheet-charts.md](worksheet-charts.md#chart-type-control)) · sort picker ·
    Format · Export · Refresh · **Full screen** (icon buttons with tooltips and `aria-label`s); then the
    Format card, the result notice and the chart. Full screen, print and the phone layout:
    [layout.md](../design/layout.md#phone-layout--640px).
@@ -28,28 +27,29 @@ Data on top, view controls on the chart ([design/layout.md](../design/layout.md#
 - **Sheet actions** (⋯ in the view bar): **Swap Rows and Columns**, **Clear sheet…** (confirm; keeps the
   chart type; Undo restores), **Fit** — Standard (a slot per category, the pane scrolls), Fit width, Fit
   height, Entire view (the fitted axis shares the pane; its labels thin out) — and **Show title and
-  caption**.
-- **Title and caption** under the view bar: click to edit, `Enter` saves, `Esc` cancels; empty = the
-  automatic one (the tab name; "sum amount by customers.name · 2 filters", in italics). Printed too.
+  caption** / **Show filter cards**. Fit and the two toggles carry only a tick at the end of the row
+  (radio-style for Fit); no icon, no extra text.
+- **Title and caption** under the view bar: click to edit, `Enter` saves, `Esc` cancels; empty = the automatic one (the tab name; "sum amount by customers.name · 2 filters"). Printed too.
 - **Status bar** at the foot of the chart card: marks · rows × columns (Table / Text) · measures · the
   selection · `Updated hh:mm:ss`, when the data was last read from ClickHouse (a cached result keeps the time it
   was fetched; `fetchCached` stamps `queriedAt`).
-- **Print header** (`beginPrint`): title, caption, date range, filters, the notice, then each calculated field
-  the view uses (shelves, marks, sheet or applied shared Top-N filters) as `Calculation: Name = formula` (also those it refers to; formulas cut at 200 characters,
-  `data-notes.js`), the update time and the print time.
+- **Print header** (`beginPrint`): title, caption, date range, filters, the notice, each calculated field the view uses as
+  `Calculation: Name = formula` (also those it refers to; cut at 200 characters, `data-notes.js`), the update time and the print time.
 
-Beside them, the **field pane** (drag its right edge, or `←`/`→` on the handle, to resize it) lists each model table as a collapsible group (`<details>`, open by
-default) with small **Dimensions** / **Measures** labels inside; each field shows a type icon (text,
-number, date, bool) rather than a coloured letter.
+Beside them, the **field pane** (drag its right edge, or `←`/`→` on the handle, to resize it) holds, top to bottom: the search box, **Calculated fields**, **Hierarchies**,
+**Marks**, then each model table. All of these are one collapsible group design (`field-group.js`: `<details class="ws-group">`, chevron + bold name, 4px between
+rows, 8px between groups; collapsed groups survive a pane rebuild); tables list small **Dimensions** / **Measures** labels inside, each field with a type icon (text,
+number, date, bool). The first button of the view bar hides / shows the pane (the worksheet takes the room; `aria-expanded`, remembered in
+`localStorage` as `dashboardbuilder.fields.collapsed`, like the sidebar rail; on a phone the pane keeps its own **Fields** overlay).
 
 **Field pane basics** (P28): a **search** box at the top filters fields by column or display name
-(non-matches get `hidden`); each field's **⋯** menu offers **Rename…** (inline, 1–60 characters — a
+(non-matches get `hidden`); a field's **context popup** (right-click, the ContextMenu key, `Shift+F10`, or `Enter` on the focused row — the same for every pill and field row below; `Core/menu.js` `openContextMenu`) offers **Rename…** (inline, 1–60 characters — a
 *display name* shown on the field, pills, axes, legends, table headers and the sort picker; the query always
 uses the real, catalog-validated column; renamed fields read in italics), **Default aggregation** (numeric
 fields: the aggregation a new measure pill starts with) and **Hide from the field list** (with a **Show
-hidden (n)** toggle). **Copy name** (T02-28) puts the display name on the clipboard, **Copy column name** the real column when renamed; a calculated field's menu also has **Copy formula** (not for a group). Settings are per workbook (`fields` in the file; store `fieldMeta`).
+hidden (n)** toggle). **Copy name** (T02-28) puts the display name on the clipboard, **Copy column name** the real column when renamed; a calculated field's popup also has **Copy formula** (not for a group). Settings are per workbook (`fields` in the file; store `fieldMeta`).
 
-**Data type cast** (T02-34): the ⋯ menu also has **Data type** — *Original*, or the casts that make sense
+**Data type cast** (T02-34): the popup also has **Data type** — *Original*, or the casts that make sense
 for the column: text → Number / Date, number or date → Text, boolean → Text / Number, anything else → Text
 (`castChoices`; the setting is `cast`: `text` | `number` | `date`). The server converts in the query, so the
 field groups, aggregates, filters and ranks (Top-N) as its new type; a value that doesn't fit becomes empty
@@ -110,24 +110,25 @@ to Columns).
   measure order sets series order.
 - **Invariant: measures always sit behind dimensions** on a shelf — `normaliseShelf` re-sorts after
   every drop, role change or add, keeping relative order within each group.
-- **Role** defaults from type (numeric → measure, else dimension) and is convertible per pill: `Σ`
-  turns a dimension into a measure, `#` a measure into a dimension. `roleOf(f)` resolves it.
-- **Aggregation** dropdown on measure pills offers only what the column's type supports
+- **Pill options** are not inline: right-click a pill (or focus it and press `Enter` / the ContextMenu key / `Shift+F10`) for its **context popup**
+  (`Dashboard/pill-options.js` lists what each pill offers; `Esc` closes and refocuses the pill): aggregation radios (a measure), **Use as dimension / measure**, **Table calculation…**
+  (opens its editor), the date part radios with **Finer** / **Coarser** and the **Show all date labels** tick (a date dimension), **Field choices…**, and for a filter its
+  operator radios, **Apply on every dashboard** and the value editor. The pill shows only its name (a filter: name, operator and value), the cast tag, and Remove.
+- **Role** defaults from type (numeric → measure, else dimension) and is convertible per pill from its popup. `roleOf(f)` resolves it.
+- **Aggregation** radios in a measure pill's popup offer only what the column's type supports
   (`aggsFor` in `filter-rules.js`): `sum/avg/min/max/median/percentile/stddev/variance/count/countDistinct/countNonNull/attr`
   for numbers; `count/countDistinct/countNonNull/min/max/attr` for text **and dates**;
   `count/countDistinct/countNonNull` otherwise (boolean, compound). `countDistinct` maps to ClickHouse `uniqExact`;
   `median` interpolates between the two middle values (like Excel `PERCENTILE.INC`), `stddev` / `variance` the sample statistics (empty for one value), `attr`
   the single value of a group or empty ([calculated-fields.md](calculated-fields.md#formulas)).
   **Percentile** (numeric fields only; a text column cast to a number counts, uncast text is refused as for `median`): choosing
-  `Percentile…` in the pill's menu adds a percent box (labelled "Percentile for …, 0 to 100"; an integer or decimal with up to six
+  `Percentile…` in the pill's popup adds a percent box (inside the popup) (labelled "Percentile for …, 0 to 100"; an integer or decimal with up to six
   decimals, starts at 90). The pill keeps the fraction as `p` (0..1; 99.5 is `0.995`), is named `orders.amount · p90`, and the measure
   is labelled `p90 amount` everywhere (chart, table, CSV, Top-N and sort choices; `p99.5 amount`). A value outside 0–100 shows the
   message ("Percentile must be between 0 and 100 percent.", warning icon, `aria-invalid`) and is never stored or sent: the view keeps
-  the last good percentile. Two percentiles of one field (p25 and p75) are separate measures. Leaving percentile drops `p`.
-  Percentile is **not** in a field's default-aggregation menu (a default would need a default fraction). A calculated pill keeps
-  its own list (use `PERCENTILE([f], p)` in the formula). Changing a pill's role to a type that
-  doesn't support its aggregation resets it and says so. The server rejects `sum` / `avg` on a
-  non-numeric column with a 400.
+  the last good percentile. Two percentiles of one field are separate measures; leaving percentile drops `p`. Percentile is **not** in a field's
+  default-aggregation menu. A calculated pill keeps its own list (use `PERCENTILE([f], p)`). Changing a pill's role to a type that
+  doesn't support its aggregation resets it and says so. The server rejects `sum` / `avg` on a non-numeric column with a 400.
 - Pill tints: dimension blue (`--dim-*`), measure teal (`--meas-*`), Marks encodings violet (`--enc-*`).
   A pill whose settings can't be sent (a filter with an unparseable value, a column that is no longer
   in the catalog) is **invalid**: dashed `--danger-line` border, warning icon and a tooltip with the

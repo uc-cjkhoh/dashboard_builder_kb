@@ -22,7 +22,7 @@ area, the crosstab and every overlay stay solid so text is never read through ot
 [D22](docs/reference/decisions.md#d22--fluent-glass-design-language)).
 
 **Progressive disclosure:** a first-time user sees the few controls that matter; the rest appears when
-relevant (the connection form's Advanced section, the encodings **More** menu, the Workbook menu,
+relevant (the connection form's Advanced section, the Workbook menu,
 collapsible field groups). Nothing is removed — an encoding that holds fields is always shown.
 
 ## Rules that never bend
