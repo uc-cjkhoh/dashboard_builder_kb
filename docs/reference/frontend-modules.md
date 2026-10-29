@@ -13,6 +13,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Shell/scheme-toggle.js` | the tab bar's appearance toggle: System / Light / Dark radio menu (`Core/menu.js`), glyph + label follow the choice |
 | `Shell/sidebar.js` | resizable sidebar (`Core/resizer.js` handle → `--sidebar-w`, capped at 30vw) + collapse-to-rail toggle (remembered in `localStorage`); exports `expandSidebar()` |
 | `Connection/connection.js` | connection form, summary, pill, gating — [connection.md](../features/connection.md) |
+| `Connection/recent-sources.js` | pure: `remember` / `forget` / `sanitize` recent connection sources (host, port, user, TLS flags — never a password), most recent first, max 5 |
 | `Connection/connection-rules.js` | pure: `advancedShouldOpen` (the Advanced section opens when TLS is off or the cert opt-in is on) |
 | `Schema/schema.js` | database `<select>`, table search, table chips + drag payload — [schema-browser.md](../features/schema-browser.md) |
 | `Dashboard/field-copy-model.js` | `fieldCopies(field)`: the Copy items on a worksheet field's ⋯ menu (name, column name, formula) |

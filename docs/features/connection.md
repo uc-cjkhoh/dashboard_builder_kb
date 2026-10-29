@@ -26,6 +26,16 @@ The section opens by itself when TLS is off or the certificate opt-in is on
 Inputs are read by element id (`conn-host`, `conn-port`, `conn-user`, `conn-password`, `conn-secure`,
 `conn-allowcert`), not `form.host` named access.
 
+## Recent connections
+
+After each successful connect the source (host, port, user, Secure, cert opt-in) is remembered in this
+browser (`localStorage` key `dashboardbuilder.recent-sources`, most recent first, max 5, one per
+host/port/user). **The password is never stored** (golden rule 4) — `recent-sources.js` copies only
+those fields and `sanitize` drops anything else on load. While the form is open the list (`#conn-recent`)
+sits above it; it is hidden when there are none or while the summary shows. Picking one refills the
+fields (opening Advanced if needed), clears the password and focuses it; the × on a row forgets it.
+Blocked storage just means nothing is remembered.
+
 ## Validation
 
 Submit validates every field with `Core/validate.js` (`host`, `port`, `text`) before any request. A failing
