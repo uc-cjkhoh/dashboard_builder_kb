@@ -35,7 +35,7 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
   (12 widgets, or no free row under the 96-row limit) a danger toast says so ("A dashboard holds at most 12 widgets." / "The
   dashboard is full — …") and nothing is added. A worksheet may be added more than once. The new widget scrolls into view.
 - **Add image** takes a PNG, JPEG, GIF or WebP file (`image-model.js`: `validateImageFile`, `isImageSrc`) — at most 256 KB, at most 4 images per
-  dashboard; anything else (SVG, another type, empty, too big, a fifth image) toasts the reason and adds nothing. The picture is read
+  dashboard and 2 MB of pictures in the whole workbook (also enforced on import, which drops what no longer fits); anything else (SVG, another type, empty, too big, a fifth image) toasts the reason and adds nothing. The picture is read
   as a data URL and **saved inside the workbook** (autosave and export), so it is self-contained: there is no upload to the server and no
   remote-URL image (a link would fetch from a third party each time the board opens and break offline — [D71](../reference/decisions-dashboards.md#d71--dashboard-images-are-workbook-data-urls-not-links)). **Add spacer** adds a blank 2 × 1 block.
 - A text widget starts with the heading "Text" and no body; a text widget is 12 × 2 by default and may be resized down to 1 row.

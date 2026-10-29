@@ -37,7 +37,7 @@ matching whatever you're touching.
 | [reference/clickhouse-integration.md](reference/clickhouse-integration.md) | Driver, TLS, the exact SQL, identifier safety, type mapping |
 | [reference/data-model.md](reference/data-model.md) | Server and client state shapes, incl. the worksheet `sheet` |
 | [reference/frontend-modules.md](reference/frontend-modules.md) | Module map, wiring, event bus, `api.js` / `ui.js` helpers |
-| [reference/decisions.md](reference/decisions.md) | Decisions D1–D25 with rationale; [connection D70](reference/decisions-connection.md); [calculated fields D26–D60 and D65–D66](reference/decisions-calculated-fields.md); [dashboards D61–D64](reference/decisions-dashboards.md); open questions |
+| [reference/decisions.md](reference/decisions.md) | Decisions D1–D25 with rationale; [connection D70](reference/decisions-connection.md); [calculated fields D26–D60 and D65–D66](reference/decisions-calculated-fields.md); [dashboards D61–D64, D71–D72](reference/decisions-dashboards.md); open questions |
 | [reference/glossary.md](reference/glossary.md) | Domain terms |
 
 ## operations/ — build, run, deploy
