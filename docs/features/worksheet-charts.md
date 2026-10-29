@@ -85,8 +85,8 @@ unit-tested); over a cut-off result the info line says "Analytics use only the r
 On Bar / Line / Area the card opens with a row of **items** — Reference line, Band, Trend line (and Forecast
 on Line / Area). **Drag** an item onto the chart, or **press** its button (keyboard): it switches on at a default
 (Average, Mean ± 1σ, Linear, 3 steps) and the selects below show and edit it. An item already on is shown
-pressed; pressing it again switches it off, and a drop on an item already on changes nothing. A drop is
-accepted only while the card is open (`analyticsDrop`). Items and defaults are `itemsFor` / `addItem` /
+pressed with a check after its label (each item has its own icon); pressing it again switches it off, and a drop on an item already on changes nothing. A drop is
+accepted only while the card is open (`analyticsDrop`). Focus returns to the pressed item after the re-render. Items and defaults are `itemsFor` / `addItem` /
 `removeItem` in `analytics-model.js`; the saved `sheet.analytics` shape is unchanged.
 
 - **Bar / Line / Area**: a **reference line** — Average, Median, Minimum, Maximum or a Constant — drawn
