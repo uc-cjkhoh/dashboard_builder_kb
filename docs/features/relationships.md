@@ -9,8 +9,17 @@ Code: `Features/Relations/` (`relations.js`, `relation-rules.js`, `relations.css
 
 1. Tick a join key on entity A and on entity B ([canvas.md](canvas.md#join-keys)). Each checked key
    shows a `.rel-connector` handle.
-2. Click A's handle, then a key handle on B. (No drag — this path is also the keyboard path.)
+2. Click A's handle, then a key handle on B. (This path is also the keyboard path.)
 3. The link is checked first (below); if it passes, pick the **cardinality** — `1:1 | 1:N | N:1 | N:M` — in a `<dialog>` (`.card-choice`).
+
+## Drawing a link — drag a column
+
+Drag any column row (`.col-row`, `draggable`; payload MIME `application/x-ch-column`) and drop it on a row of
+another card. The row under the pointer takes a solid accent outline when the link is allowed and a dashed
+muted outline (drop effect none) when it isn't; the dragged row dims. A refused drop toasts the same reason
+as a click. An allowed drop opens the same join + cardinality dialog; picking a cardinality ticks both
+columns as join keys and draws the link (cancelling changes nothing). `link-drag.js` (pure) holds the
+payload parse and `dropDecision()`, which reuses `linkProblem()`.
 
 ## What may be linked
 

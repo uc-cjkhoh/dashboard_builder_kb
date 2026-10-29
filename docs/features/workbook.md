@@ -124,6 +124,7 @@ naming the sheet and field ("Sheet "Sales": unknown chart type "radar" — reset
 | Title / caption | text ≤ 80 / ≤ 300 or null; `showTitle` a boolean; `format.fit` standard / width / height / entire |
 | Table calculation | a known type, `along` auto / columns / rows / custom, `window` an integer 2–30, `using` (custom only) up to 16 distinct dimension indexes 0–15; else removed and reported |
 | Date part | a known part on a date pill only; else reset to Auto and reported |
+| Date labels | `all` or `thin` on a date pill only (absent = thin); else reset and reported |
 | Field choices | each a full field (db / table / column / category); ≤ 8; the shown field is added if missing; fewer than 2 → dropped |
 | Parameters | ≤ 20; id `prm<n>`, a name, a known type; allowed list / range checked; a value outside them reset and reported. A filter or Top N pointing at a parameter the file doesn't have is unlinked and reported |
 | Hierarchies | ≤ 20; id `hier<n>` unique, a unique name of 1–60 characters, ≥ 2 levels of `{ db, table, column }` strings from one table; a calculated, repeated or other-table level is removed and reported, levels past 6 cut; fewer than 2 left, a bad entry, a duplicate id / name, or a table that isn't among the file's tables skips that hierarchy and reports it; a non-list means none are opened (`cleanHierarchies`) |

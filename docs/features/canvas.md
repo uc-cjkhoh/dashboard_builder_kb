@@ -44,7 +44,9 @@ first — `expandSidebar()`, [layout.md](../design/layout.md#sidebar)):
 ## Card anatomy
 
 - **Head** (`.entity__head`): the table name (600) with the database muted before it, a collapse caret,
-  a remove icon.
+  a remove icon. The card width follows the `db.table` text, from `--entity-min` (300px) to `--entity-max`
+  (480px) on `#model-view` (`card-width.js`, pure); beyond the maximum the name ellipsises (full name in its
+  `title`). Link anchors read the measured card box, so any width stays correct.
 - **Column rows** (`.col-row`): a **type icon** (number / text / date / bool), name, a **type badge**
   (`.col-row__type`, from the type category), and a **join-key checkbox** (`.col-row__key`); ticked key
   columns show the key icon.

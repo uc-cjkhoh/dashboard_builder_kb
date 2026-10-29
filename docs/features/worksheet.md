@@ -98,7 +98,7 @@ to Columns).
   no hour parts). Keys read as "2024", "2024 Q3", "Mar 2024", "Week of 2024-03-04", "Mon", "Q2", "09:00"
   (`Dashboard/date-parts.js`). A part-grouped axis isn't click-filterable. A new date pill stays on
   **Auto** (not Tableau's Year default, which would collapse a month of data to one point). Saved on the
-  pill (`datePart`); the server maps it to one whitelisted function.
+  pill (`datePart`; the server maps it to one whitelisted function). An **eye** toggle beside the picker sets the axis labels: **Thin out** (default; the date axis fits the pane and labels thin out) or **Show all** (a slot and label per date; saved as `dateLabels`; `Dashboard/date-labels.js`).
 - **Field choices** (P40): a pill's **⇄** button opens a *Choices* editor — drop up to 8 fields there
   (the shown one included). The chart card then shows a **"Columns: show" / "Rows: show"** switcher per
   such slot, under the view bar; picking a field swaps it into the slot (same role; a measure keeps its
