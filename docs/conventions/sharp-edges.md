@@ -23,6 +23,10 @@ Gotchas that have bitten (or will bite) this app. Read before touching the area 
   "server returned compressed result but HttpClient did not decompress it".
 - **Two connections, same server, different databases is normal.** Scope every query to the
   connection + database the request names, never a global default.
+- **A ClickHouse `JOIN … ON a = b` never matches NULL keys** (verified: `NULL = NULL` joins 0 rows), so a
+  Nullable group dimension drops out of the box-plot fence join. Join on `(ifNull(toString(k), ''), isNull(k))`
+  instead. And alias every helper column `__bx_*` (or similar): a `WHERE` inside the same subquery resolves a
+  user column named like an alias (`v`, `label`) to the alias, filtering different rows.
 
 ## Hosting & deploy
 
