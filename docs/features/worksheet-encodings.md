@@ -249,6 +249,13 @@ panel says so. Rules: `Dashboard/period-model.js` (unit-tested).
   cleared on import and reported. An unpinned heatmap uses its plain data span. Reverse palette still swaps the ramp's ends. Table cell scales have their own
   conditional-formatting colours and are unaffected. Pure logic: `Dashboard/colour-scale-model.js`
   (`RAMP_CHOICES`, `rampColours`, `mixHex`, `colourRangeError`, `rangeOf`).
+- **Table look** (T01-23, Format → Align · Row height · Shading, Table and Text views only; stored as
+  `format.tableAlign` `auto` | `left` | `center` | `right`, `tableDensity` `standard` | `compact` | `roomy`,
+  `tableShade` `none` | `banded` | `header` | `both`). Align sets the value cells and measure headers (Auto keeps numbers
+  right); Row height steps cell padding 0 / 4 / 8 px vertically (Roomy also 16 px sideways); Banded shades even body
+  rows and Header the header cells with `--surface-2`. All three are classes on the table (`xt-a-*`, `xt-d-*`,
+  `xt-s-*`, defaults add none); there is no free font, size or colour. Pure logic: `Dashboard/table-style-model.js`
+  (`tableStyleClasses`, `TABLE_*_CHOICES`).
 - Pure logic: `Dashboard/colour-model.js` (`setMemberColor`, `cleanMemberColors`, `colorsByName`,
   `orderedPalette`, `rampStops`, `SWATCHES`).
 

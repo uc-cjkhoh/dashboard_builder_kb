@@ -120,7 +120,7 @@ A widget points at a worksheet by tab id; one worksheet may sit on several dashb
   format: { numberFormat, decimals, currencySymbol, dateFormat, topN, dateBucket, target, downIsGood, conditional, legend,
             dataLabels, colorByDimension, xTitle, yTitle,
             lineStyle, heatmapShape, targetMeasure,
-            syncAxes, secondaryType, markerSize, markBorder, markerShape }
+            syncAxes, secondaryType, markerSize, markBorder, markerShape, tableAlign, tableDensity, tableShade }
 }
 ```
 

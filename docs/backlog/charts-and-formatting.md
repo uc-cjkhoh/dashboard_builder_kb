@@ -22,6 +22,6 @@ Format: [README.md](README.md#how-to-read-an-entry). Chart types are in [workshe
 
 ## Formatting and presentation
 
-- **Worksheet formatting** (IDs: T01-23; priority P1) — partial: number, date, legend, fit and theme; no font, alignment, shading or cell sizes. Needs: none.
+- **Worksheet formatting** (IDs: T01-23; priority P1) — partial: number, date, legend, fit, theme, and a table's alignment, row height and shading are built; missing: font choice (content text is fixed at the 14 / 16 px scale), shading of a chart's background or a chosen header/row colour, per-column alignment and column widths, and chart-view alignment. Needs: none.
 - **PDF export** (IDs: T01-28; priority P1) — partial: export is the browser print dialog on one worksheet; there is no generated PDF. A dashboard prints through the browser too (whole canvas); a generated PDF is not built. Needs: none.
 - **Phone view check** (IDs: T09-16; priority P1) — judged complete from phone and touch CSS alone; it has not been run on a device. Needs: a device run.
