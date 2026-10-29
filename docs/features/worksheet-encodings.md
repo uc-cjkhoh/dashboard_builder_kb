@@ -243,9 +243,10 @@ panel says so. Rules: `Dashboard/period-model.js` (unit-tested).
 - **Continuous colour scale** (T03-19; Format, on Scatter and Heatmap): **Colour ramp** Brand (accent soft → accent),
   Blue, Green, Amber or Violet (the surface blended 20 % toward that categorical token, up to the token) —
   `format.colorRamp`, default `brand`; **Colour from / to** (`format.colorMin` / `colorMax`, blank = the data's own
-  end) pin the ends of the scale, and values outside a pinned end draw in the neutral axis grey while the legend
-  shows the pinned span. A minimum not below the maximum is refused with a toast; a saved one is cleared on import and
-  reported. Reverse palette still swaps the ramp's ends. Table cell scales have their own
+  end) pin the ends of the scale. A value beyond a pinned end takes that end's colour (it saturates; nothing is greyed
+  out), and while a pin is active the legend reads "beyond range: end colour". The controls show on a Heatmap, and on a
+  Scatter only while a numeric field is on Color. A minimum not below the maximum is refused with a toast; a saved one is
+  cleared on import and reported. An unpinned heatmap uses its plain data span. Reverse palette still swaps the ramp's ends. Table cell scales have their own
   conditional-formatting colours and are unaffected. Pure logic: `Dashboard/colour-scale-model.js`
   (`RAMP_CHOICES`, `rampColours`, `mixHex`, `colourRangeError`, `rangeOf`).
 - Pure logic: `Dashboard/colour-model.js` (`setMemberColor`, `cleanMemberColors`, `colorsByName`,
