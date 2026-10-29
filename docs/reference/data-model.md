@@ -120,12 +120,12 @@ A widget points at a worksheet by tab id; one worksheet may sit on several dashb
   format: { numberFormat, decimals, currencySymbol, dateFormat, topN, dateBucket, target, downIsGood, conditional, legend,
             dataLabels, colorByDimension, xTitle, yTitle,
             lineStyle, heatmapShape, targetMeasure,
-            syncAxes, secondaryType, markerSize, markBorder, markerShape, tableAlign, tableDensity, tableShade }
+            syncAxes, dualAxis, secondaryType, markerSize, markBorder, markerShape, tableAlign, tableDensity, tableShade }
 }
 ```
 
 - **Format table settings:** `tableAlign` `auto` | `left` | `center` | `right` (default `auto`), `tableDensity` `standard` | `compact` | `roomy` (default `standard`), `tableShade` `none` | `banded` | `header` | `both` (default `none`); they apply to Table and Text views.
-- **Format chart settings:** `lineStyle` `straight` | `step` | `jump` (default `straight`; `jump` is shown as Step (centred)); `heatmapShape` `square` | `circle` (default `square`); `targetMeasure` null or a shelf-measure index 1–19 (the bullet's target field; null = the fixed `target`). `syncAxes` boolean (default false); `secondaryType` `line` | `bar` | `area` (default `line`); `markerSize` null (automatic) or a whole number 4–40; `markBorder` `none` | `thin` | `thick` (default `none`); `markerShape` `circle` | `square` | `diamond` | `triangle` (default `circle`). A target field that no longer points at a later shelf measure is ignored and cleared when Format opens. An unknown value is reset with a workbook import issue; a workbook without them opens unchanged.
+- **Format chart settings:** `lineStyle` `straight` | `step` | `jump` (default `straight`; `jump` is shown as Step (centred)); `heatmapShape` `square` | `circle` (default `square`); `targetMeasure` null or a shelf-measure index 1–19 (the bullet's target field; null = the fixed `target`). `syncAxes` boolean (default false); `dualAxis` boolean (default false; line / area right axis); `secondaryType` `line` | `bar` | `area` (default `line`); `markerSize` null (automatic) or a whole number 4–40; `markBorder` `none` | `thin` | `thick` (default `none`); `markerShape` `circle` | `square` | `diamond` | `triangle` (default `circle`). A target field that no longer points at a later shelf measure is ignored and cleared when Format opens. An unknown value is reset with a workbook import issue; a workbook without them opens unchanged.
 - **Pill:** `{ db, table, column, category, role?, agg?, datePart?, tableCalc?, choices? }` — `datePart` (P26) on a date dimension, `tableCalc` (P27) `{ type, along, window?, using? }` on a measure, `choices` (P40) the slot's alternative fields. `role` overrides the type default
   (`'dimension'` → `GROUP BY`; `'measure'` → aggregated with `agg` ∈ `aggsFor(category)`:
   `sum/avg/min/max/median/stddev/variance/count/countDistinct/countNonNull/attr` for numbers,
