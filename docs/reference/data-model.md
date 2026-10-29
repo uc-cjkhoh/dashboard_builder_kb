@@ -86,11 +86,13 @@ Tab:     { id: "ws#n", kind: "worksheet", name, sheet }                 one work
        | { id: "db#n", kind: "dashboard", name, widgets: [Widget], size }  a board of widgets; size = null (automatic) | { width, height } px
 Widget:  { id: "w#n", kind: "sheet", sheetId: "ws#n", x, y, w, h }       a worksheet's view
        | { id: "w#n", kind: "text", heading, body, x, y, w, h }          a text block
+       | { id: "w#n", kind: "image", alt, src, x, y, w, h }              a picture; src = a base64 PNG / JPEG / GIF / WebP data URL
+       | { id: "w#n", kind: "spacer", x, y, w, h }                       a blank block
 ```
 
 Tab names are 1–60 characters; a workbook holds at most **50 tabs** of either kind. A dashboard lays widgets on a **12-column snap
 grid** in whole cells with no overlap: `w` 2–12, `h` 2–24 (text 1–24), `y + h` ≤ 96, at most **12 widgets**, text `heading` ≤ 80 and
-`body` ≤ 2000 characters (`LIMITS`, `Core/validate.js`; the rules and the first-free-spot scan are pure, in `Board/board-model.js`).
+`body` ≤ 2000 characters, at most **4 images** per dashboard, each file ≤ 256 KB, `alt` ≤ 120; a spacer is 1–24 rows tall like text (`LIMITS`, `Core/validate.js`; the rules and the first-free-spot scan are pure, in `Board/board-model.js`).
 A widget points at a worksheet by tab id; one worksheet may sit on several dashboards, even twice on one. `store` helpers:
 `worksheets()` / `dashboards()` (the tabs of a kind), `createWorksheet` / `createDashboard` (null at the tab limit),
 `duplicateWorksheet`, `closeTab` (a closed worksheet's widgets leave every dashboard), `updateSheet` (→ `worksheet:changed`),

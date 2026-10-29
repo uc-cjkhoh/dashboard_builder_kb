@@ -1,16 +1,16 @@
 # Dashboards — the board
 
-A dashboard tab (`.tab--dashboard`) composes the workbook's worksheets and text blocks on a 12-column snap grid. Code:
+A dashboard tab (`.tab--dashboard`) composes the workbook's worksheets, text blocks, images and spacers on a 12-column snap grid. Code:
 `Features/Board/` — `board.js` (orchestration, undo / redo, full screen, print), `board-widget.js` (one widget, inline text edit),
 `board-panel.js` (the side panel), `board-interact.js` (pointer, keyboard and panel-drop wiring), and the pure, node-tested
 `board-layout.js` (cell ↔ pixel geometry), `board-model.js` (widget rules and limits), `board-drag.js` (the pointer state machine),
-`board-keys.js`, `text-edit.js` and `board-history.js`; `board.css`, `_Board.cshtml` (`#board-view`). Tab kinds, store records and events: [tabs.md](tabs.md), [data-model.md](../reference/data-model.md#tabs-and-dashboards);
+`board-keys.js`, `text-edit.js`, `image-model.js` and `board-history.js`; `board.css`, `_Board.cshtml` (`#board-view`). Tab kinds, store records and events: [tabs.md](tabs.md), [data-model.md](../reference/data-model.md#tabs-and-dashboards);
 saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2).
 
 ## Layout
 
 - **Side panel** (left, 240px; the worksheet's field-pane slot): the workbook's worksheets, each with an **Add** button
-  (`aria-label` "Add the worksheet “Sales” to the dashboard"), then **Add text**. The list redraws only when a worksheet is
+  (`aria-label` "Add the worksheet “Sales” to the dashboard"), then **Add text**, **Add image** (a file picker) and **Add spacer**. The list redraws only when a worksheet is
   added, closed or renamed, so a button keeps focus when a widget is added.
 - **Bar** above the canvas: the dashboard's name, "n of 12 widgets", the **status line** (below), the **Size** select, **Undo** / **Redo**,
   **Full screen** and **Print**.
@@ -34,6 +34,10 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
   text 12 × 2) and call `setWidgets` → `dashboard:changed`, which the workbook autosave already listens to. When nothing fits
   (12 widgets, or no free row under the 96-row limit) a danger toast says so ("A dashboard holds at most 12 widgets." / "The
   dashboard is full — …") and nothing is added. A worksheet may be added more than once. The new widget scrolls into view.
+- **Add image** takes a PNG, JPEG, GIF or WebP file (`image-model.js`: `validateImageFile`, `isImageSrc`) — at most 256 KB, at most 4 images per
+  dashboard; anything else (SVG, another type, empty, too big, a fifth image) toasts the reason and adds nothing. The picture is read
+  as a data URL and **saved inside the workbook** (autosave and export), so it is self-contained: there is no upload to the server and no
+  remote-URL image (a link would fetch from a third party each time the board opens and break offline — [D71](../reference/decisions-dashboards.md#d71--dashboard-images-are-workbook-data-urls-not-links)). **Add spacer** adds a blank 2 × 1 block.
 - A text widget starts with the heading "Text" and no body; a text widget is 12 × 2 by default and may be resized down to 1 row.
 - A worksheet row in the side panel is **draggable** (see Dropping from the panel); **Add** stays the keyboard path.
 - Adding also announces "Added “name” to the dashboard." through the polite live region (`#toast-live`). A worksheet widget's loading
@@ -50,6 +54,8 @@ Each widget is an `<article class="board-widget">` with a header — title, then
 | Kind | Header | Body |
 |---|---|---|
 | **Worksheet** | the worksheet's name; **Edit** (switches to that worksheet's tab) and **Remove** | a select-only worksheet view (`interactive: "select"`) of the worksheet's sheet |
+| **Image** | the file name as alt text (`aria-label`); **Remove** (no Edit) | the picture, contained (`object-fit: contain`, never cropped or stretched); 6 × 4, 2–12 wide, 2–24 tall |
+| **Spacer** | "Spacer"; **Remove** (no Edit) | empty, hatched on screen so it can be found; invisible in print; 2 × 1, 2–12 wide, 1–24 tall |
 | **Text** | the heading (empty reads "Text"); **Edit** (inline, below) and **Remove** | the body text, plain (`textContent`; line breaks kept and wrapped, no Markdown, no markup) |
 
 Every widget is a focusable group (`tabindex="0"`, `role="group"`, `aria-roledescription="dashboard widget"`, `aria-label` its name,
@@ -160,6 +166,8 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
 ## Tests
 
 `tests/js/dashboard-select.test.mjs`, `selection-dim.test.mjs`, the cross-filter cases of `sheet-plan`, `worksheet-view` and `worksheet-render`; `tests/live/crossfilter-ui.mjs` (real clicks on mocked data: the bound filter and the queries sent, the source's fade and badge, the chip and its keyboard clear, an unreachable widget's note, replace / clear, a failing target, latest-wins, not saved, cleared by tab switch / source removal / dimension change / reload, a second copy, light and dark screenshots).
+
+`tests/js/image-model.test.mjs` and the image / spacer cases of `board-model.test.mjs`; `tests/live/image-spacer-ui.mjs` (real file input: a PNG is decoded and drawn with its alt text, SVG / non-image / oversize files and a fifth image refused, spacer, autosave holds a data URL, reload restores, spacer hidden under print media, undo; light and dark screenshots).
 
 `tests/js/board-layout.test.mjs` (geometry, the 96-row limit, stacking), `board-model.test.mjs` (rules and limits), `board-drag.test.mjs`
 (pixel → cell snapping, ghost, click threshold, every refusal, cancel, panel drop plan), `board-keys.test.mjs` (every step and refusal

@@ -12,7 +12,7 @@ why two tab kinds: [D61](../reference/decisions-dashboards.md#d61--worksheets-an
 - After it, **one ordered list** of two tab kinds, each with its kind's icon (`.tab__kind`, decoration only) and the kind in
   its accessible name (`aria-label` "Sales (worksheet)" / "Overview (dashboard)"):
   - **Worksheet** (`.tab--worksheet`, icon `chart-bar`) — one Tableau-style worksheet ([worksheet.md](worksheet.md)).
-  - **Dashboard** (`.tab--dashboard`, icon `dashboard`) — a board of worksheet and text widgets ([dashboards.md](dashboards.md)). Its
+  - **Dashboard** (`.tab--dashboard`, icon `dashboard`) — a board of worksheet, text, image and spacer widgets ([dashboards.md](dashboards.md)). Its
     data — widgets, limits, validation, save and open — is in
     [data-model.md](../reference/data-model.md#tabs-and-dashboards).
 - **`[+]`** (`.tab-add`, `aria-haspopup="menu"`) opens a menu **New worksheet / New dashboard** (`Core/menu.js`: arrows move, Esc
