@@ -83,7 +83,7 @@ letting only checked keys be endpoints ([relationships.md](../features/relations
 
 ```
 Tab:     { id: "ws#n", kind: "worksheet", name, sheet }                 one worksheet (the editor)
-       | { id: "db#n", kind: "dashboard", name, widgets: [Widget] }      a board of widgets
+       | { id: "db#n", kind: "dashboard", name, widgets: [Widget], size }  a board of widgets; size = null (automatic) | { width, height } px
 Widget:  { id: "w#n", kind: "sheet", sheetId: "ws#n", x, y, w, h }       a worksheet's view
        | { id: "w#n", kind: "text", heading, body, x, y, w, h }          a text block
 ```
@@ -120,11 +120,11 @@ A widget points at a worksheet by tab id; one worksheet may sit on several dashb
   format: { numberFormat, decimals, currencySymbol, dateFormat, topN, dateBucket, target, downIsGood, conditional, legend,
             dataLabels, colorByDimension, xTitle, yTitle,
             lineStyle, heatmapShape, targetMeasure,
-            syncAxes, secondaryType, markerSize, markBorder }
+            syncAxes, secondaryType, markerSize, markBorder, markerShape }
 }
 ```
 
-- **Format chart settings:** `lineStyle` `straight` | `step` | `jump` (default `straight`; `jump` is shown as Step (centred)); `heatmapShape` `square` | `circle` (default `square`); `targetMeasure` null or a shelf-measure index 1–19 (the bullet's target field; null = the fixed `target`). `syncAxes` boolean (default false); `secondaryType` `line` | `bar` | `area` (default `line`); `markerSize` null (automatic) or a whole number 4–40; `markBorder` `none` | `thin` | `thick` (default `none`). A target field that no longer points at a later shelf measure is ignored and cleared when Format opens. An unknown value is reset with a workbook import issue; a workbook without them opens unchanged.
+- **Format chart settings:** `lineStyle` `straight` | `step` | `jump` (default `straight`; `jump` is shown as Step (centred)); `heatmapShape` `square` | `circle` (default `square`); `targetMeasure` null or a shelf-measure index 1–19 (the bullet's target field; null = the fixed `target`). `syncAxes` boolean (default false); `secondaryType` `line` | `bar` | `area` (default `line`); `markerSize` null (automatic) or a whole number 4–40; `markBorder` `none` | `thin` | `thick` (default `none`); `markerShape` `circle` | `square` | `diamond` | `triangle` (default `circle`). A target field that no longer points at a later shelf measure is ignored and cleared when Format opens. An unknown value is reset with a workbook import issue; a workbook without them opens unchanged.
 - **Pill:** `{ db, table, column, category, role?, agg?, datePart?, tableCalc?, choices? }` — `datePart` (P26) on a date dimension, `tableCalc` (P27) `{ type, along, window?, using? }` on a measure, `choices` (P40) the slot's alternative fields. `role` overrides the type default
   (`'dimension'` → `GROUP BY`; `'measure'` → aggregated with `agg` ∈ `aggsFor(category)`:
   `sum/avg/min/max/median/stddev/variance/count/countDistinct/countNonNull/attr` for numbers,
@@ -170,7 +170,8 @@ What [workbook.md](../features/workbook.md) saves to `localStorage` and exports 
   relationships: [ { from: { entityId, column }, to: { entityId, column }, cardinality, joinType } ],
   worksheets:    [ { name, sheet } ],      // sheet as above, minus pages.members
   dashboards:    [ { name, widgets: [ { kind: "sheet", sheet: worksheetIndex, x, y, w, h }
-                                    | { kind: "text", heading, body, x, y, w, h } ] } ],
+                                    | { kind: "text", heading, body, x, y, w, h } ],
+                     size?: { width, height } } ],   // fixed pixels; absent = automatic (older files). Bad shape → automatic, out of range → clamped, each with an import issue
   tabs:          [ { kind: "worksheet" | "dashboard", index } ],   // the strip's order, ≤ 50
   active:        { kind, index } | null    // null = Data Model
   fields:        { "db.table.column": { alias?, agg?, hidden?, cast?, memberAliases?: { [rawValue]: label } } }   // P28, T02-34, T02-29 — ≤ 2000
