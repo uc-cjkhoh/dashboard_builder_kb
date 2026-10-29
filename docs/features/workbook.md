@@ -122,7 +122,7 @@ naming the sheet and field ("Sheet "Sales": unknown chart type "radar" — reset
 | Shared filters | as sheet filters; at most **4** |
 | Analytics | reference kind in its set (a constant needs a number), band two numbers (ordered), trend none / linear / log / poly2, forecast 0 / 3 / 6 / 12, totals booleans; a bad part is reset and reported |
 | Title / caption | text ≤ 80 / ≤ 300 or null; `showTitle` a boolean; `format.fit` standard / width / height / entire |
-| Table calculation | a known type, `along` auto / columns / rows, `window` an integer 2–30; else removed and reported |
+| Table calculation | a known type, `along` auto / columns / rows / custom, `window` an integer 2–30, `using` (custom only) up to 16 distinct dimension indexes 0–15; else removed and reported |
 | Date part | a known part on a date pill only; else reset to Auto and reported |
 | Field choices | each a full field (db / table / column / category); ≤ 8; the shown field is added if missing; fewer than 2 → dropped |
 | Parameters | ≤ 20; id `prm<n>`, a name, a known type; allowed list / range checked; a value outside them reset and reported. A filter or Top N pointing at a parameter the file doesn't have is unlinked and reported |

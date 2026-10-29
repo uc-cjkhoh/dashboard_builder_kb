@@ -84,8 +84,9 @@ to Columns).
 - **Columns** and **Rows** each hold **any number** of pills. The shelf sets the crosstab axis: Rows
   dimensions are the **left stub**, Columns dimensions the **top header**.
 - **Quick table calculations** (P27): a measure pill's **fx** button opens its editor — **Running total,
-  % of total, Difference, % difference, Rank** (competition style, highest first) or **Moving average**
-  (window 2–30) — **Along** Columns or Rows (Auto = Columns when it has dimensions). Computed in the
+  % of total, Difference, % difference, Rank** (competition style, highest first), **Percentile rank** (0–100%, highest = 100)
+  or **Moving average** (window 2–30) — **Along** Columns, Rows (Auto = Columns when it has dimensions) or
+  **Specific dimensions**: a checkbox per Rows/Columns dimension; the ticked ones run together, the rest restart. Computed in the
   browser over the returned rows in sort order, restarting for each member of the other shelf's
   dimensions; no new query. The measure is renamed ("sum amount · running total"); percentages read "23.4%"
   in the table and charts. Over a cut-off result the info line says "Table calculations use only the rows

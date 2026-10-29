@@ -63,7 +63,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/action-model.js` | pure (P39): `templateError`, `buildActionUrl` (https-only, encoded `{value}`), `cleanAction` |
 | `Dashboard/analytics-model.js` | pure (P21): `refValue`, `refConstant` (a constant line's bound parameter), `trendFit` (linear / log / poly2 least squares, R²), `trendSeries` (+ forecast), `combine` (totals by aggregation) |
 | `Dashboard/history.js` | pure (P23): per-worksheet undo / redo stacks of sheet snapshots (50), keyed by tab id |
-| `Dashboard/table-calc.js` | pure (P27): `computeCalc` (running / % of total / difference / % difference / rank / moving average, partitioned by the other shelf), `applyTableCalcs` |
+| `Dashboard/table-calc.js` | pure (P27): `computeCalc` (running / % of total / difference / % difference / rank / percentile rank / moving average, partitioned by the other shelf or by the unticked dimensions), `applyTableCalcs` |
 | `Dashboard/cast-model.js` | pure (T02-34): `castChoices`, `effectiveCategory`, `withCasts` (adds `cast` to the plan), `syncCastCategories`, `statCastProblem` |
 | `Dashboard/line-style-model.js` / `heatmap-model.js` / `bullet-model.js` | pure: `LINE_STYLE_CHOICES`, `lineStep`, `linesTakeStyle`; `HEATMAP_SHAPE_CHOICES`, `circleSize`; `targetChoices`, `bulletTargets`, `bandsFor`; `axis-sync-model.js` (`syncRange`, `secondaryKind`, `SECONDARY_CHOICES`) and `mark-style-model.js` (`markBorder`, `markerSizeOr`, `markerSizeError`, `MARKER_SIZE`) — [worksheet-charts.md](../features/worksheet-charts.md) |
 | `Dashboard/date-parts.js` | pure (P26): `DATE_PART_CHOICES`, `stepPart` (+ / −), `partLabel`, `labelParts` |
