@@ -89,7 +89,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Calc/calc-dialog-model.js` | pure: `evaluateDraft` (validation), `chipFor` (role chip), `suggest` (`[` field, `[@` parameter and function-name autocomplete) |
 | `Calc/function-help.js` | pure: the function glossary `FUNCTION_HELP` (derived from `calc-types.js` + the logic keywords), `searchHelp`, `groupHelp`, `functionItems` — the dialog's Functions panel and name autocomplete |
 | `Calc/calc-pane-model.js` | pure: `paneState` (group items), `deleteCalcPlan`, `showUseAs` / session Use-as choice, `normaliseFormula` |
-| `Calc/group-model.js` | pure (T02-30): `groupTree` (CASE / OR-of-equals tree), `groupCost`, `MAX_GROUP_MEMBERS`, `checkGroupSpec`, `cleanGroupSpec`, `groupCalcName`, member ↔ group assignments — [calculated-fields.md](../features/calculated-fields.md#group-fields) |
+| `Calc/group-model.js` | pure (T02-30): `groupTree` (CASE / OR-of-equals tree), `groupCost`, `MAX_GROUP_MEMBERS`, `maxMembersFor`, `otherLabel` (remainder label), `checkGroupSpec`, `cleanGroupSpec`, `groupCalcName`, member ↔ group assignments — [calculated-fields.md](../features/calculated-fields.md#group-fields) |
 | `Calc/group-dialog.js` | DOM: `openGroupDialog({ field, fieldName, calcId?, load })` — the Group… dialog |
 | `Calc/calc-dialog.js` | DOM: `openCalcDialog(id?)` — the New / Edit calculated-field dialog |
 | `Calc/eval-order.js` | pure: `describeEvaluation` (the six stages), `evaluationInput(sheet, …)` — [calculated-fields.md](../features/calculated-fields.md#how-this-is-computed) |

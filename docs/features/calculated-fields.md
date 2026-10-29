@@ -272,11 +272,11 @@ a table — a calculation with no field in it has nothing to group or total." (n
 A field's **⋯** menu has **Group…** (T02-30): a text column's members go into named groups, saved as a **group calculation**
 (`{ id, name: "region (groups)", formula: "", group: { field, groups: [{ name, members }] } }`). The dialog (`group-dialog.js`;
 rules in `group-model.js`) names the field, adds groups (≤ 50, 1–80 characters, unique) and puts each member (the field's top 200,
-from the distinct-values read; NULL is skipped) in a group or leaves it **not grouped**. It is an ordinary calculated dimension afterwards: a
+from the distinct-values read; NULL is skipped) in a group or leaves it **not grouped**. **Label ungrouped members** (optional, default "Other", ≤ 80 characters, not a group's name) folds every ungrouped non-NULL member into that one label; NULL stays NULL. It is an ordinary calculated dimension afterwards: a
 chip in the pane (Edit… reopens this dialog, Duplicate copies the groups), a pill, a text value in formulas (`[region (groups)]`). Number, date and true/false fields, and UUID, IP address and enum columns, are refused (the engine compares text only; ClickHouse has no common type for those, pinned by `tests/live/group-smoke.mjs`). A group name equal to a member that stays ungrouped is refused (it would merge their rows). Compile: `compileCalculation` takes the tree straight from `groupTree`, never formula text, so
 the 500-character limit does not apply: `CASE WHEN member = 'a' OR … THEN 'Group' … ELSE <the field> END`, one WHEN per group, an
-OR (balanced, so shallow) of `=` against `str` literals — bound parameters, nothing quoted into SQL. A member in no group keeps its own value;
-NULL stays NULL. The **node limit (200)** bounds it: 2 + 4 nodes per member, so **49 members across all groups** (`MAX_GROUP_MEMBERS`; the dialog says
+OR (balanced, so shallow) of `=` against `str` literals — bound parameters, nothing quoted into SQL, plus a last `WHEN NOT isnull(field) THEN '<label>'` when the label is on. A member in no group keeps its own value (without the label);
+NULL stays NULL. The **node limit (200)** bounds it: 2 + 4 nodes per member, so **49 members across all groups**, **48** with the remainder label (`maxMembersFor`; the dialog says
 so and disables Save, and the server refuses a bigger tree too). A group-calculation pill takes no click-selection (E12), and member labels do not apply to it. Code: `Calc/group-model.js`.
 
 ## Non-null count
