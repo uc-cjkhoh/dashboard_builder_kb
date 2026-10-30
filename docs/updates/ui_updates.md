@@ -4,7 +4,9 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-10-30
 
+- Board device preview: explain the disabled Size, drop stale width, disable a device wider than the panel, check-mark cue (`266ff4d`)
 - Clean… field menu: trim, replace empty, recode, read as date as calculated fields (`07f9373`)
+- Board: phone / tablet / desktop device preview (T08-04) (`be3db74`)
 - board: navigation button widget UI (Add button, inline edit, go to tab) and browser check (`2134940`)
 - board: Add image and Add spacer in the dashboard panel, image and spacer widgets, live browser check (`442771c`)
 
