@@ -13,7 +13,7 @@ the allowed values it checks against are in `Core/sheet-schema.js`, the caps in 
 | each table: `db`, `table`, canvas position, ticked join keys | DOM nodes, fetched column lists (re-fetched on open) |
 | each relationship: endpoints + cardinality | loaded Pages members (re-fetched on demand) |
 | each worksheet: name + full `sheet` | the connection, host credentials, **any password** |
-| each dashboard: name + its widgets (worksheet index + grid cell, or text) | |
+| each dashboard: name + its widgets (worksheet index + grid cell, text, image, spacer, or a button with its target tab as `{ kind, index }`) | |
 | the tab strip's order, and which tab was open | |
 | the calculated fields (`calculations`) | the parsed formula tree (rebuilt on open) |
 
@@ -112,7 +112,7 @@ naming the sheet and field ("Sheet "Sales": unknown chart type "radar" — reset
 | Relationships | both endpoints reference a kept table; cardinality one of `1:1`, `1:N`, `N:1`, `N:M`; `joinType` left, else inner; at most **200** |
 | Worksheets / dashboards | each an object (others skipped and reported); name 1–60 characters (else reset to "Worksheet" / "Dashboard"); a non-list means none are opened |
 | Tab order | `tabs` entries `{ kind, index }` pointing at a kept worksheet or dashboard, no repeats — others skipped; tabs it leaves out are added at the end; absent = worksheets then dashboards (no issue); at most **50 tabs of both kinds**, the rest dropped |
-| Dashboard widgets | ≤ **12** each; a `sheet` widget whose worksheet index is missing (or cut by the tab cap) is dropped; `w` 2–12, `h` 2–24 (text 1–24), `x` + `w` ≤ 12, `y` + `h` ≤ 96, whole cells — else clamped; an overlapping widget moves to the **first free spot** (rows top to bottom, left to right), dropped when none; text `heading` ≤ 80 and `body` ≤ 2000 characters, cut with a report; unknown kinds dropped (`Board/board-model.js`, pure) |
+| Dashboard widgets | ≤ **12** each; a `sheet` widget whose worksheet index is missing (or cut by the tab cap) is dropped; `w` 2–12, `h` 2–24 (text 1–24), `x` + `w` ≤ 12, `y` + `h` ≤ 96, whole cells — else clamped; an overlapping widget moves to the **first free spot** (rows top to bottom, left to right), dropped when none; text `heading` ≤ 80 and `body` ≤ 2000 characters, cut with a report; a button's `label` (1–40, empty → "Go to") and `tip` (≤ 200) cut with a report, and a `target` whose tab index is missing is cleared (the button stays, unlinked); unknown kinds dropped (`Board/board-model.js`, pure) |
 | Sheet | `chartType` one of the 23 types; pills carry `db`, `table`, `column`, `category`; `role` and `agg` valid for the column's category (a bad `agg` resets to sum / count); a `percentile` pill needs a finite `p` 0..1 (else it resets with an issue; `p` on any other aggregation is dropped; a percentile Top-N with a bad `topBy.p` is dropped); at most 20 pills per shelf; at most 8 filters |
 | Filters | known `op` (incl. P30 `contains` / `startsWith` / `endsWith` / `relative` / `top`; a `top` must carry its `topBy` measure); single value text (a non-text value resets to empty); `in` / `between` carry a text list; the `category` may be absent (back-filled from the catalog at runtime) |
 | Marks, sort, pages, drill | shapes checked; drill needs ≥ 2 levels (≤ 6) and a path matching its depth; `selection` is never restored |

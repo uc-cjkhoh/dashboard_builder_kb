@@ -1,16 +1,16 @@
 # Dashboards — the board
 
-A dashboard tab (`.tab--dashboard`) composes the workbook's worksheets, text blocks, images and spacers on a 12-column snap grid. Code:
+A dashboard tab (`.tab--dashboard`) composes the workbook's worksheets, text blocks, images, navigation buttons and spacers on a 12-column snap grid. Code:
 `Features/Board/` — `board.js` (orchestration, undo / redo, full screen, print), `board-widget.js` (one widget, inline text edit),
 `board-panel.js` (the side panel), `board-interact.js` (pointer, keyboard and panel-drop wiring), and the pure, node-tested
 `board-layout.js` (cell ↔ pixel geometry), `board-model.js` (widget rules and limits), `board-drag.js` (the pointer state machine),
-`board-keys.js`, `text-edit.js`, `image-model.js` and `board-history.js`; `board.css`, `_Board.cshtml` (`#board-view`). Tab kinds, store records and events: [tabs.md](tabs.md), [data-model.md](../reference/data-model.md#tabs-and-dashboards);
+`board-keys.js`, `text-edit.js`, `image-model.js`, `nav-model.js` and `board-history.js`; `nav-edit.js` is the button's inline form; `board.css`, `_Board.cshtml` (`#board-view`). Tab kinds, store records and events: [tabs.md](tabs.md), [data-model.md](../reference/data-model.md#tabs-and-dashboards);
 saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2).
 
 ## Layout
 
 - **Side panel** (left, 240px; the worksheet's field-pane slot): the workbook's worksheets, each with an **Add** button
-  (`aria-label` "Add the worksheet “Sales” to the dashboard"), then **Add text**, **Add image** (a file picker) and **Add spacer**. The list redraws only when a worksheet is
+  (`aria-label` "Add the worksheet “Sales” to the dashboard"), then **Add text**, **Add image** (a file picker), **Add button** and **Add spacer**. The list redraws only when a worksheet is
   added, closed or renamed, so a button keeps focus when a widget is added.
 - **Bar** above the canvas: the dashboard's name, "n of 12 widgets", the **status line** (below), the **Size** select, **Undo** / **Redo**,
   **Full screen** and **Print**.
@@ -55,6 +55,7 @@ Each widget is an `<article class="board-widget">` with a header — title, then
 |---|---|---|
 | **Worksheet** | the worksheet's name; **Edit** (switches to that worksheet's tab) and **Remove** | a select-only worksheet view (`interactive: "select"`) of the worksheet's sheet |
 | **Image** | the file name as alt text (`aria-label`); **Remove** (no Edit) | the picture, contained (`object-fit: contain`, never cropped or stretched); 6 × 4, 2–12 wide, 2–24 tall |
+| **Button** | none (the button's label is its name); **Edit** (inline form: **Label** ≤ 40, **Tooltip** ≤ 200, **Goes to** — a list of every other tab, "Nowhere yet" by default) and **Remove** | one primary button with the label (an arrow icon when linked) and the tooltip as its `title`; a click opens the target tab (`switchTab`); unlinked, or its target closed, it is disabled and its `aria-label` says "not linked to a tab"; 4 × 2, 2–12 wide, 1–24 tall |
 | **Spacer** | "Spacer"; **Remove** (no Edit) | empty, hatched on screen so it can be found; invisible in print; 2 × 1, 2–12 wide, 1–24 tall |
 | **Text** | the heading (empty reads "Text"); **Edit** (inline, below) and **Remove** | the body text, plain (`textContent`; line breaks kept and wrapped, no Markdown, no markup) |
 
@@ -167,7 +168,7 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
 
 `tests/js/dashboard-select.test.mjs`, `selection-dim.test.mjs`, the cross-filter cases of `sheet-plan`, `worksheet-view` and `worksheet-render`; `tests/live/crossfilter-ui.mjs` (real clicks on mocked data: the bound filter and the queries sent, the source's fade and badge, the chip and its keyboard clear, an unreachable widget's note, replace / clear, a failing target, latest-wins, not saved, cleared by tab switch / source removal / dimension change / reload, a second copy, light and dark screenshots).
 
-`tests/js/image-model.test.mjs` and the image / spacer cases of `board-model.test.mjs`; `tests/live/image-spacer-ui.mjs` (real file input: a PNG is decoded and drawn with its alt text, SVG / non-image / oversize files and a fifth image refused, spacer, autosave holds a data URL, reload restores, spacer hidden under print media, undo; light and dark screenshots).
+`tests/js/nav-model.test.mjs` (the button's edit rules, targets, import cleaning, saved form); `tests/live/nav-ui.mjs` (Add button, the inline form and its messages, a click opens a worksheet and a dashboard, autosave holds the target by tab index, reload restores, a closed target unlinks it); `tests/js/image-model.test.mjs` and the image / spacer cases of `board-model.test.mjs`; `tests/live/image-spacer-ui.mjs` (real file input: a PNG is decoded and drawn with its alt text, SVG / non-image / oversize files and a fifth image refused, spacer, autosave holds a data URL, reload restores, spacer hidden under print media, undo; light and dark screenshots).
 
 `tests/js/board-layout.test.mjs` (geometry, the 96-row limit, stacking), `board-model.test.mjs` (rules and limits), `board-drag.test.mjs`
 (pixel → cell snapping, ghost, click threshold, every refusal, cancel, panel drop plan), `board-keys.test.mjs` (every step and refusal
