@@ -4,6 +4,7 @@ Functional changes (server, models, validation, calculations, charts, workbook).
 
 ## 2026-10-30
 
+- Clean…: slug ids, Enter creates, missing (NULL) wording, recode limit in LIMITS (`d2a0c3f`)
 - unpivot, union: helper aliases that cannot shadow source columns; honest Value type; Field/Value header disambiguation; tests and live smoke (`d34cde4`)
 - board: unlinked button stays keyboard-focusable (aria-disabled), NAV_LABEL, own-dashboard target is dangling (`a5af462`)
 - unpivot: bounded unpivot preview (POST /api/unpivot) with a dialog; split: Split… makes SPLIT calculated fields from a text field (`6d25807`)
