@@ -209,7 +209,7 @@ reaches the server or SQL.
 - **Nodes** (discriminator `k`): `field` (`db`, `table`, `column`), `num` (`v`, finite), `un` (`op: "-"`),
   `bin` (`op` ∈ `+ - * /`), `str` (`v`, ≤ 100 characters, bound as a `String` parameter), `cmp` (`op` ∈ `= != < <= > >=`, `l`, `r`),
   `logic` (`op` ∈ `and or`, `l`, `r`), `not` (`arg`), `case` (`whens`: `[{ "c": cond, "t": result }]` — at least one — and an optional
-  `else`; `IF`/`IIF` are one arm plus `else`), `ifnull` (`l`, `r`), `isnull` (`arg`), `fn` (`fn` ∈ `lower upper trim len left right replace concat contains startswith endswith split datediff dateadd year month day quarter week weekday date`, `args`: array), `agg` (`fn` ∈ `sum avg min max count countd median stddev variance percentile attr`, `arg`, and `p` for
+  `else`; `IF`/`IIF` are one arm plus `else`), `ifnull` (`l`, `r`), `isnull` (`arg`), `fn` (`fn` ∈ `text lower upper trim len left right replace concat contains startswith endswith split datediff dateadd year month day quarter week weekday date`, `args`: array), `agg` (`fn` ∈ `sum avg min max count countd median stddev variance percentile attr`, `arg`, and `p` for
   `percentile`). `count` counts non-NULL values (as `countNonNull`), `countd` distinct values. `p` is a finite
   number 0..1, required for `percentile` and refused on every other function (400 at `….calc.p`, "PERCENTILE
   needs a fraction between 0 and 1." / "SUM takes no fraction."); it is bound as a `Float64` parameter. Every referenced table must already be in the

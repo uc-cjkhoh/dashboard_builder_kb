@@ -19,7 +19,7 @@ wire shape in [api.md](../reference/api.md#calculated-fields-calc)). Code: `Feat
   `COUNT`/`COUNTD`/`ATTR` any type; arithmetic needs numbers; an aggregate inside an aggregate is refused. A field of
   a category other than numeric, text, temporal or boolean can't be used.
 - **Logic** ([below](#logic-functions)): comparisons, `AND` / `OR` / `NOT`, `IF` / `IIF` / `CASE`, `IFNULL`, `ISNULL`, `ZN`, text literals.
-- **Text** ([below](#text-functions)): `LOWER`, `UPPER`, `TRIM`, `LEN`, `LEFT`, `RIGHT`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `SPLIT`. A text or number field's menu **Clean…** (query-time cleaning; the data is never changed) adds ONE calculated field: text **Trim spaces** (`TRIM`), **Replace missing (NULL) values** (`IFNULL(f, 'text')`, or `IFNULL(f, 12.5)` on a number; it replaces NULL only, not an empty string), **Recode values** (`old = new` lines, up to 20, cut at the first `=`; `CASE f WHEN 'old' THEN 'new' … ELSE f END`, unlisted values kept unless unticked, the formula within 500 characters) and **Read as a date** (`DATE(f)`); named `<field> (trimmed|filled|recoded|date)`, then ` 2`… when taken; a date field has no Clean… (no date literal), nor does a field whose names hold `.`, `[` or `]`.
+- **Text** ([below](#text-functions)): `TEXT` (alias `STR`), `LOWER`, `UPPER`, `TRIM`, `LEN`, `LEFT`, `RIGHT`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `SPLIT`. A text or number field's menu **Clean…** (query-time cleaning; the data is never changed) adds ONE calculated field: text **Trim spaces** (`TRIM`), **Replace missing (NULL) values** (`IFNULL(f, 'text')`, or `IFNULL(f, 12.5)` on a number; it replaces NULL only, not an empty string), **Recode values** (`old = new` lines, up to 20, cut at the first `=`; `CASE f WHEN 'old' THEN 'new' … ELSE f END`, unlisted values kept unless unticked, the formula within 500 characters) and **Read as a date** (`DATE(f)`); named `<field> (trimmed|filled|recoded|date)`, then ` 2`… when taken; a date field has no Clean… (no date literal), nor does a field whose names hold `.`, `[` or `]`.
 - **Date** ([below](#date-functions)): `DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY`, `DATE`.
 - Operators `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`,
   `COUNTD`, `MEDIAN`, `STDDEV`, `VARIANCE`, `PERCENTILE`, `ATTR` (function names are case-insensitive). The
@@ -72,6 +72,7 @@ in the formula**, never a field or a computed value.
 
 | Function | Result | Meaning |
 |---|---|---|
+| `TEXT(x)` / `STR(x)` | text | a number, date or text as text (`STR` is the same function; the argument may be any number, date or text expression, a condition is refused: `TEXT needs a number, date or text — that value is boolean.`). Numbers print as ClickHouse `toString` of the Float64 does: `10`, `2.5`, no thousands separator. A date reads `2024-03-05`; a value with a time (a `DATEADD` result) reads `2024-03-05 14:30:00`. NULL gives NULL; text is unchanged. `CONCAT('#', TEXT([o.id]))` builds a label. The argument is not limited to text, unlike the rows below |
 | `LOWER(t)` / `UPPER(t)` | text | change case, accents and non-Latin letters included (`UPPER('straße')` is `STRASSE`) |
 | `TRIM(t)` | text | remove leading and trailing spaces (the space character only; tabs and line breaks stay) |
 | `LEN(t)` | number | length in **characters**, not bytes (`LEN('日本語')` is 3) |
@@ -89,8 +90,7 @@ in the formula**, never a field or a computed value.
 - **Row-level, aggregates as usual:** `COUNTD(LOWER([c.name]))` and `SUM(IF(CONTAINS([c.name], 'x'), 1, 0))` work; a text
   function over an aggregate (`LOWER(MAX([c.name]))`) is an aggregate; mixing with a bare row-level field is the usual error. A row-level text
   or boolean result (`LOWER`, `CONTAINS`) is a **dimension**; `LEN` is a row-level number (measure or dimension).
-- Not built: regular expressions, `FIND` / `POSITION`, `MID` / `SUBSTRING`, `LTRIM` / `RTRIM`, `STARTSWITH`/`CONTAINS` ignoring case, a length, position or separator
-  that is a field or computed value (a `[@Parameter]` works, see Parameters).
+- Not built: regular expressions, `FIND` / `POSITION`, `MID` / `SUBSTRING`, `LTRIM` / `RTRIM`, `STARTSWITH`/`CONTAINS` ignoring case, a length, position or separator that is a field or computed value (a `[@Parameter]` works, see Parameters), `TEXT` with a format string or a boolean argument.
 
 ### Date functions
 
