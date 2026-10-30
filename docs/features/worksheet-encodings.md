@@ -58,7 +58,12 @@ aligned to the template's lines of `{ size?, bold?, italic?, color? }` (`null` /
 once a line is styled, so older files round-trip unchanged). `checkTooltipStyle` (`Dashboard/tooltip-style.js`) validates
 it on import: sizes only from the type scale, colours only palette keys (mapped to `var(--ink)`, `var(--accent-ink)`…,
 so they follow the theme; no hex, nothing user-typed reaches a `style` attribute), at most 12 lines; an invalid style is
-dropped with an issue, and a style without a template is ignored. Clearing the text clears the style.
+dropped with an issue, and a style without a template is ignored. Clearing the text clears the style. Applying trims
+leading / trailing blank lines together with their styles, so styles stay on their lines. A template of more than 12 lines
+(possible from the plain textarea) opens in the modal with Apply blocked and the reason shown until lines are removed.
+Editing the plain **Tooltip text** box keeps the styles (re-aligned by line index) only while the line count is
+unchanged; if it changes, the styles are cleared and the note says so. After Apply, Cancel or Esc, focus returns to
+**Edit tooltip…**.
 
 - Extra measures never become chart series; with no marks set the plan is byte-identical to a plain
   shelves plan.
