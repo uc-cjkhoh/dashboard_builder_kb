@@ -4,6 +4,9 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-10-30
 
+- Tooltip modal review fixes: aligned trim, 12-line block, textarea style rule, focus return, dark check (`a53f68a`)
+- Tooltip style: omit the key when unstyled so v1 files round-trip identically (`1e6b582`)
+- Tooltip modal: per-line size/bold/italic/colour editor with live side-by-side preview (`77f4a49`)
 - Select: open option list follows the theme; db-select browser check (`ac26bca`)
 - Board device preview: explain the disabled Size, drop stale width, disable a device wider than the panel, check-mark cue (`266ff4d`)
 - Clean… field menu: trim, replace empty, recode, read as date as calculated fields (`07f9373`)
