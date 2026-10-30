@@ -12,8 +12,14 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
 - **Side panel** (left, 240px; the worksheet's field-pane slot): the workbook's worksheets, each with an **Add** button
   (`aria-label` "Add the worksheet “Sales” to the dashboard"), then **Add text**, **Add image** (a file picker), **Add button** and **Add spacer**. The list redraws only when a worksheet is
   added, closed or renamed, so a button keeps focus when a widget is added.
-- **Bar** above the canvas: the dashboard's name, "n of 12 widgets", the **status line** (below), the **Size** select, **Undo** / **Redo**,
+- **Bar** above the canvas: the dashboard's name, "n of 12 widgets", the **status line** (below), the **device preview** (below), the **Size** select, **Undo** / **Redo**,
   **Full screen** and **Print**.
+- **Device preview** (`Board/board-device.js`): **Desktop** (default), **Tablet** (768 px) or **Phone** (390 px) buttons, each icon + text with
+  `aria-pressed`. Tablet and Phone draw the same widgets in a centred, outlined box of that width (never wider than the panel), so the
+  normal layout rule decides the result: Tablet keeps the 12-column grid, Phone is under the 720 px stack threshold and stacks. While a
+  device is on, the Size select is disabled (the preview replaces a fixed size); Desktop restores both. Transient: never saved, not in
+  undo, ignored by print. Editing still works in the box (drag snaps to the drawn grid); there is no per-device layout yet
+  ([backlog](../backlog/dashboards.md)).
 - **Size** (`Board/board-size.js`, per dashboard): **Automatic** (default; the canvas fills its panel and stacks when narrow, as below) or a
   **fixed** preset (800 × 600, 1024 × 768, 1280 × 720, 1366 × 768, 1920 × 1080). A fixed board is exactly that box, never stacked: columns span the
   width and the rows in use (down to the lowest widget) stretch to share the height (`layoutBoard(…, { fixed })`, `fixedRowH`), so
