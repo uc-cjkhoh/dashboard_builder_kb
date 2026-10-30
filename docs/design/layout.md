@@ -24,7 +24,12 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
   ([canvas.md](../features/canvas.md#dragging-a-table-onto-the-canvas)).
 - **Full-width lists align with their siblings:** `.table-list` keeps 2px shadow room with a matching
   `-4px` inline margin (equal to its padding), so table chips share the search box's edges. A chip's table icon sits on the 8px left gutter and its `+` glyph 8px from the right edge; the hover grip overlays the icon instead of reserving a slot.
-- **Entity cards:** the head title's text starts at the column-name x (`calc(--s4 - 2px)` after the chevron box), and the ✕ glyph ends where the type badges end (the hover-only profile button is ordered before the badge).
+- **Entity cards** are measured on ink, not boxes (checked on the Data Model with the glyph's drawn bounds):
+  - Left lane: the chevron's centre sits on the row checkboxes' centre; the head title's text starts at the column-name x (`calc(--s4 - 2px)` after the chevron box); the key icon's ink has equal gaps (10.5px) to the checkbox and to the name.
+  - Right lane: the ✕ ink ends where the type badges' border ends (`margin-right: -(--s2 + --s1)`, since the ✕ strokes sit 4px inside their 32px box); the hover-only profile button is ordered before the badge.
+  - Gutters: checkbox and badge are 8px from the card's inner edges; the first and last row's checkbox are 16px from the list's top and bottom edges.
+  - Vertical: chevron, title, checkbox, key icon, name and badge text all share one optical centre (the cap-height midpoint of the 14px text) within 0.5px.
+  - A union / unpivot card has no checkbox lane, so its title and column names share one x; a failed card's status line starts on the checkbox lane (8px).
 - **Nothing touches:** menu lists (`.menu__list`, incl. the two-column chart picker) have a 4px gap between items; stacked `<details>` field rows are spaced 4px apart (`.ws-group > :not(summary) + *`). Single-choice `<select>`s show a chevron on the 16px gutter instead of the UA arrow (pill selects keep the native one).
 - **Ghost icon buttons at a row's end overhang by their 8px glyph slack** (`margin-inline: -8px`), so
   the glyph meets the edge: `#sidebar-toggle`, the appearance toggle (`.scheme`), the view bar's chart picker and last
