@@ -142,7 +142,7 @@ Cells are cut in SQL like `/api/rows`. The UI (`Union` button in the Tables head
 
 Controller: `Features/Rows/UnpivotController.cs`. `POST /api/unpivot` turns **wide columns of one table into rows**: each source row becomes
 one row per chosen column, answered in the `/api/rows` shape. Columns: the `keep` columns, then `Field` (the column's name, bound as a
-parameter) and `Value` (the cell as text, NULL stays `null`; typed as the first chosen column). No ordering, no aggregation, no filters.
+parameter) and `Value` (the cell as text, NULL stays `null`; typed `String`). A kept column already named `Field` or `Value` makes ours `Field_` / `Value_`. Helper aliases in the SQL (here and in the union) use a prefix (`__u`, grown with `_`) that no table column starts with, because ClickHouse resolves a select alias ahead of a same-named column. No ordering, no aggregation, no filters.
 
 | Field | Rule |
 |---|---|
