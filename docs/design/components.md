@@ -18,7 +18,7 @@ report lists or record-CRUD tables here — this is an explorer, not an admin te
 | Card / panel | `.card`, `.card--fill`, `.card__head`, `.card__body.flush`, `.card__foot` |
 | Dialog | `.dialog`, `.dialog--sm`, `.dialog__head/body/foot`, `.form-grid`, `.form-field` |
 | Cardinality picker | `.card-choice` |
-| Select | `.select`, `.select--light`; in the sidebar (`.sidebar .select`) it matches the text inputs — control height, edge, radius, padding, focus underline — with a token-coloured gradient chevron instead of the UA arrow |
+| Select | `.select`, `.select--light`; in the sidebar (`.sidebar .select`) it matches the text inputs — control height, edge, radius, padding, focus underline — with a token-coloured gradient chevron instead of the UA arrow; `.select option` takes `--surface`/`--ink` so the open list follows the theme |
 | Data grid | `.data`, `.num` (right-aligned numerics), `.mono`, `.cell-strong`, `.cell-sub` |
 | Empty state | `.empty` |
 | Toast | `.toast` (`.toast--ok` / `--info` / `--danger`, a coloured left rule), `.toast__text`, `.toast__close`; announced through `#toast-live` |
