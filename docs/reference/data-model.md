@@ -61,6 +61,7 @@ A table dropped onto the canvas ([canvas.md](../features/canvas.md)).
 | `joinKeys` | `Set<columnName>` — the user's checked keys; required to be a relationship endpoint |
 | `el` | the card's DOM node |
 | `pendingKeys` | join keys a just-opened workbook ticks once the columns load (kept if loading fails) |
+| `source` | present on a union / unpivot entity: `{ kind: "union", db, name, tables, columns? }` or `{ kind: "unpivot", db, name, table, columns, keep }`; `table` is then `name`, `columns` come from `/api/source/columns`, `joinKeys` stays empty — [query-sources.md](../features/query-sources.md) |
 
 ### Relationship
 
@@ -171,7 +172,7 @@ What [workbook.md](../features/workbook.md) saves to `localStorage` and exports 
 ```
 {
   format: "dashboard-builder-workbook", version: 2 (integer ≥ 1; version 1 files still open), savedAt: ISO-8601,
-  entities:      [ { id, db, table, x, y, joinKeys: [column] } ],
+  entities:      [ { id, db, table, x, y, joinKeys: [column], source? } ],   // source: a union / unpivot entity (its table = source.name); re-validated on open, a bad one skipped
   relationships: [ { from: { entityId, column }, to: { entityId, column }, cardinality, joinType } ],
   worksheets:    [ { name, sheet } ],      // sheet as above, minus pages.members
   dashboards:    [ { name, widgets: [ { kind: "sheet", sheet: worksheetIndex, x, y, w, h }

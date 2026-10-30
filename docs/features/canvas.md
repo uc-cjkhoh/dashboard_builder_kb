@@ -29,6 +29,13 @@ On drop:
    **failed** status (red) with **Retry**, never a bare error.
 4. Hide the empty state (`.canvas__empty`) once the canvas has ≥1 entity — via `hidden`.
 
+## Union and unpivot cards
+
+A union or unpivot added from the sidebar dialogs ([query-sources.md](query-sources.md)) arrives as a `source:add` event and becomes a card in the first
+free slot (the Data Model is shown first). Its `table` is the source's automatic name and its columns load from `POST /api/source/columns`. It looks
+like a table card without the key checkboxes, key glyphs and profile buttons (a source takes no relationship), with one note line under the head
+saying how its columns are matched; column names and the note start where the title text does. Remove and collapse work as on any card.
+
 ## Empty state
 
 With no entities the canvas shows **one sentence and one button**, chosen by `emptyState()` in

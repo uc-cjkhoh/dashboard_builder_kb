@@ -92,7 +92,7 @@ bound parameter or a validated integer (out-of-range limits are rejected before 
 
 ### Worksheet query (`QueryAsync`)
 
-`SELECT {rowDims} AS k0…, {colDims} AS kR…, {agg}({m0}) AS v0, … FROM t0 [INNER JOIN tN ON …] [WHERE …]
+`SELECT {rowDims} AS k0…, {colDims} AS kR…, {agg}({m0}) AS v0, … FROM t0 [INNER JOIN tN ON …] [WHERE …]  (t0 may be a union / unpivot derived table, [query-sources.md](../features/query-sources.md#sql-shape))
 [GROUP BY k0, …] ORDER BY … LIMIT n [OFFSET m]`
 
 - **Joins:** the base table is `t0`; each join edge attaches a table aliased `tN` in order, so any

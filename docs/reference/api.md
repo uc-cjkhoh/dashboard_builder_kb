@@ -154,6 +154,25 @@ parameter) and `Value` (the cell as text, NULL stays `null`; typed `String`). A 
 
 Cells are cut in SQL like `/api/rows`. The UI (`Unpivot` button in the Tables header → `Rows/unpivot-dialog.js`) shows the first 20.
 
+### Source columns
+
+Controller: `Features/Rows/SourceController.cs`. `POST /api/source/columns` takes a source definition and answers
+`{ columns: [{ name, type, category }], truncated }` — what the Data Model card and the field pane list. It reads no rows.
+
+A **source** (`QuerySource`; `/api/query` carries it as `source`) is `{ kind, db, name, … }`:
+
+| Field | Rule |
+|---|---|
+| `kind` | `union` or `unpivot`, else 400 (`source.kind`) |
+| `db`, `name` | required (`source.db`, `source.name`); `name` ≤ 200 characters (`ApiLimits.MaxSourceName`, mirrored by `LIMITS.sourceName`) — the table name the query's fields carry; never an identifier in SQL |
+| union: `tables` | 2–5 distinct, non-blank names (`source.tables`, `source.tables[i]`); unknown → unknown identifier; `table` and `keep` are refused |
+| union: `columns` | optional, ≤ 200 distinct non-blank names (`source.columns[i]`); default every column shared by name and kind; none shared → 400 (`source.tables`); one missing from a table is unknown; one of a different kind is 400; the first 200 shared columns are returned with `truncated` |
+| unpivot: `table`, `columns`, `keep` | as `/api/unpivot` (2–50 distinct same-kind columns; ≤ 5 distinct kept ones, none also unpivoted), paths prefixed `source.`; `tables` is refused |
+
+`/api/query` with `source`: `from` must be `(source.db, source.name)` (400 `from`) and `joins` empty (400 `joins`); every field reference names that
+same `(db, name)`, any other table is a 400 ("Field references a table not in the query."). The result shape, limits and caching are unchanged
+(the definition is part of the cache key). SQL and rules: [query-sources.md](../features/query-sources.md#sql-shape).
+
 ## Relationship preview
 
 Controller: `Features/Relations/RelationsController.cs`. `POST /api/relationships/preview` — the relationship
@@ -176,7 +195,7 @@ Controller: `Features/Dashboard/QueryController.cs`. All `POST` with a JSON body
 
 | Method & path | Purpose | Shape |
 |---|---|---|
-| `POST /api/query` | worksheet query across joined tables; optional `offset` (paging), `withTotal`, `otherBucket`, `dateBucket` | `QueryRequest` → `QueryResult` (incl. `truncated`, `total?`, `other?`, `bucket?`) — `values` entries are a **number, a string or `null`** (see below) |
+| `POST /api/query` | worksheet query across joined tables, or over one union / unpivot `source` (below); optional `offset` (paging), `withTotal`, `otherBucket`, `dateBucket` | `QueryRequest` → `QueryResult` (incl. `truncated`, `total?`, `other?`, `bucket?`) — `values` entries are a **number, a string or `null`** (see below) |
 | `POST /api/query/export.csv` | CSV of the same plan, up to 100,000 rows (never an Other row) | `QueryRequest` → `text/csv` |
 | `POST /api/databases/{db}/tables/{table}/histogram` | equal-width bins over one numeric column | `HistogramRequest` |
 | `POST /api/databases/{db}/tables/{table}/boxplot` | five-number summary, optionally grouped | `BoxPlotRequest` → `{ groups, truncated, outliers, outliersTruncated }`; a group is `{ label, min, q1, median, q3, max, lowerWhisker, upperWhisker }` (whiskers = extreme values inside Q1 − 1.5 IQR / Q3 + 1.5 IQR), an outlier `{ label, value }`, at most 500 (`ApiLimits.MaxBoxOutliers`; `outliersTruncated` when more exist) |

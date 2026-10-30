@@ -19,7 +19,8 @@ matching whatever you're touching.
 |---|---|
 | [features/connection.md](features/connection.md) | Connection form, TLS + cert opt-in, summary, gating |
 | [features/schema-browser.md](features/schema-browser.md) | Database picker and draggable table chips |
-| [features/canvas.md](features/canvas.md) | Drag/drop onto the Data Model, entity cards, join keys |
+| [features/canvas.md](features/canvas.md) | Drag/drop onto the Data Model, entity cards, join keys, union / unpivot cards |
+| [features/query-sources.md](features/query-sources.md) | A union or unpivot as a data source: adding, columns, reading, saving, SQL shape |
 | [features/relationships.md](features/relationships.md) | Drawing links, cardinality, shape-coded endpoints |
 | [features/tabs.md](features/tabs.md) | Data Model tab + worksheet and dashboard tabs |
 | [features/dashboards.md](features/dashboards.md) | the dashboard board: grid, side panel, widgets, lifecycle |

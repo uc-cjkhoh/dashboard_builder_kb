@@ -5,6 +5,9 @@ Logical links between two entities' join keys, drawn on the Data Model canvas. A
 ([golden rule 5](../conventions/golden-rules.md#5-relationships-are-logical-declarations-not-database-facts)).
 Code: `Features/Relations/` (`relations.js`, `relation-rules.js`, `relations.css`). Shape: [data-model.md](../reference/data-model.md#relationship).
 
+A **union or unpivot card** ([query-sources.md](query-sources.md)) takes no relationship: it has no join keys, its rows aren't draggable, and dropping a
+table column on one toasts "A union or unpivot can't be related to a table yet."
+
 ## Drawing a link — click-to-click
 
 1. Tick a join key on entity A and on entity B ([canvas.md](canvas.md#join-keys)). Each checked key

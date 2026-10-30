@@ -220,7 +220,7 @@ What happens next
 
 Fields may come from **different tables**. The client finds a **join path** (BFS over the drawn
 relationship graph) and the server builds aliased `INNER JOIN`s along it. Tables with no connecting
-relationship → a "draw a relationship" warning, never a malformed query.
+relationship → a "draw a relationship" warning, never a malformed query. A union or unpivot card is read alone ([query-sources.md](query-sources.md)).
 
 ## View data
 
