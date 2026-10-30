@@ -4,6 +4,7 @@ Functional changes (server, models, validation, calculations, charts, workbook).
 
 ## 2026-10-30
 
+- fix: removing the only field in the Field choices editor threw (switchField on undefined) (`9b0be6e`)
 - Clean…: slug ids, Enter creates, missing (NULL) wording, recode limit in LIMITS (`d2a0c3f`)
 - unpivot, union: helper aliases that cannot shadow source columns; honest Value type; Field/Value header disambiguation; tests and live smoke (`d34cde4`)
 - board: unlinked button stays keyboard-focusable (aria-disabled), NAV_LABEL, own-dashboard target is dangling (`a5af462`)
