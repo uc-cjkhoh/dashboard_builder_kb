@@ -104,7 +104,7 @@ to Columns).
   such slot, under the view bar; picking a field swaps it into the slot (same role; a measure keeps its
   aggregation when the new field supports it, else takes the first it does). Every choice is an
   ordinary field, validated by the server like any pill. Removing the shown choice shows the next; one
-  choice left = an ordinary pill. Saved on the pill (`choices`). The ⇄ turns accent-coloured when set.
+  choice left = an ordinary pill; the slot's only field shows no remove button. Saved on the pill (`choices`). The ⇄ turns accent-coloured when set.
 - **Reorder** by dragging a pill's grip (⠿) within a shelf or across to the other one; dropping onto a
   pill inserts before it, onto empty space appends. Dimension order sets nesting/category order;
   measure order sets series order.

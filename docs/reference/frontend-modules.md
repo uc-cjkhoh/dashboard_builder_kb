@@ -50,6 +50,7 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Dashboard/filter-rules.js` | pure: `aggsFor`, `checkFilter`, `statFilters`, `withCategories`, `viewCounts`, `checkAdd` (drop-time caps) — [worksheet.md](../features/worksheet.md#drop-time-limits) |
 | `Dashboard/show-me-rules.js` | pure: chart-type field rules (`CHART_NEEDS`, `chartIssue`, the shared hint texts, `roleOf`) and the chart-type menu's cues — `issueFor`, `bestType`, `showMeOptions` — [worksheet-charts.md](../features/worksheet-charts.md#chart-type-control) |
 | `Dashboard/toolbar-rules.js` | pure: `visibleTools(chartType, tools)` — which Marks slots are quiet — [worksheet-encodings.md](../features/worksheet-encodings.md#marks-slots) |
+| `Dashboard/field-choices.js` | pure: `choicesOf`, `sameRef`, `switchField`, `removeChoice` (a slot's field choices, P40) |
 | `Dashboard/pill-options.js` | pure: `fieldPillOptions` / `filterPillOptions` (the entries of a pill's context popup), `filterSummary`, `markGrid` (Marks slots in rows of three) |
 | `Dashboard/field-group.js` | the one collapsible `<details class="ws-group">` of the field pane (Calculated fields, Hierarchies, Marks, tables) |
 | `Dashboard/fields-pane-model.js` | pure: the field pane's hide / show state (`fieldsPaneView`, `readCollapsed`, storage key) |
