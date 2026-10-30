@@ -4,6 +4,7 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-10-30
 
+- Select: open option list follows the theme; db-select browser check (`ac26bca`)
 - Board device preview: explain the disabled Size, drop stale width, disable a device wider than the panel, check-mark cue (`266ff4d`)
 - Clean… field menu: trim, replace empty, recode, read as date as calculated fields (`07f9373`)
 - Board: phone / tablet / desktop device preview (T08-04) (`be3db74`)
