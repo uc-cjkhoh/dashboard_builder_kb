@@ -192,8 +192,29 @@ its column's category), so the chart, breadcrumb and click-to-drill behave ident
 renaming, editing or deleting the hierarchy later never changes a sheet that already used it. A chip whose table isn't in the
 Data Model or whose column no longer exists is shown with a "No table" / "Missing field" badge and can't be applied; a column
 cast after the hierarchy was made refuses with the cast message. The dialog's Edit keeps a level whose column has vanished (the chip shows "Missing field" until it is removed or replaced). Hierarchies are client-side only (the server never sees one)
-and save with the workbook ([workbook.md](workbook.md)). Expand / collapse headers on a crosstab are not built
-([roadmap](../backlog/data-model.md)).
+and save with the workbook ([workbook.md](workbook.md)).
+
+### Expand / collapse headers
+
+In the Table and Text views, a Rows or Columns header that has a next level below it (every dimension but the last on its
+shelf) carries a **+ / −** button before its label (`Dashboard/collapse-model.js`, drawn by `crosstabTable`). It is a real
+`<button>` with `aria-expanded` and an `aria-label` of "Collapse <header>" / "Expand <header>"; the icon changes with the
+state, the header text beside it names the member, and focus returns to the button after the redraw. Collapsing hides every
+level below that header and the header stands for them as one row (or column, spanning the remaining header levels); the
+outermost collapsed header wins. A last-level header and the measure band have no button. The Dashboard widget draws a sheet's
+saved collapsed state but has no buttons — only the editor toggles.
+
+- **Values stay correct.** A collapsed header's cells are its children's cells combined by the measure's own aggregation
+  (`combine`, the rule the subtotals and grand totals use): sums and counts add, min / max take min / max. An average, median,
+  distinct count, percentile or table calculation cannot be rebuilt from its parts, so it shows "—" — nothing is re-aggregated
+  on the client. Totals and the subtotal row read the full data, so they don't change; a first-level subtotal row is not drawn
+  under a collapsed first-level header (the header's own row is that total).
+- **No query.** Collapsing is presentation only: it redraws from the cached result (like a format change); the rows still
+  load a page at a time, so a collapsed value covers the rows loaded so far.
+- **State** is `sheet.collapsed = { rows: [key…], cols: [key…] }` (absent until a header is collapsed), saved with the workbook and
+  restored on load ([workbook.md](workbook.md)); a key names the dimensions down to the header plus its member path, so
+  re-ordering the shelves never collapses other members, and a key whose members no longer exist is ignored. Import keeps only
+  string keys (≤ 200 per axis, each ≤ 600 characters) and reports the rest. Client-side only: the server never sees it.
 
 ## Pages
 
