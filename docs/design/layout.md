@@ -72,8 +72,10 @@ tabs wrap, the bar grows taller than the brand.
 
 ## Entity cards
 
-**Uniform height** — a head (table name in 600 weight, the database muted before it) over an
-internally-scrolling column list: flat solid card, 1px stroke, `--elev-2`. No rows on the card: a table's rows
+A head on `--surface-2` (table name in 600 weight, the database muted before it) over an
+internally-scrolling column list up to 240px tall: flat solid card, 1px stroke, `--elev-2`; the column type is plain muted text.
+The Data Model ground is a 24px dot grid; cards snap to 8px and are placed on a 312px slot with a 48px gutter, which holds a link's elbow and badge
+([canvas.md](../features/canvas.md#canvas-ground)). The gutter is canvas placement, not component spacing, so it sits outside the 4 / 8 / 16 / 24 steps. No rows on the card: a table's rows
 open in a dialog from its schema-browser chip. A caret in the head collapses the card to its title bar; key columns show the
 key icon.
 

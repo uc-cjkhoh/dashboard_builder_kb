@@ -5,6 +5,12 @@ Drag and Drop API — no library ([D4](../reference/decisions.md#d4--vanilla-js-
 Code: `Features/Canvas/` (`_Canvas.cshtml`, `canvas.js`, `empty-state.js`, `canvas.css`). Relationship drawing on top of
 the cards is [relationships.md](relationships.md).
 
+## Canvas ground
+
+A 24px dot grid (`--line-2` dots, offset by the 16px gutter) on `.view--model`, `background-attachment: local` so it scrolls with the cards.
+Cards snap to its 8px steps; the free-slot step (312 + 48 = 360) is a whole number of dot cells. While a table chip is dragged over, the ground takes a faint accent wash
+and the dashed accent outline.
+
 ## Dragging a table onto the canvas
 
 - A sidebar chip's `dragstart` sets `application/x-ch-table` = `{db, table}` with
@@ -15,8 +21,8 @@ the cards is [relationships.md](relationships.md).
   added twice: the existing card is scrolled into view and focused (`tabindex="-1"`) and a toast says so.
 - The `table:add` event (the chip's `＋` fallback) takes the same path. A dropped table always lands in
   the shared model — `table:add` switches to the Data Model tab first ([tabs.md](tabs.md)).
-- A `＋`-added card goes in the **first free grid slot** (300 × 300 cells from the 16px view gutter,
-  24px gap, as many columns as fit the visible canvas), so it never covers another card's title. A dropped card lands at the drop point.
+- A `＋`-added card goes in the **first free grid slot** (312 × 312 cells from the 16px view gutter,
+  a 48px gutter between cards — room for a link's elbow and badge — as many columns as fit the visible canvas), so it never covers another card's title. A dropped card lands at the drop point.
 
 ## Creating an entity
 
@@ -38,7 +44,8 @@ saying how its columns are matched; column names and the note start where the ti
 
 ## Empty state
 
-With no entities the canvas shows **one sentence and one button**, chosen by `emptyState()` in
+With no entities the canvas shows **a ghost model** (two dashed cards joined by an elbow link with its one / many ends, drawn in tokens,
+`aria-hidden`), **one sentence and one button**, chosen by `emptyState()` in
 `empty-state.js` (pure) and the button focuses the control for that step (expanding a collapsed sidebar
 first — `expandSidebar()`, [layout.md](../design/layout.md#sidebar)):
 
@@ -51,21 +58,22 @@ first — `expandSidebar()`, [layout.md](../design/layout.md#sidebar)):
 ## Card anatomy
 
 - **Head** (`.entity__head`): the table name (600) with the database muted before it, a collapse caret,
-  a remove icon. The card width follows the `db.table` text, from `--entity-min` (300px) to `--entity-max`
+  a remove icon. The card width follows the `db.table` text, from `--entity-min` (312px — the slot width) to `--entity-max`
   (480px) on `#model-view` (`card-width.js`, pure); beyond the maximum the name ellipsises (full name in its
   `title`). Link anchors read the measured card box, so any width stays correct.
 - **Column rows** (`.col-row`): a **type icon** (number / text / date / bool), name, a **type badge**
   (`.col-row__type`, from the type category), and a **join-key checkbox** (`.col-row__key`); ticked key
   columns show the key icon.
-- Flat solid card: 1px stroke, `--elev-2` (`--elev-16` while dragging).
-- **No rows on the card.** Cards are uniform height with an internally-scrolling column list; a table's rows are
+- Flat solid card: 1px stroke, `--elev-2` (`--elev-16` while dragging). The head sits on `--surface-2`.
+- The type is plain muted monospace text at the row's end (no chip); a join-key row's name and key icon are accent.
+- **No rows on the card.** The column list scrolls inside the card up to 240px tall (a short table is only as tall as its columns); a table's rows are
   previewed from its chip in the schema browser ([schema-browser.md](schema-browser.md#row-preview)).
 - The caret toggles `.entity--collapsed`, leaving only the title bar.
 
 ## Moving & removing
 
 - Cards move by dragging the **head** with pointer events (a separate gesture from chip DnD); the
-  entity's `x, y` update and `entity:moved` fires so links re-route.
+  entity's `x, y` snap to 8px steps and update and `entity:moved` fires so links re-route.
 - Removing a card removes its relationships, with a confirm dialog when any exist. If a half-drawn link
   was waiting on that card, it is cancelled (no dangling "undefined" toast).
 

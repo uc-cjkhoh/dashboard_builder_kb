@@ -36,12 +36,17 @@ types, and no cardinality dialog — when:
 
 ## Rendering
 
-- Links are SVG paths in an overlay (`.rel-svg`, `.rel-link`) between the two column rows, with a wider
-  invisible hit path (`.rel-link__hit`) for clicking.
-- **Shape-coded endpoints** (`.rel-end`) — a tick for "one", a crow's foot for "many" — so cardinality
+- Links are **elbow lines with rounded corners** between the two column rows, in two SVG overlays: the lines (`.rel-svg`, `.rel-link`) sit
+  **under** the cards, so a link to a far card slips under the cards between; the badges (`.rel-svg--labels`) sit **over** them, so a badge wider than the
+  gutter is never clipped. A wider invisible hit path (`.rel-link__hit`) makes the line easy to click; line and badge act as one link (hover, click).
+- The route (`link-route.js`, pure): a link leaves a card's side straight out, turns at right angles and enters the other card straight in.
+  Cards with a gutter of at least 32px face each other and the link turns 24px out of the left card's edge; closer or overlapping cards both use the right
+  edge and the link loops out past the farther one. Links sharing a gutter take lanes 8px apart; a badge that would cover another steps down.
+- **Shape-coded endpoints** (`.rel-end`) — a tick for "one", a crow's foot for "many", square to the card edge — so cardinality
   reads without colour.
-- A **cardinality badge** (`.rel-badge`) sits at the midpoint — "1:N", or "1:N · left" / "· right" / "· full" for an outer join.
-- Resting links use `--ink-2`; a link is `--accent` blue only while **selected or being drawn**.
+- A **cardinality badge** (`.rel-badge`, a pill) sits on the link's middle run — "1:N", or "1:N · left" / "· right" / "· full" for an outer join.
+- Resting links use `--ink-3`; a link is `--accent` while **hovered, selected or being drawn**, and the two key rows it joins take the accent wash
+  (`.col-row--linked`) so which columns a line connects reads at a glance.
 
 ## Editing & cleanup
 
