@@ -15,11 +15,13 @@ saving: [workbook.md](workbook.md). Why separate tab kinds: [D61](../reference/d
 - **Bar** above the canvas: the dashboard's name, "n of 12 widgets", the **status line** (below), the **device preview** (below), the **Size** select, **Undo** / **Redo**,
   **Full screen** and **Print**.
 - **Device preview** (`Board/board-device.js`): **Desktop** (default), **Tablet** (768 px) or **Phone** (390 px) buttons, each icon + text with
-  `aria-pressed`. Tablet and Phone draw the same widgets in a centred, outlined box of that width (never wider than the panel), so the
-  normal layout rule decides the result: Tablet keeps the 12-column grid, Phone is under the 720 px stack threshold and stacks. While a
-  device is on, the Size select is disabled (the preview replaces a fixed size); Desktop restores both. Transient: never saved, not in
-  undo, ignored by print. Editing still works in the box (drag snaps to the drawn grid); there is no per-device layout yet
-  ([backlog](../backlog/dashboards.md)).
+  `aria-pressed`; the pressed one also shows a check mark and a heavier outline. Tablet and Phone draw the same widgets in a centred,
+  outlined box of that width, so the normal layout rule decides the result: Tablet keeps the 12-column grid, Phone is under the 720 px
+  stack threshold and stacks. A device wider than the panel is disabled, its title saying so (widen the window). While a device is on, the
+  Size select is disabled with the title "Size is replaced by the device preview; choose Desktop to change it" (a fixed-size dashboard
+  also gets that sentence in the status line); the fixed box is dropped and comes back on Desktop. Transient: never saved, not in
+  undo, ignored by print. The Tablet box is editable like the board (drag and resize snap to the drawn grid); the stacked Phone box has no
+  drag or resize, as on any narrow canvas. There is no per-device layout yet ([backlog](../backlog/dashboards.md)).
 - **Size** (`Board/board-size.js`, per dashboard): **Automatic** (default; the canvas fills its panel and stacks when narrow, as below) or a
   **fixed** preset (800 × 600, 1024 × 768, 1280 × 720, 1366 × 768, 1920 × 1080). A fixed board is exactly that box, never stacked: columns span the
   width and the rows in use (down to the lowest widget) stretch to share the height (`layoutBoard(…, { fixed })`, `fixedRowH`), so
