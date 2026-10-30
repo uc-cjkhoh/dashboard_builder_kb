@@ -4,6 +4,11 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-10-30
 
+- Entity card ✕ ink ends where the type badges end (optical alignment audit of the Data Model cards) (`e15f377`)
+- Union and unpivot as a data source in the client: Add to model, source cards, worksheet plan, workbook save/restore (`fc93948`)
+- Expand / collapse headers: review fixes (`431a772`)
+- Expand / collapse crosstab row and column headers (T03-29) (`7f51489`)
+- Optical alignment audit: table chips on the gutter, entity head title/badges/✕, shelf label width, 4px menu and field-row gaps, chevron selects, phone view bar wraps (`0f7cf6d`)
 - Tooltip modal review fixes: aligned trim, 12-line block, textarea style rule, focus return, dark check (`a53f68a`)
 - Tooltip style: omit the key when unstyled so v1 files round-trip identically (`1e6b582`)
 - Tooltip modal: per-line size/bold/italic/colour editor with live side-by-side preview (`77f4a49`)

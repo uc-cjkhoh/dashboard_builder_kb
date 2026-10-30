@@ -20,6 +20,24 @@
             "command": "/unified/user/cj/knowledge/web_development/dashboard_builder/.claude/hooks/update-log.py",
             "timeout": 15,
             "statusMessage": "Updating docs/updates logs..."
+          },
+          {
+            "type": "command",
+            "command": "/unified/user/cj/knowledge/web_development/dashboard_builder/.claude/hooks/reap-chrome.sh",
+            "timeout": 10,
+            "statusMessage": "Checking for orphaned Chrome..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/unified/user/cj/knowledge/web_development/dashboard_builder/.claude/hooks/reap-chrome.sh",
+            "timeout": 10,
+            "statusMessage": "Checking for orphaned Chrome..."
           }
         ]
       }

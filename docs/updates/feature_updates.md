@@ -4,6 +4,9 @@ Functional changes (server, models, validation, calculations, charts, workbook).
 
 ## 2026-10-30
 
+- Source review: name limit and relationship/duplicate handling on import, lossy card note, browser check (`fc81764`)
+- Source review: exact integer and Nullable unification with a lossy marker, stub-ClickHouse gateway tests (`9e5cabe`)
+- Union and unpivot as a query source: SourceSql, /api/query source, /api/source/columns (`0e765fd`)
 - Date axis labels: null-canvas fallback, one-pass maps, Show all sized from shortened labels (`e2f932c`)
 - Date axis labels: abbreviate datetimes, thin by measured width, keep first and last, never overlap (`c149386`)
 - feat(calc): TEXT error wording names STR; more TEXT tests (`4066070`)
