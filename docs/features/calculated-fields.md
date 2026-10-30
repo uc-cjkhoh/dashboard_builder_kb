@@ -72,7 +72,7 @@ in the formula**, never a field or a computed value.
 
 | Function | Result | Meaning |
 |---|---|---|
-| `TEXT(x)` / `STR(x)` | text | a number, date or text as text (`STR` is the same function; the argument may be any number, date or text expression, a condition is refused: `TEXT needs a number, date or text — that value is boolean.`). Numbers print as ClickHouse `toString` of the Float64 does: `10`, `2.5`, no thousands separator. A date reads `2024-03-05`; a value with a time (a `DATEADD` result) reads `2024-03-05 14:30:00`. NULL gives NULL; text is unchanged. `CONCAT('#', TEXT([o.id]))` builds a label. The argument is not limited to text, unlike the rows below |
+| `TEXT(x)` / `STR(x)` | text | a number, date or text as text (`STR` is the same function; the argument may be any number, date or text expression, a condition is refused: `TEXT (or STR) needs a number, date or text — that value is boolean.`). Numbers print as ClickHouse prints a Float64 (`10`, `2.5`, `0.30000000000000004`, `1e21`; no thousands separator). A date reads `YYYY-MM-DD`; any value with a time (a `DATETIME` column, a `DATEADD` result) reads `YYYY-MM-DD hh:mm:ss`. NULL gives NULL; text is unchanged. `CONCAT('#', TEXT([o.id]))` builds a label. The argument is not limited to text, unlike the rows below |
 | `LOWER(t)` / `UPPER(t)` | text | change case, accents and non-Latin letters included (`UPPER('straße')` is `STRASSE`) |
 | `TRIM(t)` | text | remove leading and trailing spaces (the space character only; tabs and line breaks stay) |
 | `LEN(t)` | number | length in **characters**, not bytes (`LEN('日本語')` is 3) |
