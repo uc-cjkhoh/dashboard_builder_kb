@@ -23,7 +23,9 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
   appearance toggle = shelves = chart card on the right. `+`-placed entity cards start on the gutter
   ([canvas.md](../features/canvas.md#dragging-a-table-onto-the-canvas)).
 - **Full-width lists align with their siblings:** `.table-list` keeps 2px shadow room with a matching
-  `-2px` inline margin, so table chips share the search box's edges.
+  `-4px` inline margin (equal to its padding), so table chips share the search box's edges. A chip's table icon sits on the 8px left gutter and its `+` glyph 8px from the right edge; the hover grip overlays the icon instead of reserving a slot.
+- **Entity cards:** the head title's text starts at the column-name x (`calc(--s4 - 2px)` after the chevron box), and the ✕ glyph ends where the type badges end (the hover-only profile button is ordered before the badge).
+- **Nothing touches:** menu lists (`.menu__list`, incl. the two-column chart picker) have a 4px gap between items; stacked `<details>` field rows are spaced 4px apart (`.ws-group > :not(summary) + *`). Single-choice `<select>`s show a chevron on the 16px gutter instead of the UA arrow (pill selects keep the native one).
 - **Ghost icon buttons at a row's end overhang by their 8px glyph slack** (`margin-inline: -8px`), so
   the glyph meets the edge: `#sidebar-toggle`, the appearance toggle (`.scheme`), the view bar's chart picker and last
   icon button, the tool-panel ✕, and both `.entity__head` buttons (chevron over the row checkboxes, ✕ flush with the
@@ -76,7 +78,7 @@ Data controls sit in the glass header; view controls sit on the chart card they 
 ([features/worksheet.md](../features/worksheet.md#layout)):
 
 1. **Data header** (`.ws-shelves`, glass) — **Columns**, **Rows** and **Marks** lanes, each a fixed
-   label column + zone (`72px 1fr`) so every lane starts at the same x. Pills are 24px, so a filled lane
+   label column + zone (`88px 1fr`, wide enough for "COLUMNS") so every lane starts at the same x. Pills are 24px, so a filled lane
    stays as tall as an empty one. The Marks slots sit in the field pane
    ([Marks slots](../features/worksheet-encodings.md#marks-slots)); one editor panel (`.ws-toolpanel`) opens under the lanes at a time.
 2. **Chart card** (`.ws-chart-card`, solid) — a head (`.ws-chart-head`) with the **view bar**
@@ -107,7 +109,7 @@ viewport ≤ 760px the panel moves above the canvas (max-height 9rem, scrolling)
 
 The shell keeps its fixed frame; the sidebar starts on its rail (not remembered — a wide screen keeps the
 user's choice) and opens over the content. The worksheet becomes one column: the data header (a **Fields**
-button, then Columns / Rows / Marks with 68px labels, tools wrapping), then the chart card at ≥ 380px tall;
+button, then Columns / Rows / Marks with 84px labels, tools wrapping), then the chart card at ≥ 380px tall;
 `.ws-main` scrolls inside itself. The field pane opens as an overlay from **Fields** (`.is-fields-open`)
 and closes on a tap outside it or `Esc`. The view bar wraps: chart type, then sort and the icon group.
 These are responsive CSS rules (`dashboard.css`), not visibility toggles — `hidden` stays the only
