@@ -8,7 +8,7 @@ Base worksheet: [worksheet.md](worksheet.md). State shapes:
 
 ## Marks slots
 
-The Marks group of the field pane (after Hierarchies; `.ws-shelf--marks`, collapsible like the others) is a grid of **three columns** of slots — Color, Size, Label, Detail,
+The Marks group of the field pane (at its top; `.ws-shelf--marks`, collapsible like the others) is a grid of **three columns** of slots — Color, Size, Label, Detail,
 Tooltip, Shape, Path, Angle, Filters, Date range, Drill, Pages (`buildTools` / `toolButton`; `markGrid` in `Dashboard/pill-options.js` chunks them into rows of three).
 Every tool is always reachable (there is no More menu): `visibleTools(chartType, tools)` (`Dashboard/toolbar-rules.js`, pure) only decides which are **quiet** — the
 tools the chart type doesn't use (Size / Shape: scatter, square, circle; Path: line, area; Angle: pie, donut; Detail, Drill, Pages by default) are dimmed unless they hold fields.
@@ -181,7 +181,7 @@ A **named hierarchy** (T03-29) is a reusable drill path kept on the workbook:
 `{ id, name, levels: [{ db, table, column }] }` — 2–6 levels, all from one table, no repeated column (the same rules as
 the Drill tool), at most **20** per workbook, a name of 1–60 characters unique case-insensitively. A calculated field or a
 field with a type cast can't be a level (the calc refusal text, or "A field with a type cast can't be a hierarchy level").
-They are managed in the field pane's **Hierarchies** group (above the tables): **New hierarchy** and **Hierarchies…** open the
+They are managed in the Hierarchies dialog (the sidebar's drill icon on a worksheet tab; each row has **Use** to set the worksheet's drill levels, **Edit** and **Delete**): **New hierarchy** and **Hierarchies…** open the
 dialog (`Dashboard/hierarchy-dialog.js`) — a name, a table, and an ordered level list built with an "Add a level" picker and
 per-level **Up / Down / Remove** buttons (labelled, keyboard-operable; focus stays on the control just used), plus
 Edit / Delete (Delete confirms). Each hierarchy is a chip with its level count.

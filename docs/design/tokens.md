@@ -65,6 +65,11 @@ The tint stays ≥ 70 % so text on glass keeps AA contrast whatever the wash doe
 `backdrop-filter`, or `prefers-reduced-transparency: reduce` → `--glass` becomes the opaque `--surface-2`
 and `--glass-ctl` the opaque `--surface`.
 
+### Buttons have no border
+
+`Core/buttons.css` (loaded last) removes the border of every button (`button`, `.btn`, `.iconbtn`, `.tab`, `.tab-add`, `.ws-tool`, `.card-choice`, `[role=button|tab]`; `!important`, because feature sheets set their own).
+The fill carries the edge instead: `--btn-fill` / `--btn-fill-hover` (8 % / 14 % ink over `--surface`) for `.btn`, `--btn-fill`-tinted frosted fills for the glass tiers and the sidebar tools, `--danger-bg` for a danger button, the accent for a primary one. Where the ≥ 3:1 edge rule below named a border, read "a fill that stands out from the glass".
+
 ### Controls on glass — three tiers and a state ladder
 
 Blur does not signal "clickable", so interactivity is carried by solidity, edge and feedback:

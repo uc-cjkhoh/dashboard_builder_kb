@@ -173,7 +173,7 @@ limit and a workbook over the calculation count are refused with a message; none
 
 ## The dialog
 
-**New calculated field** (field pane) and **Edit…** open one dialog (`calc-dialog.js`; all logic in
+**New calculated field** (in the Calculated fields dialog, opened from the sidebar's calculator icon on a worksheet tab: one row per calculation — its chip with the add-to-shelf plus and context menu — and an **Edit** button; it redraws as calculations change; fields can no longer be dragged from a list, so the plus is how a calculation reaches a shelf) and **Edit…** open one dialog (`calc-dialog.js`; all logic in
 `calc-dialog-model.js`):
 
 - **Name** — 1 to `LIMITS.calcName` characters after trimming, no `.`, `[` or `]`, unique ignoring case.

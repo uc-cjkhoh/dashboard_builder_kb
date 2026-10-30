@@ -4,6 +4,11 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-10-30
 
+- Flat buttons: no border on any button; the fill carries the edge (buttons.css) (`50dcd31`)
+- Sidebar tool tiles: a visible control edge and full-ink icon so they read on the glass in light and dark (`2b0b540`)
+- Worksheet rail: the tool icons in one column (1 x N) so the sidebar is as narrow as the dashboard rail (`127836f`)
+- Sidebar tools on worksheet tabs are two icons; each opens a dialog (Calculated fields manager, Hierarchies with Use) (`4ef62c1`)
+- Field pane: Marks first, then search and tables; Calculated fields and Hierarchies move to the sidebar body on worksheet tabs (Data Source: connection/tables; dashboard: rail) (`a06b4ba`)
 - Field pane redesign: a solid tile per table as the focus, flat tinted field rows, quieter marks / calculated fields / hierarchies below (`6b92cc3`)
 - Sidebar body only on the Data Source tab; worksheets and dashboards get a brand-only rail (`b432db2`)
 - Entity cards: more depth off the wash (visible edge, two-layer shadow, head rim highlight, light and dark) (`5c19f64`)

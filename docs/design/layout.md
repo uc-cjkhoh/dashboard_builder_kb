@@ -49,9 +49,10 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
   state is remembered in this browser (`localStorage` `dashboardbuilder.sidebar.collapsed`, read/write
   wrapped in `try`). Anything that focuses a sidebar control first calls `expandSidebar()`
   (the canvas empty-state button does).
-- **Data Source only:** the sidebar body (`#sidebar-body`: connection, database, tables) belongs to the Data Source tab. `Shell/sidebar.js` sets `.app[data-view="model"|"sheet"]` from
-  `view:changed`; on any worksheet or dashboard tab the body, its resizer, the brand name and the toggle are `display: none` and the column shrinks to a `--topbar-h` rail
-  holding the brand mark, so the worksheet gets the room. The user's own collapse choice is untouched and returns with the Data Source tab.
+- **The body follows the tab.** `Shell/sidebar.js` sets `.app[data-view="model"|"sheet"|"board"]` from `view:changed`. **Data Source:** the full sidebar — connection, database and tables.
+  **Worksheet and dashboard:** the sidebar shrinks to a `--topbar-h` rail (the brand name, toggle, resizer and the connection / database / tables are `display: none`) that holds the brand mark;
+  on a **worksheet** the rail also carries the tool icons in one column, 1 × N (`#ws-tools`, `.sidebar__tool`, 40px, frosted control tier: `--ctl-edge` ≥ 3:1 border, full-ink icon, accent on hover; filled by `dashboards.js`): **Calculated fields** (`calc` icon) and **Hierarchies**
+  (`drill` icon), each with its name as `aria-label` / tooltip and each opening a dialog. A dashboard's rail has the mark only. The user's own collapse choice is untouched and returns with the Data Source tab.
 - The brand name is one line (ellipsis), so the toggle never makes the brand row taller
   than `--topbar-h`.
 - Glass rail in the active theme (light or dark). Section titles are sentence case, `--fs-body` 600.
