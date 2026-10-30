@@ -33,7 +33,7 @@ How each encoding reaches the query (`planDims` / `planMeasures`):
 | **Path** | 1 field | numeric → extra measure | orders line/area vertices (`pathOrderedRows`) |
 | **Angle** | 1 measure | — | acknowledged for pie/donut (already measure → angle); a hint elsewhere |
 
-### Tooltip text (T01-19)
+### Tooltip text (T01-19) and the tooltip modal
 
 The Tooltip tool panel also holds a **Tooltip text** editor: free text with `<Field>` placeholders for the
 view's fields — group-by / Tooltip fields as `table.column`, measures as named in the view — plus literal text
@@ -45,6 +45,20 @@ bar / line / area / combo (axis tooltip: every series in the hover), pie / donut
 unknown placeholders show as literal text, values use the existing value / category formatters. All HTML is built
 in `Dashboard/tooltip-model.js` from escaped parts only (`<script>`, quotes, `&` are escaped — user text never
 becomes markup). The automatic tooltip is kept on Table, Text, KPI, Heatmap, Treemap, discrete-colour splits, Scatter with a Shape field and the P36 chart types. The chips offer only fields that resolve: group-by / Tooltip fields and the shelf measures (not Size / continuous-Colour measures).
+
+**Edit tooltip…** (button in the panel) opens a modal (`Dashboard/tooltip-dialog.js`): left, the template as a list of
+lines (one text input each, at most `LIMITS.tooltipLines` = 12; the 300-character total still applies and blocks Apply),
+field chips that insert `<field>` into the selected line, **Add line**, per-line **move up / down** (buttons, or Alt+Up /
+Alt+Down in a line's input; the style travels with the line) and **remove**, and per line a **size** (Auto, 14, 16 or
+24 px), **bold**, **italic** and **colour** (Auto or a token palette: text, muted, accent, green, amber, blue, teal,
+violet). Right, a live preview rendered by the same `tooltipHtml` the chart hover uses, filled with the chart's first-mark
+sample values. Edits are a draft: **Apply** commits once (one undo step), **Cancel** / Esc discard, **Automatic**
+clears the template. Focus goes to the first line on open. The style is stored as `tooltipStyle` on the sheet — a list
+aligned to the template's lines of `{ size?, bold?, italic?, color? }` (`null` / absent = default; the key exists only
+once a line is styled, so older files round-trip unchanged). `checkTooltipStyle` (`Dashboard/tooltip-style.js`) validates
+it on import: sizes only from the type scale, colours only palette keys (mapped to `var(--ink)`, `var(--accent-ink)`…,
+so they follow the theme; no hex, nothing user-typed reaches a `style` attribute), at most 12 lines; an invalid style is
+dropped with an issue, and a style without a template is ignored. Clearing the text clears the style.
 
 - Extra measures never become chart series; with no marks set the plan is byte-identical to a plain
   shelves plan.

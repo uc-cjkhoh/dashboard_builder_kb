@@ -14,7 +14,7 @@ Format: [README.md](README.md#how-to-read-an-entry). Chart types are in [workshe
 
 ## Authoring gaps
 
-- **Tooltip field formats** (IDs: T01-19 remainder; priority P2) — Open: tooltip text has no per-field number/date format inside the template (values use the view's formats). Needs: none.
+- **Tooltip field formats** (IDs: T01-19 remainder; priority P2) — partial: the tooltip modal covers line order, per-line size / bold / italic / colour and a live preview; missing: per-field number / date format inside the template (values use the view's formats), and styling a single field token or word within a line (style is per line). Needs: none.
 - **Discrete/continuous pills and double-click placement** (IDs: T01-04, T01-15; priority P1) — Partial: role convert and date part only, no explicit discrete/continuous toggle; drag and plus-button placement only, no double-click. Needs: continuous axes for the toggle.
 - **Start screen and recent sources** (IDs: T01-14; priority P1) — partial: import, autosave restore and recent connections (host, port, user; no password) exist; no start screen listing recent workbooks or sample data. Needs: none.
 - **Analytics pane** (IDs: T07-01; priority P2) — partial: the Analytics card has draggable / pressable items (reference line, band, trend, forecast) that add at a default; missing: a separate always-visible pane, items placed per measure or per chart (a line sits on one chosen measure), and items for a table (totals stay checkboxes). Needs: none.
