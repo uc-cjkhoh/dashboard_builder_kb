@@ -21,6 +21,8 @@ Gotchas that have bitten (or will bite) this app. Read before touching the area 
   ([D11](../reference/decisions.md#d11--tls-certificate-validation-safe-by-default-explicit-per-connection-opt-in)).
 - **A hand-built `HttpClient` must set `AutomaticDecompression`**, or ClickHouse.Client throws
   "server returned compressed result but HttpClient did not decompress it".
+- **A union or unpivot source multiplies the scan** (every source table in full, up to 50 rows per unpivoted source row); only
+  `max_execution_time` bounds it, and a profile that refuses settings has none — [query-sources.md](../features/query-sources.md#cost-limit).
 - **Two connections, same server, different databases is normal.** Scope every query to the
   connection + database the request names, never a global default.
 - **A ClickHouse `JOIN … ON a = b` never matches NULL keys** (verified: `NULL = NULL` joins 0 rows), so a

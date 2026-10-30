@@ -157,7 +157,7 @@ Cells are cut in SQL like `/api/rows`. The UI (`Unpivot` button in the Tables he
 ### Source columns
 
 Controller: `Features/Rows/SourceController.cs`. `POST /api/source/columns` takes a source definition and answers
-`{ columns: [{ name, type, category }], truncated }` — what the Data Model card and the field pane list. It reads no rows.
+`{ columns: [{ name, type, category }], truncated, lossy }` (`lossy`: names of columns read as `Float64` because their types differ with no exact common type) — what the Data Model card and the field pane list. It reads no rows.
 
 A **source** (`QuerySource`; `/api/query` carries it as `source`) is `{ kind, db, name, … }`:
 
