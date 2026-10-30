@@ -11,6 +11,17 @@
             "statusMessage": "Verifying KB against kb-maintenance.md..."
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/unified/user/cj/knowledge/web_development/dashboard_builder/.claude/hooks/update-log.py",
+            "timeout": 15,
+            "statusMessage": "Updating docs/updates logs..."
+          }
+        ]
       }
     ]
   }

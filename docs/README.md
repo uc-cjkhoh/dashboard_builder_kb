@@ -74,6 +74,13 @@ Overview: [../DESIGN.md](../DESIGN.md).
 | [backlog/journeys-and-releases.md](backlog/journeys-and-releases.md) | journeys, acceptance scenarios, releases R0–R3, quality targets |
 | [backlog/out-of-scope.md](backlog/out-of-scope.md) | deliberately excluded topics and why |
 
+## updates/ — what changed, by date
+
+| Doc | Topic |
+|---|---|
+| [updates/ui_updates.md](updates/ui_updates.md) | visual and interaction changes, grouped by date (generated) |
+| [updates/feature_updates.md](updates/feature_updates.md) | functional changes, grouped by date (generated) |
+
 ## Not here
 
 - **Phases P0–P20 as built, step by step** → the frozen [../archive/build-plan.md](../archive/build-plan.md)

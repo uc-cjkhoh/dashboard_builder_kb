@@ -14,7 +14,7 @@ Run with --all to check every KB doc from the shell (prints findings, exit 1 if 
 import json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-EXEMPT = ("archive/",)
+EXEMPT = ("archive/", "docs/updates/")  # updates/ is a generated log (update-log.py): history by design, underscore names
 HISTORY = [
     (r"\bCorrection,? same day\b", "changelog-style 'Correction, same day'"),
     (r"\b(shipped|added|fixed|removed|changed|built|deployed|migrated)\s+(on\s+|live\s+)?\d{4}-\d{2}-\d{2}\b", "dated changelog entry"),

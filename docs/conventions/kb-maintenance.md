@@ -52,6 +52,16 @@ agent) line-limit breaches, code blocks in `ARCHITECTURE.md`, non-kebab-case `do
 changelog phrasing, and broken file/anchor links — inbound ones included. `archive/` and
 `*.local.md` are exempt. Fix what it reports in the same change.
 
+## Update logs
+
+`docs/updates/ui_updates.md` and `feature_updates.md` are the one place history lives, and they are
+generated, not edited: `.claude/hooks/update-log.py` rebuilds them from the app repo's `main` history
+whenever a Bash call runs `git merge` or `git commit` (or by hand: `python3 .claude/hooks/update-log.py
+--rebuild`). One section per commit date, newest first; each commit lands in exactly one file (UI =
+styles, markup, visual wording; feature = server, models, behaviour); test-only and docs-only commits
+are skipped, and commits of one date that open with the same four words collapse to one bullet.
+`kb-verify.py` exempts `docs/updates/` from the history-phrasing, kebab-case and line rules.
+
 ## Related
 
 - The full standard → `/unified/user/cj/knowledge/general/knowledge_base_best_practice.md`
