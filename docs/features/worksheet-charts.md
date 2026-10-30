@@ -146,6 +146,15 @@ Format → **Line style** (Line, Area, Combo; also the dashed comparison lines, 
   scatter have no category axis and always fit the pane.
 - **Fit** (P23, `format.fit`): `applyFitMode` drops the minimum width / height (and the zoom) on the fitted
   axis, whose labels then thin out (`hideOverlap`) instead of forcing a slot each.
+- **Date axis labels** (`Dashboard/date-axis.js`, pure; wired in `chart.js` `dateAxisLabels`; only when the
+  chart's first dimension is a date). Datetime labels are shortened to what varies across the data — midnight-only
+  reads as dates, one day as times, one year drops the year, zero seconds drop; other text is left alone. **Thin
+  out** draws only as many labels as fit the measured text width (canvas `measureText` in the axis font) plus
+  8px, spread evenly with the **first and last always shown** and none touching (end labels hang inward; a
+  left axis needs 18px a label); when ticks land a day or more apart the time of day is dropped. A bottom
+  axis that can't hold three horizontal labels turns them upright. Works on the left axis of horizontal
+  bars too, and is re-planned on resize. **Show all** keeps every label, shortened. The tooltip keeps the full
+  value.
 - **Big charts.** Past **1,000** categories an axis stops growing: a themed **zoom slider** (plus wheel /
   drag in the plot) shows a pane-width window of categories at a time (`addZoom`). Past **1,500** marks
   the chart draws on **canvas** instead of SVG; bars use ECharts' large mode (unless a bar carries its own
