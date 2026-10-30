@@ -198,7 +198,7 @@ and save with the workbook ([workbook.md](workbook.md)).
 
 In the Table and Text views, a Rows or Columns header that has a next level below it (every dimension but the last on its
 shelf) carries a **+ / −** button before its label (`Dashboard/collapse-model.js`, drawn by `crosstabTable`). It is a real
-`<button>` with `aria-expanded` and an `aria-label` of "Collapse <header>" / "Expand <header>"; the icon changes with the
+`<button>` with `aria-expanded` and an `aria-label` of "Collapse <header> (rows)" / "Expand <header> (columns)"; the icon changes with the
 state, the header text beside it names the member, and focus returns to the button after the redraw. Collapsing hides every
 level below that header and the header stands for them as one row (or column, spanning the remaining header levels); the
 outermost collapsed header wins. A last-level header and the measure band have no button. The Dashboard widget draws a sheet's
@@ -209,12 +209,15 @@ saved collapsed state but has no buttons — only the editor toggles.
   distinct count, percentile or table calculation cannot be rebuilt from its parts, so it shows "—" — nothing is re-aggregated
   on the client. Totals and the subtotal row read the full data, so they don't change; a first-level subtotal row is not drawn
   under a collapsed first-level header (the header's own row is that total).
-- **No query.** Collapsing is presentation only: it redraws from the cached result (like a format change); the rows still
-  load a page at a time, so a collapsed value covers the rows loaded so far.
+- **No query.** Collapsing is presentation only: it redraws from the cached result (like a format change). While the table is
+  still paging, or the result was cut at its group limit, a collapsed cell (and a collapsed row's or column's total) reads "—"
+  rather than a partial sum. Colour scales and data bars are measured on the values shown, collapsed sums included.
 - **State** is `sheet.collapsed = { rows: [key…], cols: [key…] }` (absent until a header is collapsed), saved with the workbook and
   restored on load ([workbook.md](workbook.md)); a key names the dimensions down to the header plus its member path, so
   re-ordering the shelves never collapses other members, and a key whose members no longer exist is ignored. Import keeps only
-  string keys (≤ 200 per axis, each ≤ 600 characters) and reports the rest. Client-side only: the server never sees it.
+  string keys (≤ 200 per axis, each ≤ 600 characters) and reports the rest. A click first prunes keys that match no current
+  header; at 200 collapsed headers a further collapse is refused with a toast and nothing changes. Undo / redo cover it (the
+  sheet snapshot). Client-side only: the server never sees it.
 
 ## Pages
 
