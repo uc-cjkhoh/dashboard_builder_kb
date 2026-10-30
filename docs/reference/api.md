@@ -138,6 +138,21 @@ parameter), then the shared columns. No ordering, no aggregation, no filters.
 
 Cells are cut in SQL like `/api/rows`. The UI (`Union` button in the Tables header → `Rows/union-dialog.js`) shows the first 20.
 
+### Unpivot
+
+Controller: `Features/Rows/UnpivotController.cs`. `POST /api/unpivot` turns **wide columns of one table into rows**: each source row becomes
+one row per chosen column, answered in the `/api/rows` shape. Columns: the `keep` columns, then `Field` (the column's name, bound as a
+parameter) and `Value` (the cell as text, NULL stays `null`; typed as the first chosen column). No ordering, no aggregation, no filters.
+
+| Field | Rule |
+|---|---|
+| `db`, `table` | required; unknown → 400/404 |
+| `columns` | 2–50 distinct names (`ApiLimits.MaxUnpivotColumns`, mirrored by `LIMITS.unpivotColumns`); blank or repeated → 400 (`columns[i]`); unknown → unknown identifier; all must be the **same kind** (text / number / date …), else 400 (`columns[i]`) |
+| `keep` | optional, ≤ 5 (`MaxUnpivotKeep` / `LIMITS.unpivotKeep`); blank → 400 (`keep[i]`); also in `columns` → 400 (`keep[i]`) |
+| `limit` | 1–1000, default 100, never clamped. The statement has one `LIMIT limit + 1`, which ClickHouse applies **after** the `arrayJoin`, so it bounds the unpivoted rows (a source row is read only as far as needed); `truncated` = more existed |
+
+Cells are cut in SQL like `/api/rows`. The UI (`Unpivot` button in the Tables header → `Rows/unpivot-dialog.js`) shows the first 20.
+
 ## Relationship preview
 
 Controller: `Features/Relations/RelationsController.cs`. `POST /api/relationships/preview` — the relationship

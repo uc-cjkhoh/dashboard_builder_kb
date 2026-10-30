@@ -79,7 +79,7 @@ in the formula**, never a field or a computed value.
 | `REPLACE(t, from, to)` | text | every occurrence of `from` replaced by `to`; case-sensitive; an empty `from` changes nothing; `from` and `to` may be fields (pinned live) |
 | `CONCAT(a, b, …)` | text | two to ten texts joined; empty if any is empty (wrap a part in `IFNULL(x, '')` to keep the rest) |
 | `CONTAINS(t, s)` / `STARTSWITH(t, s)` / `ENDSWITH(t, s)` | boolean | **case-sensitive** match (`LOWER` both sides for a case-insensitive one); an empty `s` is always true |
-| `SPLIT(t, sep, k)` | text | the `k`-th piece (1 is the first) of `t` cut at `sep`; `sep` is text of 1 to 20 characters, `k` a whole number 1 to 1000; empty when there is no `k`-th piece; an empty text has one empty piece; two neighbouring separators leave an empty piece |
+| `SPLIT(t, sep, k)` | text | the `k`-th piece (1 is the first) of `t` cut at `sep`; `sep` is text of 1 to 20 characters, `k` a whole number 1 to 1000; empty when there is no `k`-th piece; an empty text has one empty piece; two neighbouring separators leave an empty piece. A text field's menu **Split…** asks for a separator (1–20 characters) and 2–10 pieces, then adds one calculated field per piece (`tags 1`, `tags 2`, … = `SPLIT([db.table.tags], ',', k)`), stopping at the 20-field limit; a field whose names hold `.`, `[` or `]` can't be split |
 
 - **Empty in, empty out:** a NULL text gives NULL from every function (`LEN`, `CONTAINS` too), so `IFNULL(x, …)` first when a
   default is wanted. There is no `+` on text; use `CONCAT`. A negative, fractional, field-valued or over-limit length or

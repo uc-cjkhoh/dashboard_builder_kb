@@ -79,3 +79,13 @@ enabled for 2–5 ticked tables (a sixth can't be ticked; the hint reads "Pick 2
 `POST /api/union` ([api.md § Union](../reference/api.md#union)): the first 20 rows of the tables stacked over their shared
 columns, `Source table` first. A refusal (no shared column, …) shows in the dialog. Union is a preview only; it is not a
 table on the canvas and no sheet can use it yet ([data-model.md](../backlog/data-model.md)).
+
+## Unpivot
+
+The **Unpivot** button beside **Union** opens a dialog: pick a table of the database, then tick the columns to **turn into rows** (2–50, all
+of one kind: all numbers, all text, …) and, optionally, up to 5 columns to **keep** beside them. A column ticked on one side is disabled on
+the other; the hint under the lists says what is missing. **Show rows** opens the rows dialog on `POST /api/unpivot`
+([api.md § Unpivot](../reference/api.md#unpivot)): the first 20 rows, the kept columns then `Field` (the column's name) and `Value`, one
+row per source row per chosen column; NULL stays empty and 0 stays 0. A refusal shows in the dialog. Unpivot is a preview only, like Union: it is not a
+table on the canvas and no sheet can use it yet ([data-model.md](../backlog/data-model.md)). Splitting a text field is in
+[calculated-fields.md § Text functions](calculated-fields.md#text-functions).

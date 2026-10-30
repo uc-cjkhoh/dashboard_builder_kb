@@ -228,3 +228,12 @@ It is refused at edit time with a plain message (`checkGroupSpec`), never at que
 (bound), the OR is balanced (depth ≤ 12), and ELSE is the field itself: an ungrouped member keeps its value and NULL stays NULL (a CASE condition on NULL is false). Only text fields
 (the engine compares text with text) whose ClickHouse type is String-like: UUID, IPv4, IPv6 and enum columns fail in ClickHouse (no common type with the text branches; `toString` in the tree was not adopted) and are refused up front. A group name equal to an ungrouped member is refused. An optional remainder label adds one last `WHEN NOT isnull(field)` (4 nodes, so 48 members; NULL is left empty so it stays distinguishable) and must not equal a group name; the rest is in the backlog. **Rejected:** generated formula text (the 500-character limit would allow about 25 members and a
 round trip through quoting); a new server `in` node (no gain until groups need more than 49 members).
+
+### D73 — A split is generated calculated fields; an unpivot is a bounded preview
+**Split** adds nothing to the engine: the field menu's **Split…** plans one ordinary calculated field per piece (`SPLIT([db.table.col], 'sep', k)`,
+`Calc/split-model.js`), so pills, queries, caching and the workbook already work, and the separator and position stay the literals D54 requires. The piece
+count is the user's (2–10), not discovered from the data, since a discovery query would add an unbounded read for a convenience. **Unpivot** changes the row
+grain, which a calculated field can't, so it is a server read like Union: `POST /api/unpivot` builds `arrayJoin([(name, value), …])` over the chosen same-kind
+columns (names bound, columns quoted and catalog-checked, cells cut in SQL). ClickHouse applies the statement's `LIMIT` after the `arrayJoin` (pinned by
+`tests/live/unpivot-smoke.mjs`), so one `LIMIT limit + 1` bounds the unpivoted rows. Same-kind is required so the one `Value` column is comparable; mixed kinds
+are refused (400), not silently cast. It is a preview only until a query source exists for union and unpivot together.
