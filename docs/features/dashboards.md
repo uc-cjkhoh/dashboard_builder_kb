@@ -148,7 +148,7 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
 
 ## Lifecycle
 
-- **Only the active dashboard renders.** Leaving it (another tab, the Data Model) destroys every widget — queries aborted, chart
+- **Only the active dashboard renders.** Leaving it (another tab, the Data Source) destroys every widget — queries aborted, chart
   instances and their resize observers released, DOM removed. Showing it again rebuilds the widgets; a worksheet that was edited
   meanwhile draws its new sheet, an unedited one comes from the cache. (`worksheet:changed` for a widget's sheet while its dashboard
   is on screen re-runs that widget.)

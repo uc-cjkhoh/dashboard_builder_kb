@@ -8,6 +8,9 @@ Sidebar, below the connection panel. Code: `Features/Schema/` (`SchemaController
 - On `connection:changed` (connected), `schema.js` fills a native `<select>` from
   `GET /api/databases` (`SHOW DATABASES`), with a disabled "Select a database…" placeholder. On
   disconnect it clears.
+- **Open list.** Where the browser supports customizable selects (`appearance: base-select`, `@supports` in `schema.css`), the open list takes the table rows' design: a solid
+  panel (`--surface`, one stroke, `--elev-16`, 8px radius) of flat 32px rows whose names start on the closed control's text lane, an ink wash on hover / focus, the current
+  database bold with an accent tick at the right, and the app's chevron (flipped while open) in place of the UA triangle; the placeholder is not listed. Other browsers keep the native list, themed by `core.css`.
 - Choosing a database loads its tables. Switching databases replaces the table list but leaves the
   canvas untouched — an entity keeps the `db.table` it was dropped from.
 
@@ -48,7 +51,7 @@ Sidebar, below the connection panel. Code: `Features/Schema/` (`SchemaController
 ## Column profile / field details
 
 - Each field row on a canvas entity card has a **Profile button** (`.col-row__profile`, analytics icon, `aria-label`
-  "Profile <column>"; shown on hover / focus, always on touch; it does not toggle the join key). It opens the **profile
+  "Profile <column>"; shown on hover / focus, always on touch). It opens the **profile
   dialog** (`Schema/column-profile-dialog.js`, rules in `column-profile-model.js`): `POST /api/databases/{db}/tables/{table}/profile`
   ([api.md](../reference/api.md)), read-only.
 - **Field details:** Name, Type (raw ClickHouse type), Kind (the display category) and Role (*measure* for numeric,
@@ -77,7 +80,7 @@ FROM`; an unknown or hostile name → **404** before any SQL is built
 The **Union** button beside the Tables heading opens a dialog listing the database's tables as checkboxes. **Show rows** is
 enabled for 2–5 ticked tables (a sixth can't be ticked; the hint reads "Pick 2 to 5 tables."). It opens the rows dialog on
 `POST /api/union` ([api.md § Union](../reference/api.md#union)): the first 20 rows of the tables stacked over their shared
-columns, `Source table` first. A refusal (no shared column, …) shows in the dialog. **Add to model** (primary, same pick rule) puts the union on the Data Model as a card worksheets can read
+columns, `Source table` first. A refusal (no shared column, …) shows in the dialog. **Add to model** (primary, same pick rule) puts the union on the Data Source as a card worksheets can read
 ([query-sources.md](query-sources.md)).
 
 ## Unpivot
@@ -86,6 +89,6 @@ The **Unpivot** button beside **Union** opens a dialog: pick a table of the data
 of one kind: all numbers, all text, …) and, optionally, up to 5 columns to **keep** beside them. A column ticked on one side is disabled on
 the other; the hint under the lists says what is missing. **Show rows** opens the rows dialog on `POST /api/unpivot`
 ([api.md § Unpivot](../reference/api.md#unpivot)): the first 20 rows, the kept columns then `Field` (the column's name) and `Value`, one
-row per source row per chosen column; NULL stays empty and 0 stays 0. A refusal shows in the dialog. **Add to model** (primary, same pick rule) puts the unpivot on the Data Model as a card worksheets can read
+row per source row per chosen column; NULL stays empty and 0 stays 0. A refusal shows in the dialog. **Add to model** (primary, same pick rule) puts the unpivot on the Data Source as a card worksheets can read
 ([query-sources.md](query-sources.md)); there `Value` keeps the columns' kind. Splitting a text field is in
 [calculated-fields.md § Text functions](calculated-fields.md#text-functions).

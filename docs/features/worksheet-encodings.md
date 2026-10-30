@@ -190,7 +190,7 @@ Dragging a chip onto the **Drill** tool (its slot or its open panel) — or its 
 **replaces the sheet's drill** with `{ levels, depth: 0, path: [] }`, the structure a hand-built drill has (each level carries
 its column's category), so the chart, breadcrumb and click-to-drill behave identically. The sheet gets a **copy** of the levels:
 renaming, editing or deleting the hierarchy later never changes a sheet that already used it. A chip whose table isn't in the
-Data Model or whose column no longer exists is shown with a "No table" / "Missing field" badge and can't be applied; a column
+Data Source or whose column no longer exists is shown with a "No table" / "Missing field" badge and can't be applied; a column
 cast after the hierarchy was made refuses with the cast message. The dialog's Edit keeps a level whose column has vanished (the chip shows "Missing field" until it is removed or replaced). Hierarchies are client-side only (the server never sees one)
 and save with the workbook ([workbook.md](workbook.md)).
 

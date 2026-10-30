@@ -7,7 +7,7 @@ files linked below.
 ## Shape in one paragraph
 
 A single ASP.NET Core MVC app serves **one HTML page** plus a small **read-only JSON API**. The
-**browser holds all builder state**: the one shared data model (tables dragged onto the canvas + the
+**browser holds all builder state**: the one shared data source (tables dragged onto the canvas + the
 relationships drawn between them), one worksheet per worksheet tab and a board of widgets per dashboard tab. The **server is a thin,
 session-scoped proxy to ClickHouse**: it keeps the session's connection, validates every identifier
 against the live catalog, runs introspection and bounded aggregate/join queries, and returns JSON.
@@ -20,7 +20,7 @@ state auto-saves as a **workbook** in the browser
 Browser — one page, vanilla JS ES modules          ASP.NET Core MVC (Kestrel)               ClickHouse
 ┌──────────────────────────────────────┐  JSON   ┌───────────────────────────────┐  HTTPS  ┌──────────┐
 │ Sidebar: connection · db · tables    │ ──────▶ │ Connection / Schema / Query   │ ──────▶ │ 8443 TLS │
-│ Data Model: entities + relationships │         │   API controllers             │  SHOW   │ read-only│
+│ Data Source: entities + relationships│         │   API controllers             │  SHOW   │ read-only│
 │ Worksheets (+ dashboards, a board)   │ ◀────── │ ClickHouseGateway + Identifier│ DESCRIBE│          │
 │   (field pane · shelves · chart)     │         │ ConnectionRegistry (session)  │ SELECT  │          │
 └──────────────────────────────────────┘         └───────────────────────────────┘ ◀────── └──────────┘
@@ -39,7 +39,7 @@ In production Apache httpd terminates TLS and proxies `/dashboardbuilder` to Kes
 2. **Browse.** List databases, then a database's tables (the database name is validated before it is
    quoted into SQL); tables render as draggable chips. → [schema-browser.md](docs/features/schema-browser.md)
 3. **Model.** Dropping a chip fetches the table's columns (`DESCRIBE`, type-categorised) and renders an
-   entity card. Ticking join keys and linking them declares a relationship with a cardinality —
+   entity card. Dragging one column onto another declares a relationship with a cardinality —
    entirely client-side. → [canvas.md](docs/features/canvas.md), [relationships.md](docs/features/relationships.md)
 4. **Build a worksheet.** On a worksheet tab, fields dragged onto shelves and encodings become one plan:
    dimensions, measures, filters, sort, limit. The client resolves a **join path** over the drawn

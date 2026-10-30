@@ -4,6 +4,19 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-10-30
 
+- Field pane redesign: a solid tile per table as the focus, flat tinted field rows, quieter marks / calculated fields / hierarchies below (`6b92cc3`)
+- Sidebar body only on the Data Source tab; worksheets and dashboards get a brand-only rail (`b432db2`)
+- Entity cards: more depth off the wash (visible edge, two-layer shadow, head rim highlight, light and dark) (`5c19f64`)
+- Database picker: the open list takes the table rows' design (customizable select, native fallback) (`f49fe3a`)
+- Entity cards: one 16px gutter on both sides (title and names left, type text and ✕ right), caret beside the ✕, scrollbar gutter reserved (`b04b3cc`)
+- Relationships by drag-and-drop only: remove connector buttons and join-key checkboxes, add the how-to pill (`4352d3f`)
+- Warning modal when a relationship is refused for mismatched data types (`ee397c5`)
+- Entity cards: table-only title, fixed checkbox lane, union cards share the table card lanes (`7741906`)
+- Relationship pairs: pinned key strip, one relationship per column, Needs-a-partner cards, centred lanes, 96px gutter (`f6c8cee`)
+- Sidebar bento: database picker and table search share one row pattern (icon lane, text lane, 40px, regular weight) (`aeeca7e`)
+- Sidebar bento: solid tiles for connection, database, table list and Union/Unpivot pair (`43e2e6d`)
+- Sidebar redesign: no section titles or dividers, flat table rows, flat connection row, pinned Union/Unpivot (`e9923e1`)
+- Data Model canvas redesign: dot-grid ground, elbow links with lanes and layered badges, lighter cards, ghost-model empty state (`ca21335`)
 - Entity card ✕ ink ends where the type badges end (optical alignment audit of the Data Model cards) (`e15f377`)
 - Union and unpivot as a data source in the client: Add to model, source cards, worksheet plan, workbook save/restore (`fc93948`)
 - Expand / collapse headers: review fixes (`431a772`)

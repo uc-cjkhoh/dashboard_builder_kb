@@ -1,7 +1,7 @@
 # Drag-and-Drop Dashboard Builder for ClickHouse
 
 An ASP.NET Core web app for **visually exploring a ClickHouse server**: connect, browse databases and
-tables, **drag tables onto a shared data model**, **draw logical relationships** between them, and
+tables, **drag tables onto a shared data source**, **draw logical relationships** between them, and
 build **Tableau-style worksheets** — one per worksheet tab — that chart data across the related tables, and add dashboard tabs for arranging them.
 
 **Status:** built and running at `https://10.168.49.20:8443/dashboardbuilder`. This directory is the
@@ -24,9 +24,9 @@ knowledge base; the source lives at `/unified/user/cj/web_development/prototype/
 |---|---|---|
 | Connect | validated form (host/port/user), TLS with an explicit self-signed-cert opt-in under Advanced; credentials stay in the server session | [connection.md](docs/features/connection.md) |
 | Browse | database picker → searchable, draggable table chips | [schema-browser.md](docs/features/schema-browser.md) |
-| Model | entity cards with type badges and join keys | [canvas.md](docs/features/canvas.md) |
-| Relate | click-to-click links with 1:1 / 1:N / N:1 / N:M cardinality | [relationships.md](docs/features/relationships.md) |
-| Tabs | Data Model tab + any number of worksheet and dashboard tabs (50 in all) | [tabs.md](docs/features/tabs.md) |
+| Model | entity cards with type badges | [canvas.md](docs/features/canvas.md) |
+| Relate | drag-to-relate links with 1:1 / 1:N / N:1 / N:M cardinality | [relationships.md](docs/features/relationships.md) |
+| Tabs | Data Source tab + any number of worksheet and dashboard tabs (50 in all) | [tabs.md](docs/features/tabs.md) |
 | Worksheet | Columns/Rows shelves, automatic cross-table joins, crosstab, sort, format | [worksheet.md](docs/features/worksheet.md) |
 | Charts | 23 types incl. heatmap, treemap, histogram, box plot, waterfall, funnel, gauge, bullet, Sankey, small multiples, KPI; PNG/SVG/CSV export | [worksheet-charts.md](docs/features/worksheet-charts.md) |
 | Encodings | Marks (Color, Size, Label, Detail, Tooltip, Shape, Path, Angle), Filters, click-to-filter, Drill, Pages | [worksheet-encodings.md](docs/features/worksheet-encodings.md) |

@@ -19,10 +19,10 @@ matching whatever you're touching.
 |---|---|
 | [features/connection.md](features/connection.md) | Connection form, TLS + cert opt-in, summary, gating |
 | [features/schema-browser.md](features/schema-browser.md) | Database picker and draggable table chips |
-| [features/canvas.md](features/canvas.md) | Drag/drop onto the Data Model, entity cards, join keys, union / unpivot cards |
+| [features/canvas.md](features/canvas.md) | Drag/drop onto the Data Source, entity cards, union / unpivot cards |
 | [features/query-sources.md](features/query-sources.md) | A union or unpivot as a data source: adding, columns, reading, saving, SQL shape |
 | [features/relationships.md](features/relationships.md) | Drawing links, cardinality, shape-coded endpoints |
-| [features/tabs.md](features/tabs.md) | Data Model tab + worksheet and dashboard tabs |
+| [features/tabs.md](features/tabs.md) | Data Source tab + worksheet and dashboard tabs |
 | [features/dashboards.md](features/dashboards.md) | the dashboard board: grid, side panel, widgets, lifecycle |
 | [features/worksheet.md](features/worksheet.md) | Field pane, shelves, query lifecycle (latest-wins, cache, truncation), joins, crosstab, sort, format |
 | [features/worksheet-charts.md](features/worksheet-charts.md) | Chart types, orientation, ECharts adapter, export |

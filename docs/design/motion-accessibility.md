@@ -52,7 +52,7 @@ never required to understand state.
   container is never announced); connection and save failures arrive as toasts. Danger
   toasts stay until dismissed; others close after 5 s.
 - **Keyboard / non-drag paths:** a `＋` on each table chip adds it to the canvas; relationships are
-  created click-to-click (no drag); a `＋` on each field adds it to a shelf; `F2` / `Enter` renames a
+  created by dragging a column onto another (no keyboard path yet); a `＋` on each field adds it to a shelf; `F2` / `Enter` renames a
   tab; `←`/`→` on a focused resize handle resizes the sidebar or field pane; menus open on click and move with `ArrowUp` / `ArrowDown`, `Esc` closes and returns focus;
   `Esc` clears the table search.
 - **Contrast** is ≥ 4.5:1 for every ink/background pair in both themes (ratios in [tokens.md](tokens.md)).

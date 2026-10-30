@@ -21,11 +21,11 @@ shared helpers live in `Features/Core/`. Why: [D19](decisions.md#d19--mvc-in-fea
 | `Schema/table-filter.js` | pure: `matchTables(names, query)` — the table search |
 | `Canvas/canvas.js` | drop handling, entity cards, card movement, empty state — [canvas.md](../features/canvas.md) |
 | `Canvas/empty-state.js` | pure: `emptyState({connected, databaseSelected})` → the sentence, button and control to focus |
-| `Relations/relations.js` | join-key connectors, links, cardinality — [relationships.md](../features/relationships.md) |
+| `Relations/relations.js` | drag-to-relate, links, cardinality, pinned keys — [relationships.md](../features/relationships.md) |
 | `Relations/join-preview-model.js`, `Relations/join-check.js` | pure wording and declared-vs-observed comparison of a join preview (`describePreview`, `observedCardinality`, `pct`, `previewRequest`); the dialog's "Check this join" section (DOM, `textContent` only) |
 | `Relations/link-route.js` | pure: `linkSides` (which card edge each end uses), `linkRoute` (the elbow's corner points, lanes, badge spot), `roundedPath` — the link geometry |
 | `Relations/relation-rules.js` | pure: `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked; `JOIN_TYPES`, `normalizeJoinType`, `joinChoices`, `planJoinType`, `joinBadge` — join types |
-| `Tabs/tabs.js` | Data Model tab + one ordered list of worksheet and dashboard tabs, the `[+]` menu, close confirms — [tabs.md](../features/tabs.md) |
+| `Tabs/tabs.js` | Data Source tab + one ordered list of worksheet and dashboard tabs, the `[+]` menu, close confirms — [tabs.md](../features/tabs.md) |
 | `Board/board-model.js` | pure (P24b): widget geometry and limits — `overlaps`, `inBounds`, `firstFreeSpot`, `placeNew`, `placeAt` (a drop), `checkPlacement`, `explainRefusal` (the refusal in words), the import clean-up `cleanWidgets`, `savedWidgets`, `removeSheetWidgets`, `dashboardsUsing`, `defaultTabName` — [data-model.md](data-model.md#tabs-and-dashboards) |
 | `Board/board-device.js` | pure (node-tested): device preview — `DEVICES` (desktop / tablet 768 / phone 390), `deviceOf`, `previewWidth` — [dashboards.md](../features/dashboards.md#layout) |
 | `Board/board-size.js` | pure (node-tested): dashboard size — `SIZE_PRESETS`, `SIZE_LIMITS`, `sizeError`, `cleanSize` (import), `savedSize`, `sizeKey` / `sizeLabel` — [dashboards.md](../features/dashboards.md#layout) |

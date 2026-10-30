@@ -1,6 +1,6 @@
 # Calculated fields
 
-A **calculated field** is a named formula over fields of the data model, used like a field:
+A **calculated field** is a named formula over fields of the data source, used like a field:
 `SUM([orders.amount]) / SUM([orders.qty])` on a shelf, in a mark slot, in a Top-N rank. The browser keeps
 the formula text; before a query it expands and type-checks the formula into a tree that ClickHouse
 computes on the read-only, bounded path ([clickhouse-integration.md](../reference/clickhouse-integration.md#calculated-fields--the-compile-path),

@@ -23,19 +23,17 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
   appearance toggle = shelves = chart card on the right. `+`-placed entity cards start on the gutter
   ([canvas.md](../features/canvas.md#dragging-a-table-onto-the-canvas)).
 - **Full-width lists align with their siblings:** `.table-list` keeps 2px shadow room with a matching
-  `-4px` inline margin (equal to its padding), so table chips share the search box's edges. A chip's table icon sits on the 8px left gutter and its `+` glyph 8px from the right edge; the hover grip overlays the icon instead of reserving a slot.
-- **Entity cards** are measured on ink, not boxes (checked on the Data Model with the glyph's drawn bounds):
-  - Left lane: the chevron's centre sits on the row checkboxes' centre; the head title's text starts at the column-name x (`calc(--s4 - 2px)` after the chevron box); the key icon's ink has equal gaps (10.5px) to the checkbox and to the name.
-  - Right lane: the ✕ ink ends where the type badges' border ends (`margin-right: -(--s2 + --s1)`, since the ✕ strokes sit 4px inside their 32px box); the hover-only profile button is ordered before the badge.
-  - Gutters: checkbox and badge are 8px from the card's inner edges; the first and last row's checkbox are 16px from the list's top and bottom edges.
-  - Vertical: chevron, title, checkbox, key icon, name and badge text all share one optical centre (the cap-height midpoint of the 14px text) within 0.5px.
-  - A union / unpivot card has no checkbox lane, so its title and column names share one x; a failed card's status line starts on the checkbox lane (8px).
+  `-4px` inline margin (equal to its padding), so table chips share the search box's edges. A chip is a flat 32px row (no border or shadow; an ink wash on hover / focus) whose table icon sits on the 8px left gutter; the hover grip overlays the icon, and the preview and `+` buttons overlay the row's right end on hover / focus instead of reserving space.
+- **Entity cards** are measured on ink, not boxes (checked on the Data Source with the glyph's drawn bounds):
+  - **One 16px gutter (`--s4`) on both sides**, so the space left of the content equals the space right of it: the head's title, the column names and a source card's note start on it; the type text, the head's ✕ ink and the pinned strip's type text end on it. A union / unpivot card uses the same lanes.
+  - Right end of the head: the caret sits just left of the ✕ (the title takes the left gutter); the ✕ is pulled out by its 12px slack (`margin-right: -(--s2 + --s1)`: the glyph is a 16px box in a 32px button, strokes 4px inside) so its ink ends on the gutter.
+  - The scrolling list reserves its 10px scrollbar (`scrollbar-gutter: stable`) and its rows give up that much right padding, so the type text ends on the same line whether or not the list overflows.
+  - Vertical: caret, title, name and type text all share one optical centre (the cap-height midpoint of the 14px text) within 0.5px; the first and last row sit 4px inside the list's top and bottom edges. A failed card's status line uses the same 16px gutter.
 - **Nothing touches:** menu lists (`.menu__list`, incl. the two-column chart picker) have a 4px gap between items; stacked `<details>` field rows are spaced 4px apart (`.ws-group > :not(summary) + *`). Single-choice `<select>`s show a chevron on the 16px gutter instead of the UA arrow (pill selects keep the native one).
 - **Ghost icon buttons at a row's end overhang by their 8px glyph slack** (`margin-inline: -8px`), so
   the glyph meets the edge: `#sidebar-toggle`, the appearance toggle (`.scheme`), the view bar's chart picker and last
-  icon button, the tool-panel ✕, and both `.entity__head` buttons (chevron over the row checkboxes, ✕ flush with the
-  type badges). Reset the overhang wherever the button is centred (collapsed rail).
-- **Checkboxes carry no UA margin** (`.form-check input`, `.col-row__key`: 14px, `margin: 0`); a
+  icon button, the tool-panel ✕, and both `.entity__head` buttons (the caret and ✕ in the head's right end). Reset the overhang wherever the button is centred (collapsed rail).
+- **Checkboxes carry no UA margin** (`.form-check input`: 14px, `margin: 0`); a
   sub-option (`.form-check--sub`, `.form-warn`) indents by checkbox + gap, i.e. to its parent's label text.
   `.entity__title` is padded so it starts at the column-name x.
 - **Buttons centre their label** (`.btn { justify-content: center }`), including stretched ones.
@@ -51,13 +49,18 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
   state is remembered in this browser (`localStorage` `dashboardbuilder.sidebar.collapsed`, read/write
   wrapped in `try`). Anything that focuses a sidebar control first calls `expandSidebar()`
   (the canvas empty-state button does).
+- **Data Source only:** the sidebar body (`#sidebar-body`: connection, database, tables) belongs to the Data Source tab. `Shell/sidebar.js` sets `.app[data-view="model"|"sheet"]` from
+  `view:changed`; on any worksheet or dashboard tab the body, its resizer, the brand name and the toggle are `display: none` and the column shrinks to a `--topbar-h` rail
+  holding the brand mark, so the worksheet gets the room. The user's own collapse choice is untouched and returns with the Data Source tab.
 - The brand name is one line (ellipsis), so the toggle never makes the brand row taller
   than `--topbar-h`.
 - Glass rail in the active theme (light or dark). Section titles are sentence case, `--fs-body` 600.
 - Contents: **Connection** (form or one-row summary — [connection.md](../features/connection.md)), the
   **Database** picker, then **Tables** with a search box ([schema-browser.md](../features/schema-browser.md)).
-- The empty Data Model shows one centred sentence + one button that focuses the control for the next
+- The empty Data Source shows one centred sentence + one button that focuses the control for the next
   step ([canvas.md](../features/canvas.md#empty-state)).
+
+The sidebar has **no section titles and no dividers** below the brand row (the Connection / Database / Tables headings are screen-reader-only): spacing groups the connected summary and the database picker, then the search box and table list. The connected summary is a flat row (status dot on the gutter, host, edit and disconnect ghost buttons). **Union** and **Unpivot** are pinned under the scrolling list with one hairline above them.
 
 ## Tab bar
 
@@ -72,12 +75,11 @@ tabs wrap, the bar grows taller than the brand.
 
 ## Entity cards
 
-A head on `--surface-2` (table name in 600 weight, the database muted before it) over an
-internally-scrolling column list up to 240px tall: flat solid card, 1px stroke, `--elev-2`; the column type is plain muted text.
-The Data Model ground is a 24px dot grid; cards snap to 8px and are placed on a 312px slot with a 48px gutter, which holds a link's elbow and badge
+A head on `--surface-2` (table name alone in 600 weight) over an
+internally-scrolling column list up to 240px tall: solid card lifted off the wash: a visible `--line-2` stroke, the two-layer `--elev-card` shadow (`--elev-card-hover` on hover) and a 1px `--card-rim` highlight along the head's top edge; the column type is plain muted text.
+The Data Source ground is a 24px dot grid; cards snap to 8px and are placed on a 312px slot with a 96px gutter, which holds a link's elbow and badge
 ([canvas.md](../features/canvas.md#canvas-ground)). The gutter is canvas placement, not component spacing, so it sits outside the 4 / 8 / 16 / 24 steps. No rows on the card: a table's rows
-open in a dialog from its schema-browser chip. A caret in the head collapses the card to its title bar; key columns show the
-key icon.
+open in a dialog from its schema-browser chip. A caret in the head collapses the card to its title bar; a key column's name turns accent.
 
 ## Worksheet — data header and chart card
 

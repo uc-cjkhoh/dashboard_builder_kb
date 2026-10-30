@@ -32,9 +32,9 @@ report lists or record-CRUD tables here — this is an explorer, not an admin te
 |---|---|
 | Shell | `.sidebar`, `.sidebar__section`, `.sidebar__title`, `.sidebar__resizer` (+ shared `.resizer`) |
 | Connection | `.conn-form`, `.conn-advanced` (collapsed `<details>`), `.form-field`, `.form-check`, `.form-warn` (cert warning), `.conn-summary` |
-| Schema | `.table-search`, `.table-list`, `.table-list__empty`, `.table-chip` (`draggable="true"`; `--dragging`), `.table-chip__grip`, `.table-chip__icon`, `.table-chip__name` |
+| Schema | `.sidebar__sources` (pinned Union / Unpivot), `.table-search`, `.table-list`, `.table-list__empty`, `.table-chip` (`draggable="true"`; `--dragging`), `.table-chip__grip`, `.table-chip__icon`, `.table-chip__name` |
 | Canvas | `.canvas`, `.canvas__bar` (glass tab bar), `.canvas__empty` (`.empty__model` ghost model: `.empty__card`, `.empty__row`, `.empty__link`, `.empty__end`), `.entity`, `.entity__head`, `.entity__title`, `.entity__toggle`, `.entity__status`, `.entity__cols`, `.entity--collapsed`, `.entity--dragging`, `.col-row`, `.col-row__key`, `.col-row__type` |
-| Relations | `.rel-svg` (`--labels`), `.rel-link` (`--selected`, `--hover`, `--label`), `.rel-link__line`, `.rel-link__hit`, `.col-row--linked`, `.rel-end`, `.rel-badge`, `.rel-connector` |
+| Relations | `.rel-svg` (`--labels`), `.rel-link` (`--selected`, `--hover`, `--label`), `.rel-link__line`, `.rel-link__hit`, `.col-row--linked`, `.rel-end`, `.rel-badge`, `.rel-guide` (the how-to pill), `.entity__keys`, `.entity__need` |
 | Tabs | `.tabs`, `.tab`, `.tab--model`, `.tab.is-active`, `.tab__label`, `.tab__rename`, `.tab__close`, `.tab-add` (a `.menu`: `.tab-menu`, `.tab-menu__list`), `.tab--worksheet`, `.tab--dashboard`, `.tab__kind`, `.view--model`, `.view--worksheet`, `.view--board` |
 | Workbook | `.workbook` (right end of `.canvas__bar`), `.workbook__status` (quiet autosave text), the Workbook `.menu` |
 | Worksheet | see below |
@@ -58,5 +58,5 @@ report lists or record-CRUD tables here — this is an explorer, not an admin te
 
 A `.table-chip` exists to be **dragged** onto the canvas (its `＋` button is the non-drag fallback);
 it is not a link. An `.entity` is **moved by dragging its head**; its rows expose explicit affordances
-only — a join-key checkbox per column and a remove icon on the card. The card body performs no hidden
+only — a remove icon on the card and drag handles on the rows. The card body performs no hidden
 action, so nothing about it should promise one. Grid rows get a plain hover; they are not clickable.

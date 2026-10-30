@@ -4,6 +4,11 @@ Functional changes (server, models, validation, calculations, charts, workbook).
 
 ## 2026-10-30
 
+- Rename the Data Model view to Data Source (tab, labels, messages, comments) (`a6cf969`)
+- Magnetic snap: a dragged card's top is pulled onto the position that straightens a relationship link (Alt disables) (`79bd9c2`)
+- Pinned keys are ordered by partner and relationship order so links never cross (`1e92491`)
+- Cards with no relationship are held out of worksheets: hidden from the field pane, views reading them say why and send nothing (`3134cd9`)
+- Relationship link turns in the middle of the gutter so the badge is equidistant from both cards (`6c44523`)
 - Source review: name limit and relationship/duplicate handling on import, lossy card note, browser check (`fc81764`)
 - Source review: exact integer and Nullable unification with a lossy marker, stub-ClickHouse gateway tests (`9e5cabe`)
 - Union and unpivot as a query source: SourceSql, /api/query source, /api/source/columns (`0e765fd`)

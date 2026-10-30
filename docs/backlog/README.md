@@ -22,7 +22,7 @@ Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5
 
 `- **name** (IDs: Txx-nn; priority P0–P3; effort S/M/L if stated) — open: nothing implements it, or partial: what exists and what is missing. Needs: dependency or none. Spec: file.`
 
-- IDs are stable Tableau-inventory requirement IDs (`T01`–`T09`: workspace, data model, charts, calculations, table calculations, maps, statistics, dashboards, consumption); entries without an ID are product phases (P24, P38 …). The name and the open/partial text stand alone.
+- IDs are stable Tableau-inventory requirement IDs (`T01`–`T09`: workspace, data source, charts, calculations, table calculations, maps, statistics, dashboards, consumption); entries without an ID are product phases (P24, P38 …). The name and the open/partial text stand alone.
 - "Open" means nothing implements it; "partial" says what exists.
 - Entries inside a file run by dependency, then priority.
 

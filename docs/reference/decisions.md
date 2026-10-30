@@ -134,8 +134,8 @@ ClickHouse enforces no foreign keys and no uniqueness (a MergeTree primary key i
 1:1 / 1:N / N:1 / N:M links are the **user's assertions**, used for joins and layout; the DB is never
 asked to create or validate them.
 
-### D12 — Subtabs are dashboards over one shared data model
-The dragged tables + relationships form **one shared data model** (the pinned Data Model tab);
+### D12 — Subtabs are dashboards over one shared data source
+The dragged tables + relationships form **one shared data source** (the pinned Data Source tab);
 worksheets and dashboards are built *from* it ([D61](decisions-dashboards.md)). Each worksheet tab **is one Tableau-style
 worksheet** — a field pane plus shelves you drag fields onto.
 - **Joins are executed.** Fields from different tables join automatically along the drawn
@@ -195,7 +195,7 @@ byte-identical to a plain shelves plan.
 - **Continuous colour is scatter-only** — `visualMap` over point arrays is the clean idiom;
   bar-gradient is not supported.
 - **Gantt Bar and Density marks are not built** (no clean bounded shape). **Maps are out of scope** —
-  no geo data model, tiles or projection; that would need its own decision.
+  no geo data source, tiles or projection; that would need its own decision.
 - **Pages autoplay respects `prefers-reduced-motion`** (Play omitted; stepping always works).
 - The encodings live in one **icon toolbar** with a single open editor, not stacked lanes, so the
   header stays short as channels are added.

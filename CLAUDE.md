@@ -25,7 +25,7 @@ value bound. These shape every server change:
 ## What this is in one screen
 
 One ASP.NET Core MVC app (Kestrel) serves **a single page** (`GET /`, composed from feature partials)
-plus a **read-only JSON API**. The **browser holds all builder state** — the shared data model
+plus a **read-only JSON API**. The **browser holds all builder state** — the shared data source
 (entities + relationships) and one worksheet per dashboard tab — in vanilla-JS ES modules. The
 **server is a thin, session-scoped proxy to ClickHouse**: `ConnectionRegistry` holds the session's
 connection; `ClickHouseGateway` runs introspection and bounded, identifier-safe aggregate/join queries

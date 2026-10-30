@@ -1,7 +1,7 @@
 # Union and unpivot as a data source
 
 A **union** (2–5 tables stacked) or an **unpivot** (wide same-kind columns of one table turned into `Field` / `Value` rows) can be added
-to the Data Model as a card and read by worksheets like a table. Code: `Features/Core/source-model.js` (pure rules),
+to the Data Source as a card and read by worksheets like a table. Code: `Features/Core/source-model.js` (pure rules),
 `Features/Canvas/canvas.js` (the card), `Features/Rows/union-dialog.js` / `unpivot-dialog.js` (the **Add to model** buttons),
 `Features/Rows/SourceController.cs`, `ClickHouse/SourceSql.cs` (the derived table). The row **preview** of each is in
 [schema-browser.md](schema-browser.md#union).
@@ -9,7 +9,7 @@ to the Data Model as a card and read by worksheets like a table. Code: `Features
 ## Adding one
 
 - The Union and Unpivot dialogs have **Show rows** (the preview) and **Add to model** (primary; enabled by the same pick rules). Add to
-  model fires `source:add`; the canvas switches to the Data Model and puts the card in the first free slot
+  model fires `source:add`; the canvas switches to the Data Source and puts the card in the first free slot
   ([canvas.md](canvas.md#union-and-unpivot-cards)).
 - **Name** (automatic, not editable): `Union: a + b` or `Unpivot: sales`, cut to 200 characters (`LIMITS.sourceName`); a name already used by
   a table of the database or a card on the canvas gets ` 2`, ` 3` … (`takenNames`, `uniqueName`). The name is the entity's `table`, so every

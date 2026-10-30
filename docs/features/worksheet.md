@@ -36,10 +36,10 @@ Data on top, view controls on the chart ([design/layout.md](../design/layout.md#
 - **Print header** (`beginPrint`): title, caption, date range, filters, the notice, each calculated field the view uses as
   `Calculation: Name = formula` (also those it refers to; cut at 200 characters, `data-notes.js`), the update time and the print time.
 
-Beside them, the **field pane** (drag its right edge, or `←`/`→` on the handle, to resize it) holds, top to bottom: the search box, **Calculated fields**, **Hierarchies**,
-**Marks**, then each model table. All of these are one collapsible group design (`field-group.js`: `<details class="ws-group">`, chevron + bold name, 4px between
-rows, 8px between groups; collapsed groups survive a pane rebuild); tables list small **Dimensions** / **Measures** labels inside, each field with a type icon (text,
-number, date, bool). The first button of the view bar hides / shows the pane (the worksheet takes the room; `aria-expanded`, remembered in
+Beside them, the **field pane** (drag its right edge, or `←`/`→` on the handle, to resize it) holds, top to bottom: the search box, then **each model table** that is in a relationship (a table card with none is held out — [relationships.md](relationships.md#rendering)). The fields are the focus: each table is a solid tile (`.ws-table`: `--line-2` stroke, `--elev-2`) on the quiet `--surface-2` pane, its fields flat 32px rows (hover wash, the add `+` on hover)
+with the type icon tinted by role (`--dim-ink` for dimensions, `--meas-ink` for measures), under sentence-case **Dimensions** / **Measures** labels. The tools that shape the fields follow below the tiles, without outlines: **Marks** (soft `--surface-3` slots; accent wash when set or open),
+then **Calculated fields** and **Hierarchies** (plain headers, ghost "New …" buttons). All of these are one collapsible group design (`field-group.js`: `<details class="ws-group">`, chevron + bold name, 4px between
+rows, 8px between groups; collapsed groups survive a pane rebuild). The first button of the view bar hides / shows the pane (the worksheet takes the room; `aria-expanded`, remembered in
 `localStorage` as `dashboardbuilder.fields.collapsed`, like the sidebar rail; on a phone the pane keeps its own **Fields** overlay).
 
 **Field pane basics** (P28): a **search** box at the top filters fields by column or display name
@@ -195,7 +195,7 @@ What happens next
 1. **Latest wins.** `runChart` takes a ticket from a gate; starting a new query **aborts** the previous
    request (the server stops it too — [clickhouse-integration.md](../reference/clickhouse-integration.md#database-level-guards))
    and any answer that arrives for a superseded ticket is dropped, so a slow old result can never
-   overwrite a newer chart. Leaving for the Data Model cancels the in-flight query.
+   overwrite a newer chart. Leaving for the Data Source cancels the in-flight query.
 2. **Cache before query.** The request (endpoint + full plan) is the cache key. The last **16** results
    per worksheet are kept, so presentation-only changes (legend, decimals, axis titles, data labels,
    colour-by-category) and paging back through the Pages shelf re-render instantly with **no** ClickHouse

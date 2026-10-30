@@ -1,13 +1,13 @@
-# Tabs — Data Model, worksheets and dashboards
+# Tabs — Data Source, worksheets and dashboards
 
 The view strip across the top of the content area. Code: `Features/Tabs/` (`tabs.js`, `tabs.css`,
 `duplicate-model.js`) over the shared state in `Core/store.js`; the dashboard tab's body is `Features/Board/`.
-Why one shared model: [D12](../reference/decisions.md#d12--subtabs-are-dashboards-over-one-shared-data-model);
+Why one shared model: [D12](../reference/decisions.md#d12--subtabs-are-dashboards-over-one-shared-data-source);
 why two tab kinds: [D61](../reference/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2).
 
 ## The strip
 
-- Tabs are frosted pills (tier-2 glass controls): the active tab has an accent fill, edge and underline and bold text. A pinned **Data Model** tab (`.tab--model`) — the shared entity canvas ([canvas.md](canvas.md) +
+- Tabs are frosted pills (tier-2 glass controls): the active tab has an accent fill, edge and underline and bold text. A pinned **Data Source** tab (`.tab--model`) — the shared entity canvas ([canvas.md](canvas.md) +
   [relationships.md](relationships.md)). It cannot be closed.
 - After it, **one ordered list** of two tab kinds, each with its kind's icon (`.tab__kind`, decoration only) and the kind in
   its accessible name (`aria-label` "Sales (worksheet)" / "Overview (dashboard)"):
@@ -47,7 +47,7 @@ why two tab kinds: [D61](../reference/decisions-dashboards.md#d61--worksheets-an
   (`isWorksheetActive()`); `board.js` shows `#board-view` for a dashboard (`isDashboardActive()`) and renders only the active one, destroying its views when you leave it.
 - Each module shows/hides its own view on `view:changed`; the strip redraws on `tabs:changed`. `worksheet:changed { id }` means a
   worksheet's sheet was replaced; `dashboard:changed { id }` means a dashboard's widgets changed.
-- Closing the active tab activates its right-hand neighbour (else the left one, else the Data Model).
+- Closing the active tab activates its right-hand neighbour (else the left one, else the Data Source).
 - All tabs build from the **same** entities and relationships — a table added while on a
   worksheet still lands in the shared model.
 

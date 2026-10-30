@@ -13,7 +13,7 @@ feature's own `Features/<Feature>/<feature>.css`. Keep the docs below and the st
 > full-screen shell — no page scroll; panels scroll internally.
 
 The builder is a two-world layout: a **left glass rail** owns connection and schema browsing; the **right
-canvas** holds the data model, relationships and dashboard worksheets. Windows 11 Fluent structure
+canvas** holds the data source, relationships and dashboard worksheets. Windows 11 Fluent structure
 (4/8/16/24 px spacing, one 8 px radius, 32 px controls, a soft elevation ramp) with Flat Design 2.0
 surfaces: the fixed chrome is translucent and blurs a warm background wash, while entity cards, the chart
 area, the crosstab and every overlay stay solid so text is never read through other text. Light or dark is the viewer's choice — a

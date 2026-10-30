@@ -186,7 +186,7 @@ sans-serif` — system fonts only. UI text is weight **400 / 600**. Two content 
 
 ## Elevation & focus
 
-- **Elevation (warm-tinted ramp):** `--elev-2` cards at rest · `--elev-8` hovered cards · `--elev-16`
+- **Elevation (warm-tinted ramp):** `--elev-card` / `--elev-card-hover` / `--card-rim` Data Source cards (two-layer shadow + head highlight, light and dark) · `--elev-2` other cards at rest · `--elev-8` hovered cards · `--elev-16`
   menus, popovers, toast and the card being dragged · `--elev-28` dialogs. Flat 2.0: shadows are soft and
   short; there are no hover-lift transforms.
 - **Glass:** see [Glass](#glass) — chrome only.

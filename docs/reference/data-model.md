@@ -1,4 +1,4 @@
-# Data model
+# Data source
 
 The shapes the app works with — transient on the server, in-memory in the browser. There is **no
 application database** ([D2](decisions.md#d2--thin-session-scoped-proxy-no-application-database)):
@@ -39,12 +39,12 @@ client — `GET /api/connection` returns a password-free view.
 ## Client side — `Features/Core/store.js`
 
 ```
-entities:      Map id → Entity              ┐ ONE shared data model
-relationships: Map id → Relationship        ┘ (the Data Model tab)
+entities:      Map id → Entity              ┐ ONE shared data source
+relationships: Map id → Relationship        ┘ (the Data Source tab)
 tabs:          [ Tab, … ]                   ONE ordered list — worksheet and dashboard tabs (below)
 activeView:    { kind: "model" } | { kind: "worksheet", id } | { kind: "dashboard", id }
 bus:           EventTarget — entity:added · entity:loaded · entity:moved · entity:removed
-                             joinkey:changed · rel:changed · view:changed · tabs:changed
+                             rel:changed · view:changed · tabs:changed
                              worksheet:changed { id } · dashboard:changed { id }
 ```
 
@@ -58,10 +58,8 @@ A table dropped onto the canvas ([canvas.md](../features/canvas.md)).
 | `db`, `table` | source, from the drag payload |
 | `x`, `y` | canvas position |
 | `columns` | `{ name, type, category }[]` from `DESCRIBE` |
-| `joinKeys` | `Set<columnName>` — the user's checked keys; required to be a relationship endpoint |
 | `el` | the card's DOM node |
-| `pendingKeys` | join keys a just-opened workbook ticks once the columns load (kept if loading fails) |
-| `source` | present on a union / unpivot entity: `{ kind: "union", db, name, tables, columns? }` or `{ kind: "unpivot", db, name, table, columns, keep }`; `table` is then `name`, `columns` come from `/api/source/columns`, `joinKeys` stays empty — [query-sources.md](../features/query-sources.md) |
+| `source` | present on a union / unpivot entity: `{ kind: "union", db, name, tables, columns? }` or `{ kind: "unpivot", db, name, table, columns, keep }`; `table` is then `name`, `columns` come from `/api/source/columns` — [query-sources.md](../features/query-sources.md) |
 
 ### Relationship
 
@@ -71,14 +69,13 @@ A **logical** link — the database neither creates nor validates it
 | Field | Notes |
 |---|---|
 | `id` | client id |
-| `from` | `{ entityId, column }` — a checked join key on entity A |
-| `to` | `{ entityId, column }` — a checked join key on entity B |
+| `from` | `{ entityId, column }` — a column on entity A (it is pinned to A's key strip) |
+| `to` | `{ entityId, column }` — a column on entity B |
 | `cardinality` | `1:1` · `1:N` · `N:1` · `N:M` — intent, not a data guarantee |
 | `joinType` | `inner` (default) / `left` / `right` / `full` (P31, T02-12/13) — which side keeps its unmatched rows (FROM = left, TO = right) |
 | `joinFixed` | `true` once saved by the join dialog: the sides are the link's own. Absent/false with `left` = older link, keeps the base side |
 
-The project statement requires every dragged-in table to select ≥1 join key; the UI enforces it by
-letting only checked keys be endpoints ([relationships.md](../features/relationships.md)).
+A column is in at most one relationship, and with two or more table cards each should be in one (a card with none is held out of worksheets) — [relationships.md](../features/relationships.md).
 
 ### Tabs and dashboards
 
@@ -179,7 +176,7 @@ What [workbook.md](../features/workbook.md) saves to `localStorage` and exports 
                                     | { kind: "text", heading, body, x, y, w, h } ],
                      size?: { width, height } } ],   // fixed pixels; absent = automatic (older files). Anything outside the limits (not whole pixels, 320–3840 × 240–2400) → automatic with an import issue, never clamped
   tabs:          [ { kind: "worksheet" | "dashboard", index } ],   // the strip's order, ≤ 50
-  active:        { kind, index } | null    // null = Data Model
+  active:        { kind, index } | null    // null = Data Source
   fields:        { "db.table.column": { alias?, agg?, hidden?, cast?, memberAliases?: { [rawValue]: label } } }   // P28, T02-34, T02-29 — ≤ 2000
   parameters:    [{ id: "prm<n>", name, type: number|text|date, value, allowed: { kind: any|list|range, list?, min?, max?, step? } }]   // P32 — ≤ 20
   hierarchies?:  [{ id: "hier<n>", name, levels: [{ db, table, column }] }]   // T03-29 — optional, ≤ 20, 2–6 same-table levels; a sheet's drill copies them
