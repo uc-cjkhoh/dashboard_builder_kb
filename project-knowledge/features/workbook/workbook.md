@@ -1,0 +1,222 @@
+# Workbook — save, restore, export, import
+
+The whole builder state — the Data Source, every worksheet and every dashboard — survives a page reload and can
+be moved between browsers as a file. Everything stays **in the browser**; there is no server-side
+database ([D21](../../reference/decisions/decisions.md#d21--workbooks-persist-in-the-browser-not-on-the-server)).
+
+**Code:**
+
+- `Features/Workbook/` — `workbook.js`, `workbook-model.js`, `_Workbook.cshtml`, `workbook.css`
+- `Core/sheet-schema.js` — the allowed values the checks use
+- `Core/validate.js` `LIMITS` — the caps
+
+## At a glance
+
+- **Auto-save:** every change is saved to `localStorage` 500 ms later, one workbook per server + user. No password is ever saved.
+- **Restore:** connecting with an empty canvas reopens the saved workbook; anything repaired is reported.
+- **Export / Import:** the **Workbook** menu downloads or opens a JSON file (format version 2; version 1 files still open).
+- **Validation never silently coerces:** a broken file is refused outright; any other problem is repaired and reported, one sentence per issue.
+- **Never lose a stored workbook:** an unreadable entry is backed up, and autosave never overwrites what it couldn't read.
+
+## What a workbook holds
+
+| Kept | Left out |
+|---|---|
+| each table: `db`, `table`, canvas position | DOM nodes, fetched column lists (re-fetched on open) |
+| each relationship: endpoints + cardinality | loaded Pages members (re-fetched on demand) |
+| each worksheet: name + full `sheet` | the connection, host credentials, **any password** |
+| each dashboard: name + its widgets (worksheet index + grid cell, text, image, spacer, or a button with its target tab as `{ kind, index }`) | |
+| the tab strip's order, and which tab was open | |
+| the calculated fields (`calculations`) | the parsed formula tree (rebuilt on open) |
+
+The format is JSON with `"format": "dashboard-builder-workbook"` and an integer `version`.
+The current version is **2**; this build also opens version 1. Shapes are in
+[data-model.md](../../reference/data-model.md#workbook-file).
+
+## Format v2 and old files
+
+- **Version 2** holds `worksheets`, `dashboards`, `tabs` (the strip order, `{ kind, index }` per tab) and `active`
+  (`{ kind, index }`, or null for the Data Source).
+- **A version 1 file is read forever.** `migrateV1` (in `workbook-model.js`):
+  - turns every v1 `dashboards[i]` (one worksheet each) into `worksheets[i]`, and makes no dashboards;
+  - orders the tabs as the worksheets were;
+  - carries `active` and each bookmark's `dashboard` index over as worksheet indexes (v2 bookmarks say `worksheet` / `worksheetName`).
+
+  A valid v1 file opens with identical content and **no issues**. A malformed one is reported through the same checks as v2.
+- **A file with a version above 2 is refused.**
+- **Writing is v2 only**, so an older build refuses a newer file instead of silently dropping dashboards
+  ([D61](../../reference/decisions/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2)).
+
+## Auto-save
+
+- **When:** any model or worksheet change (`entity:added/moved/removed`, `rel:changed`, `tabs:changed`, `worksheet:changed`, `dashboard:changed`)
+  schedules a save **500 ms** later to `localStorage`.
+- **Where:** one workbook per **server + user**, under key `dashboardbuilder.workbook.v2|<host>|<port>|<user>`.
+  - Nothing is saved while disconnected.
+  - A pending save is flushed under the old key when the connection changes.
+- **Older autosaves.** An older build's autosave lives under `…workbook.v1|…`. With no v2 entry yet, that one is read and migrated.
+  It is **left in place** (never rewritten or deleted), and the next save writes the v2 key.
+- **Disconnect clears the screen, not the save.**
+  - After the flush, the cards and tabs fade out (~100ms), and the model and every tab are cleared (`clearWorkspace`).
+  - The stored workbook is untouched, so reconnecting to the same server + user restores it.
+  - Reconnecting mid-fade keeps the workspace as it was.
+- **Storage unavailable.** There is no save-status text. When storage is unavailable (private window, blocked), a danger toast says
+  "Not saved — browser storage is unavailable. Use Export to keep a copy." It shows once per cause, not on every autosave.
+- **Autosave never overwrites a stored workbook it couldn't read.**
+  - It is blocked for that key only when no backup copy could be kept (see [Restore on connect](#restore-on-connect)).
+  - A toast then says "Not saved — your previous workbook couldn't be read and has been left untouched. Use Export to keep a copy."
+  - A deliberate Import replaces the stored entry and lifts the block.
+
+## Restore on connect
+
+When a connection is established **and the canvas is empty**, the saved workbook for that server + user reopens.
+
+- A toast says `Restored your last workbook (N tables, M worksheets[, K dashboards]).` The dashboards part appears only when there are some.
+- Tables re-fetch their columns. Relationships draw as soon as both key rows exist.
+- The previously open tab becomes active (a worksheet re-runs its query).
+- A table that no longer exists shows its card's **failed** state with Retry, and keeps its saved keys.
+
+Problems while restoring:
+
+- **Repairs are reported.** If validation reset or dropped anything, the toast adds "N part(s) were reset",
+  and an issues dialog lists each one (first 20, then "…and N more").
+- **An unreadable or newer-format entry** is copied to `<key>:backup-<ISO time>` (an identical backup is not duplicated),
+  and a danger toast says so. Saving then continues normally.
+  If storage is full and no backup can be kept, the entry is left untouched and autosave is blocked for it.
+- **A partial open** (a table, worksheet or dashboard failed to rebuild) is never autosaved over the stored entry.
+
+## Export & Import
+
+Both live in the **Workbook** overflow menu, an icon button near the right end of the tab bar (`_Workbook.cshtml`).
+The menu holds:
+
+- **Export workbook** downloads `workbook-YYYY-MM-DD.json` of the current state. When the canvas is empty it says "Nothing to export yet".
+- **Save view as bookmark…** (hidden on a dashboard tab) names and saves the open worksheet's view.
+  - A bookmark holds the worksheet's whole sheet (filters, date range, click selection, drill level, page, chart type, format) plus the shared filters.
+  - At most **30** per workbook. Bookmarks save with the workbook (`Workbook/bookmarks-dialog.js`).
+  - **Bookmarks…** lists them (worksheet and time saved) with **Apply** and **Delete**.
+  - Applying restores the shared filters and that worksheet's sheet, and switches to it.
+    If the worksheet was closed, it is recreated under its saved name; a toast says why when the tab limit blocks that.
+- **Parameters…** (P32) lists the workbook's parameters (at most 20) with **New**, **Edit** and **Delete**.
+  - Each has a name (unique, 1–60 characters), a type (number / text / date), the allowed values (any, a list of ≤ 50, or a number range) and the current value.
+  - Each is checked before it is kept (`Core/parameters-model.js`).
+  - Parameters save with the workbook; disconnecting clears them from the screen.
+- **Theme…** opens the theme dialog, with choices as labelled swatches:
+  - an accent: Crimson, Blue, Teal, Violet, Graphite or a custom colour (refused with the reason if it can't carry white text);
+  - chart colours: Default, Colour-blind safe, Muted.
+
+  Choices apply live and save with the workbook. Disconnecting returns the screen to the default theme until the workbook reopens
+  ([tokens.md](../../design/tokens.md#workbook-themes-p41)).
+- **Import workbook…** opens a `.json` file.
+  - It needs a connection, because a workbook opens against the connected server.
+  - If the canvas isn't empty, a confirm dialog asks before **replacing** it.
+  - The file is validated in full (below). Anything repaired is listed in an issues dialog ("Opened <file> with N issue(s)");
+    otherwise a toast says "Opened <file>.".
+
+Two more parts save with the workbook but are not managed from this menu:
+
+- **Hierarchies** (T03-29) are managed from the field pane's Hierarchies group
+  ([worksheet-encodings.md](../worksheet/worksheet-encodings.md#named-hierarchies)).
+  - They save as the optional `hierarchies` field of version 2, omitted when there are none.
+  - A file without it (every older file) opens with none and **no issue**. `parseWorkbook` ignores fields it doesn't know, so the field needs no version bump.
+  - Disconnecting clears them from the screen.
+- **Calculated fields** save as `calculations: [{ id, name, formula }]`: the formula text only. The tree is rebuilt on open
+  ([calculated-fields.md](../worksheet/calculated-fields.md)).
+  - `nextCalcId` (the next calculation number) is saved beside them, so deleting the highest id never lets a bookmark's old id bind to a new calculation.
+    A file without it derives the number from the highest id.
+  - A file without `calculations` opens with none, and the field needs no `version` bump.
+  - A Top-N filter ranked by a calculation (`topBy.calc`) round-trips.
+
+## Validation (`parseWorkbook`)
+
+**Hard failures** refuse the file with a specific toast and change nothing:
+
+- not JSON, or not a workbook (`format` mismatch);
+- a missing / non-integer / < 1 `version`, or a `version` newer than this build;
+- a file over 5 MB.
+
+**Everything else is repaired and reported — never silently coerced.** Each issue is one sentence
+naming the sheet and field ("Sheet "Sales": unknown chart type "radar" — reset to Bar."). Checked:
+
+| Part | Rule |
+|---|---|
+| Tables | `id`, `db`, `table` non-empty text; ids and `db.table` unique (first kept); position finite and ≥ 0 else reset to 0; `joinKeys` (written for older builds: the columns the relationships use) is read but not used; at most **100** tables |
+| Relationships | both endpoints reference a kept table; cardinality one of `1:1`, `1:N`, `N:1`, `N:M`; `joinType` one of `inner`, `left`, `right`, `full` (anything else reads as `inner`); at most **200** |
+| Worksheets / dashboards | each an object (others skipped and reported); name 1–60 characters (else reset to "Worksheet" / "Dashboard"); a non-list means none are opened |
+| Tab order | `tabs` entries `{ kind, index }` pointing at a kept worksheet or dashboard, no repeats — others skipped; tabs it leaves out are added at the end; absent = worksheets then dashboards (no issue); at most **50 tabs of both kinds**, the rest dropped |
+| Dashboard widgets | see [Dashboard widgets](#dashboard-widgets) below |
+| Sheet | `chartType` one of the 23 types; pills carry `db`, `table`, `column`, `category`; `role` and `agg` valid for the column's category (a bad `agg` resets to sum / count); a `percentile` pill needs a finite `p` 0..1 (else it resets with an issue; `p` on any other aggregation is dropped; a percentile Top-N with a bad `topBy.p` is dropped); at most 20 pills per shelf; at most 8 filters; `collapsed` string keys only (≤ 200 per axis), the rest dropped with an issue |
+| Filters | known `op` (incl. P30 `contains` / `startsWith` / `endsWith` / `relative` / `top`; a `top` must carry its `topBy` measure); single value text (a non-text value resets to empty); `in` / `between` carry a text list; the `category` may be absent (back-filled from the catalog at runtime) |
+| Marks, sort, pages, drill | shapes checked; drill needs ≥ 2 levels (≤ 6) and a path matching its depth; `selection` is never restored |
+| Format | `numberFormat`, `dateFormat`, `dateBucket`, `legend` in their sets; `decimals` integer 0–10; `topN` in 5 / 10 / 20 / 50 / 100; `target` a finite number; `lineStyle`, `heatmapShape`, `secondaryType` (line / bar / area), `markBorder` (none / thin / thick), `markerShape` (circle / square / diamond / triangle) in their sets; `tableAlign` (auto / left / center / right), `tableDensity` (standard / compact / roomy), `tableShade` (none / banded / header / both) in their sets; `markerSize` null or a whole number 4–40; booleans (`syncAxes`, `dualAxis` among them) must be booleans; currency symbol ≤ 8 characters; axis titles ≤ 80 |
+| Conditional formatting | ≤ 20 measures; `mode` / `scale` in their sets, `mid` a number or null; ≤ 5 rules each with a known `op` and `tone` and a numeric `value` — bad entries / rules dropped and reported |
+| Date range | a temporal field; `preset` and `compare` in their sets; custom days `YYYY-MM-DD`; else cleared and reported |
+| Shared filters | as sheet filters; at most **4** |
+| Analytics | reference kind in its set (a constant needs a number), band two numbers (ordered), trend none / linear / log / poly2, forecast 0 / 3 / 6 / 12, totals booleans; a bad part is reset and reported |
+| Title / caption | text ≤ 80 / ≤ 300 or null; `showTitle` a boolean; `format.fit` standard / width / height / entire |
+| Table calculation | a known type, `along` auto / columns / rows / custom, `window` an integer 2–30, `using` (custom only) up to 16 distinct dimension indexes 0–15; else removed and reported |
+| Date part | a known part on a date pill only; else reset to Auto and reported |
+| Date labels | `all` or `thin` on a date pill only (absent = thin); else reset and reported |
+| Field choices | each a full field (db / table / column / category); ≤ 8; the shown field is added if missing; fewer than 2 → dropped |
+| Parameters | ≤ 20; id `prm<n>`, a name, a known type; allowed list / range checked; a value outside them reset and reported. A filter or Top N pointing at a parameter the file doesn't have is unlinked and reported |
+| Hierarchies | ≤ 20; id `hier<n>` unique, a unique name of 1–60 characters, ≥ 2 levels of `{ db, table, column }` strings from one table; a calculated, repeated or other-table level is removed and reported, levels past 6 cut; fewer than 2 left, a bad entry, a duplicate id / name, or a table that isn't among the file's tables skips that hierarchy and reports it; a non-list means none are opened (`cleanHierarchies`) |
+| Calculations | see [Calculations](#calculations) below |
+| Field settings | keys `db.table.column`; `alias` 1–60 characters, `agg` a known aggregation, `hidden` true, `cast` a known cast, `memberAliases` an object of member value (≤ 100 characters) → label (1–80 characters), ≤ 200 entries (a bad entry is dropped and reported per field; a non-object clears it); ≤ 2000; bad ones dropped and counted |
+| Bookmarks | at most 30; a name 1–60 characters and a sheet (validated like any sheet; a well-formed click selection is kept, unlike a dashboard's); shared filters as above; a worksheet index in range, else "closed" (recreated when applied) |
+| Link action | `https://` with a host and `{value}`, ≤ 500 characters; else removed and reported |
+| Theme | `accent` a preset id or a valid custom `#rrggbb`, `palette` a known id; absent = default; else reset and reported |
+| `active` | `{ kind, index }` pointing at a kept tab, else the Data Source opens |
+
+Repaired settings never abort the import. An `entities` / `relationships` / `worksheets` / `dashboards` value that
+isn't a list means none of that part is opened.
+
+### Dashboard widgets
+
+The rules are in `Board/board-model.js` (pure).
+
+- At most **12** widgets per dashboard.
+- A `sheet` widget whose worksheet index is missing (or cut by the tab cap) is dropped.
+- Size and position: `w` 2–12, `h` 2–24 (text 1–24), `x` + `w` ≤ 12, `y` + `h` ≤ 96, whole cells — else clamped.
+- An overlapping widget moves to the **first free spot** (rows top to bottom, left to right); it is dropped when there is none.
+- Text: `heading` ≤ 80 and `body` ≤ 2000 characters, cut with a report.
+- Button: `label` (1–40, empty → "Go to") and `tip` (≤ 200) are cut with a report.
+  A `target` whose tab index is missing is cleared; the button stays, unlinked.
+- Unknown kinds are dropped.
+
+### Calculations
+
+- At most `LIMITS.calculations`. Each is `{ id: calc<n>, name, formula }`.
+- **Group fields** (T02-30) have `formula: ""` plus `group: { field: { db, table, column }, groups: [{ name, members }] }`, checked by `checkGroupSpec`.
+  An invalid group skips that calculation and reports it.
+- **Name:** 1–`LIMITS.calcName` characters, without `.`, `[`, `]`. **Formula:** a string ≤ `LIMITS.calcFormula`.
+- A bad entry, a duplicate id or a duplicate name (case-insensitive, first kept) is skipped and reported.
+  A non-list means none are opened.
+- `nextCalcId` must be an integer 1–999999, or it is ignored and reported.
+- A calculation that fails to compute on open is kept and shows its error state.
+
+**Calculated pills:**
+
+- A pill `{ calc: id, category, role, … }` is valid without `db` / `table` / `column`.
+- A pill pointing at a calculation the file lacks is removed from its shelf or mark slot and reported as
+  `Sheet "X" rows: a calculated field that no longer exists was removed.`
+  The same applies to `columns`, `color`, `filters`, `size`, `label`, `shape`, `path`, `angle`, `detail`, `tooltip` and `pages`.
+- A Top-N filter ranked by a missing calculation is removed the same way, whether in a sheet, a shared-filter list or a bookmark.
+  Bookmark sheets are cleaned like worksheets.
+- A calculated pill is also removed from `filters`, drill levels, the date range, `pages` and shared filters.
+- A saved `datePart` is dropped from a calculated pill, and an `agg` outside sum / avg / min / max / countDistinct / countNonNull resets to sum.
+  Each of these is reported.
+
+## How opening works
+
+`openWorkbook` (in `workbook.js`) rebuilds the workbook in this order:
+
+1. Clear the model (`canvas.clearModel()`) and close every tab.
+2. Re-add each table through `canvas.addEntity(db, table, x, y, { source })`, and map saved entity ids to the new ones.
+3. Recreate relationships via `relations.restoreRelationship`.
+4. Recreate the tabs in strip order (`createWorksheet` + `updateSheet`, `createDashboard`).
+5. Recreate each dashboard's widgets (`setWidgets`), with fresh `w#N` ids pointing at the new worksheet ids.
+
+- Saved sheets are validated over today's defaults (`sanitizeSheet`; `restoreSheet` is the same without the report),
+  so workbooks from older builds gain new fields.
+- Auto-save is paused while this runs.
+- If a part fails to open, a danger toast says so, and no success toast or autosave follows.

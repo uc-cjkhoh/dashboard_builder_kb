@@ -1,0 +1,27 @@
+# Backlog: calculations and table calculations
+
+Calculation work not yet built. Entries are in dependency order. Format: [README.md](README.md#how-to-read-an-entry).
+
+Already built ([calculated-fields.md](../features/worksheet/calculated-fields.md)):
+
+- calculated fields with `+ − * /` and `SUM`/`AVG`/`MIN`/`MAX`/`COUNT`/`COUNTD`/`MEDIAN`/`STDDEV`/`VARIANCE`/`PERCENTILE`/`ATTR` over fields;
+- text functions: `TEXT`/`STR`, `LOWER`, `UPPER`, `TRIM`, `LEN`, `LEFT`, `RIGHT`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `SPLIT`;
+- parameters in formulas as `[@Name]`;
+- date functions: `DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY`, `DATE`;
+- on plain measures: median, percentile (a percent box on the pill), standard deviation, variance and ATTR.
+
+Rules for new work:
+
+- Every new function goes through the whitelisted expression tree, never formula text on the server.
+- The endpoint also takes LOD (level of detail) terms, extra join types and a function whitelist, with the same limits and response shape. It never accepts SQL text.
+
+- **Logic functions remainder** — Open: the keyword form `IF c THEN a ELSEIF d THEN b ELSE e END`, date and boolean literals, a `NULL` literal (use `ISNULL`/`IFNULL` today), `IN`/`BETWEEN` in formulas. Needs: none.
+- **Text functions remainder** — Open: regular expressions, `FIND` / `MID` / `LTRIM` / `RTRIM`, case-insensitive `CONTAINS` / `STARTSWITH` / `ENDSWITH` (write `LOWER` on both sides today), and a `LEFT` / `RIGHT` length or `SPLIT` position or separator that is a field or computed value (a `[@Parameter]` works). Needs: none.
+- **Date functions remainder** — Open: `TODAY()` / `NOW()` (non-deterministic; need a decision), `MAKEDATE(y, m, d)` (`makeDate` returns 1970-01-01 or rolls over for an impossible date, so it needs guards), fiscal calendars and a fiscal year start, `ISOYEAR`, date-part bucketing of a calculated date (a calculated date dimension groups per distinct value today), `DATENAME` / `DATETRUNC`, `DATEPARSE` with a format, time zones, and a unit, amount or part that is a field (a `[@Parameter]` works). Needs: none.
+- **Parameters remainder** (IDs: T04-31, T04-32; priority P2) — Open: analytics band bounds, the moving-average window and a trend forecast cannot bind a parameter (only a Constant reference line can); a step size exists only for a number range (not for "any value"); a calculated field reads a parameter only through `[@Name]` (no parameter picker in the pill menu). Needs: none.
+- **Filters on calculated fields** — a calculated field cannot be a filter, a Pages field, a drill level or the date-range field; the histogram and box-plot views cannot use one. Click-to-filter is off when the primary dimension is a calculation. Needs: none.
+- **Table-calculation polish** (IDs: T05-07, T05-09, T05-10, T05-11, T05-12, T05-13, T05-14, T05-15, T05-16, T05-17, T05-19, T05-21; priority P1–P2) — Built: percentile rank (T05-09 partly), compute-using a chosen set of dimensions (the rest restart). Open: YTD total, compound growth, YTD growth, assistance overlay. Partial: year-over-year is a comparison series only; no per-dimension restart interval (restart at a level of a date hierarchy), no addressing by specific members, no scope/at-level options; no duplicate-as-crosstab; no bump preset; the moving-average window is not parameter-bindable. Needs: none.
+- **Table-calculation engine order** — table calculations run in the browser on the bounded result, after the server aggregate; filter-order rules between filter classes are written down before more calculations are added (the evaluation-order popover already lists the six stages). Needs: none.
+- **Table-calculation formulas** (IDs: T05-18; priority P2) — Open: only the fixed quick-calculation list exists; no custom table functions. Needs: table-calculation polish.
+- **Level of detail** (IDs: T05-22, T05-23, T05-24, T05-25, T05-26, T05-27; priority P2) — Open: `FIXED`, `INCLUDE`, `EXCLUDE`, first-event cohort, aggregate-per-entity-then-average, higher-level benchmark. Needs: filter-order rules written down first. LOD compiles to SQL; whether it is a subquery or a window is settled in [platform.md](platform.md).
+- **P25 data-pane authoring** (priority P1; effort L) — Open: sets (named member subsets), bins (numeric buckets), folders. Groups and reusable hierarchies are in [data-model.md](data-model.md). Needs: calculated fields (built); a decision recorded before building.

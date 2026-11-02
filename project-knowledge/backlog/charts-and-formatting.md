@@ -1,0 +1,27 @@
+# Backlog: charts, authoring and formatting
+
+Chart, authoring and formatting work not yet built. Format: [README.md](README.md#how-to-read-an-entry). Built chart types are in [worksheet-charts.md](../features/worksheet/worksheet-charts.md).
+
+## Chart gaps
+
+- **Continuous time axis, gap filling and true jump lines** (IDs: T03-05 remainder, T03-07; priority P1) — Open: a true jump line (disconnected horizontal segments with no risers, as in Tableau; the current Step (centred) is a connected step); lines sit on a category axis, so unevenly spaced dates are drawn evenly and missing periods are not filled. Partial: discrete and truncated date parts exist; no continuous time axis or gap filling. Needs: none.
+- **Layered marks and dual axis beyond line, area and the combo** (IDs: T03-16 remainder, T03-17 remainder; priority P2) — Partial: the combo and Line / Area (Format → Dual axis) put measures on a right axis with Synchronise axes. Open: a dual axis on scatter; independent mark types per measure (all right-axis measures share one type, and line / area have no right-axis mark choice); a user-set axis range or a synchronise that spans a field the chart does not plot. Needs: none.
+- **Gantt and Density marks** (IDs: T03-14; priority P2) — Open: no interval marks, no density surface. Needs: none.
+- **Colour, size and shape beyond current marks** (IDs: T03-19, T03-20, T03-21, T01-21; priority P1) — Partial: continuous colour works on scatter, heatmap and table, with a hue choice and a pinned range on scatter and heatmap (Format); shape works on scatter only; size on scatter bubbles only. Open: continuous colour on bars, lines, treemap and the other types; stepped or diverging colour; size on line markers, bars and treemap; shape beyond scatter. Needs: none.
+- **Palette editing, diverging colour and member-colour gaps** (IDs: T01-20 and T03-24 remainder, T03-33 remainder; priority P1) — Open: diverging continuous colour on heatmap and scatter (diverging exists only in table scales); custom palette editing and a free-hex picker (only 24 fixed swatches); member colours cannot be set from the legend (a legend click highlights), cannot be assigned to scatter groups, treemap or funnel members, and are unsupported for calculated fields; no stepped or reversed-per-field ramps. Needs: none.
+- **Marker and border refinements** (IDs: T01-22 remainder, T03-34 remainder; priority P2) — Partial: Format has a marker size (4–40 px), a marker shape on line charts, and a none / thin / thick mark border (in the muted ink) for scatter, line markers, circle heatmap, bars, cells, pie, treemap and funnel. Open: a border on the P36 types (box plot, bullet, gauge, waterfall, histogram and the rest); a border colour or width of the user's choosing (from the palette tokens); per-series marker size and shape. Needs: none.
+- **Filter on an aggregated measure** (IDs: T03-27; priority P1) — partial: row-level between/compare only; no filter on an aggregated measure (HAVING) and no range slider. Needs: a whitelisted bounded HAVING in the server builder.
+
+## Authoring gaps
+
+- **Tooltip field formats** (IDs: T01-19 remainder; priority P2) — partial: the tooltip modal covers line order, per-line size / bold / italic / colour and a live preview; missing: per-field number / date format inside the template (values use the view's formats), and styling a single field token or word within a line (style is per line). Needs: none.
+- **Discrete/continuous pills and double-click placement** (IDs: T01-04, T01-15; priority P1) — Partial: role convert and date part only, no explicit discrete/continuous toggle; drag and plus-button placement only, no double-click. Needs: continuous axes for the toggle.
+- **Start screen and recent sources** (IDs: T01-14; priority P1) — partial: import, autosave restore and recent connections (host, port, user; no password) exist; no start screen listing recent workbooks or sample data. Needs: none.
+- **Analytics pane** (IDs: T07-01; priority P2) — partial: the Analytics card has draggable / pressable items (reference line, band, trend, forecast) that add at a default; missing: a separate always-visible pane, items placed per measure or per chart (a line sits on one chosen measure), and items for a table (totals stay checkboxes). Needs: none.
+- **Performance recording** (IDs: T01-30; priority P2) — Open: no query or render timing capture. Needs: none.
+
+## Formatting and presentation
+
+- **Worksheet formatting** (IDs: T01-23; priority P1) — partial: number, date, legend, fit, theme, and a table's alignment, row height and shading are built; missing: font choice (content text is fixed at the 14 / 16 px scale), shading of a chart's background or a chosen header/row colour, per-column alignment and column widths, and chart-view alignment. Needs: none.
+- **PDF export** (IDs: T01-28; priority P1) — partial: export is the browser print dialog on one worksheet; there is no generated PDF. A dashboard prints through the browser too (whole canvas); a generated PDF is not built. Needs: none.
+- **Phone view check** (IDs: T09-16; priority P1) — judged complete from phone and touch CSS alone; it has not been run on a device. Needs: a device run.

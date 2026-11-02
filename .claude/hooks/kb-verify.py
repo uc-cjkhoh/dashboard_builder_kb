@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""PostToolUse hook: verify an edited KB doc against docs/conventions/kb-maintenance.md.
+"""PostToolUse hook: verify an edited KB doc against agent-behavior/kb/kb-maintenance.md.
 
 Reads the hook JSON on stdin. If the edited file is a markdown doc of this KB (not the exempt
 archive/ or a git-ignored *.local.md), it checks:
-  - CLAUDE.md / README.md < 200 lines; every other doc <= 300 lines
+  - CLAUDE.md / README.md < 200 lines; every other doc <= 350 lines
   - ARCHITECTURE.md has no code blocks (fences with a language tag; untagged plain-text fences are allowed)
-  - kebab-case filename under docs/
+  - kebab-case filename under project-knowledge/ and agent-behavior/
   - no changelog / history phrasing ("current state, not history")
   - relative links (file and #anchor) in the file resolve, and links elsewhere to this file still resolve
 Findings go back to the model as additionalContext (non-blocking). Clean edits print nothing.
@@ -14,7 +14,7 @@ Run with --all to check every KB doc from the shell (prints findings, exit 1 if 
 import json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-EXEMPT = ("archive/", "docs/updates/")  # updates/ is a generated log (update-log.py): history by design, underscore names
+EXEMPT = ("project-knowledge/archive/", "project-knowledge/updates/", "agent-behavior/run-logs/")  # updates/ is a generated log (update-log.py), run-logs/ are dated agent logs: history by design
 HISTORY = [
     (r"\bCorrection,? same day\b", "changelog-style 'Correction, same day'"),
     (r"\b(shipped|added|fixed|removed|changed|built|deployed|migrated)\s+(on\s+|live\s+)?\d{4}-\d{2}-\d{2}\b", "dated changelog entry"),
@@ -76,20 +76,20 @@ def check(f, inbound=True):
     lines = text.count("\n") + (0 if text.endswith("\n") or not text else 1)
     name, issues = os.path.basename(f), []
 
-    if rel in ("CLAUDE.md", "README.md"):
-        if lines >= 200: issues.append(f"{rel} is {lines} lines; indexes must stay under 200 — move detail into docs/")
-    elif lines > 300:
-        issues.append(f"{rel} is {lines} lines (limit ~300) — extract its most self-contained sub-topic into a new file in the same docs/ subfolder and link it")
+    if rel in ("CLAUDE.md", "README.md", "project-knowledge/README.md", "agent-behavior/README.md"):
+        if lines >= 200: issues.append(f"{rel} is {lines} lines; indexes must stay under 200 — move detail into a topic file")
+    elif lines > 350:
+        issues.append(f"{rel} is {lines} lines (limit ~350) — extract its most self-contained sub-topic into a new file in the same subfolder and link it")
     # a fence with a language tag is code; an untagged fence is plain text (diagrams, trees) and allowed
-    if rel == "ARCHITECTURE.md" and re.search(r"^[ \t]*```[ \t]*\w", text, re.M):
-        issues.append("ARCHITECTURE.md must be high-level flow only: remove code blocks and point to source / docs/ files")
-    if rel.startswith("docs/") and name != "README.md" and not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*\.md", name):
+    if rel == "project-knowledge/ARCHITECTURE.md" and re.search(r"^[ \t]*```[ \t]*\w", text, re.M):
+        issues.append("ARCHITECTURE.md must be high-level flow only: remove code blocks and point to source / topic files")
+    if rel.startswith(("project-knowledge/", "agent-behavior/")) and name not in ("README.md", "ARCHITECTURE.md") and not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*\.md", name):
         issues.append(f"filename '{name}' is not kebab-case")
     fence = False
     for n, line in enumerate(text.splitlines(), 1):
         if line.lstrip().startswith("```"): fence = not fence
         if fence: continue
-        for pat, label in ([] if rel == "docs/conventions/kb-maintenance.md" else HISTORY):   # that page quotes the banned phrases
+        for pat, label in ([] if rel == "agent-behavior/kb/kb-maintenance.md" else HISTORY):   # that page quotes the banned phrases
             if re.search(pat, line, re.I):
                 issues.append(f"{rel}:{n} {label} — KB tracks current state, not history; overwrite the line instead")
     for n, t in links(f):
@@ -120,7 +120,7 @@ def main():
     if exempt(os.path.relpath(f, ROOT)): return
     issues = check(f)
     if issues:
-        msg = ("KB check (docs/conventions/kb-maintenance.md) failed for " + os.path.relpath(f, ROOT) + ":\n- "
+        msg = ("KB check (agent-behavior/kb/kb-maintenance.md) failed for " + os.path.relpath(f, ROOT) + ":\n- "
                + "\n- ".join(issues[:15]) + "\nFix these in the same change.")
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": msg}}))
 
