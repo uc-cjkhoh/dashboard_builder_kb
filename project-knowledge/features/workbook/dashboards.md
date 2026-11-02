@@ -27,7 +27,7 @@ A dashboard tab (`.tab--dashboard`) composes the workbook's worksheets, text blo
 - **Worksheet widgets** show the worksheet's current sheet, read-only except for selecting marks. A mark click filters the other widgets (cross-widget filtering, never saved).
 - **Only the active dashboard renders**, and widgets reuse the worksheet editor's result cache, so re-showing an unchanged board sends no query.
 - **Undo / redo** covers layout edits for the session only. The layout itself is autosaved with the workbook.
-- **Narrow canvases stack** widgets full width; print lays out a single column (fixed-size boards keep their arrangement).
+- **Desktop only:** the board has no phone or tablet layout; print lays out a single column (fixed-size boards keep their arrangement).
 
 ## Layout
 
@@ -38,33 +38,16 @@ A dashboard tab (`.tab--dashboard`) composes the workbook's worksheets, text blo
   - then **Add text**, **Add image** (a file picker), **Add button** and **Add spacer**.
 
   The list redraws only when a worksheet is added, closed or renamed, so a button keeps focus when a widget is added.
-- **Bar** above the canvas holds, in order: the dashboard's name, "n of 12 widgets", the **status line** (below), the **device preview** (below),
+- **Bar** above the canvas holds, in order: the dashboard's name, "n of 12 widgets", the **status line** (below),
   the **Size** select, **Undo** / **Redo**, **Full screen** and **Print**.
-
-### Device preview
-
-Previews the board at a device width (`Board/board-device.js`).
-
-- **Buttons:** **Desktop** (default), **Tablet** (768 px) or **Phone** (390 px), each icon + text with `aria-pressed`.
-  The pressed one also shows a check mark and a heavier outline.
-- **How it draws:** Tablet and Phone draw the same widgets in a centred, outlined box of that width, so the normal layout rule decides the result.
-  Tablet keeps the 12-column grid. Phone is under the 720 px stack threshold, so it stacks.
-- **Editing:** the Tablet box is editable like the board (drag and resize snap to the drawn grid).
-  The stacked Phone box has no drag or resize, as on any narrow canvas.
-- A device wider than the panel is disabled, and its title says so (widen the window).
-- **Interaction with Size:** while a device is on, the Size select is disabled with the title
-  "Size is replaced by the device preview; choose Desktop to change it". A fixed-size dashboard also gets that sentence in the status line.
-  The fixed box is dropped and comes back on Desktop.
-- **Transient:** never saved, not in undo, ignored by print.
-- There is no per-device layout yet ([backlog](../../backlog/dashboards.md)).
 
 ### Size
 
 Each dashboard has its own size (`Board/board-size.js`).
 
-- **Automatic** (default): the canvas fills its panel and stacks when narrow, as below.
+- **Automatic** (default): the canvas fills its panel.
 - **Fixed** preset: 800 × 600, 1024 × 768, 1280 × 720, 1366 × 768 or 1920 × 1080.
-  - A fixed board is exactly that box, never stacked.
+  - A fixed board is exactly that box.
   - Columns span the width, and the rows in use (down to the lowest widget) stretch to share the height
     (`layoutBoard(…, { fixed })`, `fixedRowH`), so drag and resize snap to the drawn rows.
   - Rows never shrink below 16px, so a tall stack in a short box overflows.
@@ -80,10 +63,6 @@ Each dashboard has its own size (`Board/board-size.js`).
   (`layoutBoard(widgets, panelWidth, { rowH, gap })` → pixel rects). `board.js` reads the row height and gap from the tokens.
 - **Scrolling:** the canvas grows downward (at most 96 rows) and scrolls **inside its panel**; the page never scrolls (golden rule 8).
 - Column width follows the canvas width. A `ResizeObserver` on the grid re-lays out.
-- **Narrow canvas:** below `STACK_BELOW` = 720px the grid is unusable, so widgets **stack full width in reading order** (by row, then column).
-  Each keeps its row count, and the DOM order is the same reading order.
-- **Narrow viewport:** at viewport width ≤ 760px the side panel moves above the canvas as a short scrolling list.
-  The shell keeps its sidebar at every width, so a phone user collapses it first.
 - An empty dashboard shows "Empty dashboard" with an icon. The field list beside it is the way to add widgets.
 
 ## Adding and removing
@@ -165,20 +144,19 @@ All geometry and verdicts are pure. `board-interact.js` turns events into points
 draws the **ghost** and commits. Every committed edit is **one undo step** and fires `dashboard:changed` (autosave).
 
 - **Move and resize with the pointer.** Press the widget **header** (not its buttons) and drag to move; drag the **corner grip** to resize.
-  - Pointer capture is on the header / grip, with `touch-action: none`. A press that travels under 4px is a click, not a drag.
+  - Pointer capture is on the header / grip. A press that travels under 4px is a click, not a drag.
   - The pointer delta snaps to the nearest whole cell (`snapMove`, `snapResize`).
     The dragged widget dims, and a dashed **ghost** covers the target cells.
   - **Refused drops:** when the target overlaps another widget, runs off the grid or breaks a size limit, the ghost turns refused
     (danger border + "Can't drop here" with an icon). A release then **snaps back**: nothing moves, and the status line says why
     ("Can't move: it would overlap “Sales”."). The widget is never silently moved elsewhere.
   - `pointercancel`, a lost capture, window blur and Esc end the drag with no ghost and no change.
-  - **No drag on a stacked (narrow) canvas** — the header and grip are plain there.
 - **Keyboard.** Focus a widget (Tab):
   - **arrows** move it one cell;
   - **Shift + arrows** resize from the bottom-right (Right / Down grow, Left / Up shrink).
 
   Each key press is a committed step; a refused one changes nothing. Keys act only while the widget itself (not a button or field inside it) has focus,
-  and focus stays on the widget after a step. This works on a stacked canvas too.
+  and focus stays on the widget after a step.
 - **Status line** (`#board-status`, a polite live region, visible in the bar).
   - Messages: "Moved to column 3, row 2", "Resized to 4 columns by 3 rows", "Text updated.", "Undid the last change.",
     or the refusal in the danger colour with a warning icon. It clears after 8 seconds.
@@ -188,7 +166,7 @@ draws the **ghost** and commits. Every committed edit is **one undo step** and f
   - The ghost shows a default-size (6 × 4) widget whose top-left is the cell under the pointer, slid left just far enough to stay inside the 12 columns.
   - The drop adds it there. Like Add, an added widget toasts "Added …".
   - A taken or too-low cell, or a 12th-plus widget, refuses with the status line and adds nothing.
-  - A stacked canvas says to use **Add**. Other drags are ignored.
+  - Other drags are ignored.
 - **Text edit.** **Edit** on a text widget replaces its body with a form.
   - Fields: a labelled **Heading** input (≤ 80) and **Text** textarea (≤ 2 000), with `maxLength` from `LIMITS` and a live "n / max" count.
   - **Save:** Enter in the heading, Ctrl+Enter, or the **Save** button. **Discard:** Esc or **Cancel**. Focus returns to **Edit** either way.
@@ -293,22 +271,22 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
 
 **Layout and editing**
 
-- `tests/js/board-layout.test.mjs` — geometry, the 96-row limit, stacking.
+- `tests/js/board-layout.test.mjs` — geometry, the 96-row limit, print stacking.
 - `board-model.test.mjs` — rules and limits.
 - `board-drag.test.mjs` — pixel → cell snapping, ghost, click threshold, every refusal, cancel, panel drop plan.
 - `board-keys.test.mjs` — every step and refusal message.
 - `text-edit.test.mjs`, `board-history.test.mjs`.
 - `tests/live/board-edit-ui.mjs` — real mouse events: move and resize with the ghost, overlapping / off-grid drops that snap back,
   keyboard and the live status, text edit / limits / Esc, undo and redo of every edit type by button and shortcut, panel drag,
-  pointercancel / blur / Esc, no drag when stacked, reload keeps the layout but not the history;
+  pointercancel / blur / Esc, reload keeps the layout but not the history;
   light and dark screenshots with the ghost, a refused ghost and the focus ring.
 
 **Whole board**
 
 - `tests/live/board-ui.mjs` — mocked API: three widget kinds draw with their own queries, a failing widget, Remove, Edit, disposal on
-  tab switch, a worksheet edit, theme flip, phone stacking, full screen, reload from autosave, a shared filter and a parameter in a
+  tab switch, a worksheet edit, theme flip, resize re-fit without a query, full screen, reload from autosave, a shared filter and a parameter in a
   widget's query, a calculated field + cast + tooltip template + member colour in a widget, table paging inside a widget, the Cancel
   label and live-region announcement, and print layout checked under emulated print media with the chart-to-cell geometry;
-  light, dark, phone and print screenshots.
+  light, dark and print screenshots.
 
 Not verified: the browser's real print dialog and PDF pages.

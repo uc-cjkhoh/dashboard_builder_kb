@@ -34,13 +34,11 @@ worksheets (and text) on a 12-column snap grid; one worksheet may sit on several
 Only the active dashboard has live views: leaving it destroys every widget's worksheet view, and showing it rebuilds them.
 - **Shared cache.** Widgets run through the **same result cache as the worksheet editor** (`sharedResults`, keyed by the exact
   request). A widget draws what its worksheet tab just ran, and a re-shown dashboard re-queries only what changed or failed.
-- **Layout in JS.** Widget positions are computed by the pure `board-layout.js` (not CSS grid). Below 720px of canvas width,
-  widgets stack full width in reading order.
+- **Layout in JS.** Widget positions are computed by the pure `board-layout.js` (not CSS grid). 
 - **Why:**
   - Twelve live charts on a hidden tab would hold queries and chart instances for nothing, and "stale" tracking would be extra
     state. Rebuilding from a content-addressed cache is correct by construction.
-  - JS geometry is what pointer snapping, the ghost and keyboard moves need, and it makes the narrow-canvas rule testable.
-  - A 2-column widget on a narrow grid is ~100px wide, so stacking beats shrinking.
+  - JS geometry is what pointer snapping, the ghost and keyboard moves need, and it makes the layout rules testable.
 - **Rejected:** keeping hidden dashboards alive (leaks); a separate cache per widget (the same query would run twice after an
   edit); CSS grid with `grid-column` (no pixel geometry to snap against).
 
@@ -116,3 +114,12 @@ label policy, field choices, a filter's operator / sharing / value) opens in one
   (its dimmed items and best-fit icon are Show Me's cues), and picking only sets the type. Show Me's re-layout of Columns / Rows
   is not offered: it was the redundant half.
 - **Marks** live in the field pane as a three-column slot grid with no More menu, so every encoding is one click or drop away.
+
+### D74 — Desktop-only: no phone or tablet layouts, no device preview
+Decided 2026-11-02 by the owner. The app targets desktop browsers only.
+- **What this means:** the board has one layout (the 12-column grid, or a fixed size); there is no narrow-width stacking, no
+  Desktop / Tablet / Phone preview, no phone field-pane overlay and no touch-sized targets. Print and full screen stay: they are
+  presentation, not small-screen features. Print still lays the widgets out in one column.
+- **Why:** the phone layout was judged complete from CSS alone and never run on a device, so keeping it meant carrying an
+  unverified claim, and every region paid for rules that desktop users never meet.
+- **Rejected:** keeping the CSS "best effort" (untested rules rot); per-device layouts (T08-05), now out of scope.

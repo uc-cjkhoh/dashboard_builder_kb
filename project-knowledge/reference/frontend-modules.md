@@ -49,10 +49,9 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Tabs/tabs.js` — Data Source tab + one ordered list of worksheet and dashboard tabs, the `[+]` menu, close confirms — [tabs.md](../features/workbook/tabs.md)
 - `Board/board-model.js` — pure (P24b):
   - widget geometry and limits — `overlaps`, `inBounds`, `firstFreeSpot`, `placeNew`, `placeAt` (a drop), `checkPlacement`, `explainRefusal` (the refusal in words), the import clean-up `cleanWidgets`, `savedWidgets`, `removeSheetWidgets`, `dashboardsUsing`, `defaultTabName` — [data-model.md](data-model.md#tabs-and-dashboards)
-- `Board/board-device.js` — pure (node-tested): device preview — `DEVICES` (desktop / tablet 768 / phone 390), `deviceOf`, `previewWidth` — [dashboards.md](../features/workbook/dashboards.md#layout)
 - `Board/board-size.js` — pure (node-tested): dashboard size — `SIZE_PRESETS`, `SIZE_LIMITS`, `sizeError`, `cleanSize` (import), `savedSize`, `sizeKey` / `sizeLabel` — [dashboards.md](../features/workbook/dashboards.md#layout)
 - `Board/board-layout.js` — pure (node-tested):
-  - cell → pixel geometry — `layoutBoard(widgets, panelWidth, { rowH, gap, stack?, fixed? })` → `{ stacked, height, rects }`, `fixedRowH`, `columnWidth`, `isStacked`, `STACK_BELOW`, `widgetOrder` (reading order)
+  - cell → pixel geometry — `layoutBoard(widgets, panelWidth, { rowH, gap, stack?, fixed? })` → `{ stacked, height, rects }` (`stack` is for print), `fixedRowH`, `columnWidth`, `widgetOrder` (reading order)
   - pixel → cell: `cellAt`, `snapMove`, `snapResize`, `cellRect` — [dashboards.md](../features/workbook/dashboards.md#layout)
 - `Board/board.js` — the dashboard tab's body (`#board-view`):
   - shows the active dashboard only, reconciles its widgets by id, lays them out from the tokens, add / remove, theme and resize handling, full screen and print — [dashboards.md](../features/workbook/dashboards.md)

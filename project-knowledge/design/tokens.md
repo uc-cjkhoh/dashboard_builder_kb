@@ -110,7 +110,7 @@ edge / shadow / ink / weight:
 | disabled | `opacity .5`, no shadow, `not-allowed`, no hover change |
 
 Only `background`, `border-color`, `box-shadow`, `color` and `transform` transition (`--dur-fast`). The
-blur is never animated. Under `@media (pointer: coarse)` glass controls grow to a 44px target.
+blur is never animated.
 `tests/js/contrast.test.mjs` pins `--ctl-edge` at ≥ 3:1 against the glass over the base and the strongest
 wash tint, in both themes.
 

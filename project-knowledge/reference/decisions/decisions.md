@@ -10,7 +10,7 @@ open question, promote it to a decision.
 |---|---|
 | D1–D25 | this file |
 | D26–D60, D65–D68, D73 (calculated fields, parameters, member labels, groups, split / unpivot) | [decisions-calculated-fields.md](decisions-calculated-fields.md) |
-| D61–D64, D69, D71–D72 (dashboards, hierarchies, option controls) | [decisions-dashboards.md](decisions-dashboards.md) |
+| D61–D64, D69, D71–D72, D74 (dashboards, hierarchies, option controls, desktop-only) | [decisions-dashboards.md](decisions-dashboards.md) |
 | D70 (recent connection sources) | [decisions-connection.md](decisions-connection.md) |
 
 ## Platform & safety
@@ -318,7 +318,7 @@ Worksheet results are kept **in the server's memory for 60 seconds** per server 
 - a 10% `SAMPLE` (counts and sums scaled by `_sample_factor`) on a base table that declares a sampling key.
 - If the server refuses the sampled query, it runs once more unsampled (logged).
 
-Calculated-field decisions D26–D60, D65–D68 and D73: [decisions-calculated-fields.md](decisions-calculated-fields.md). Dashboard decisions D61–D64, D69 and D71–D72: [decisions-dashboards.md](decisions-dashboards.md). Connection decision D70: [decisions-connection.md](decisions-connection.md).
+Calculated-field decisions D26–D60, D65–D68 and D73: [decisions-calculated-fields.md](decisions-calculated-fields.md). Dashboard decisions D61–D64, D69, D71–D72 and D74: [decisions-dashboards.md](decisions-dashboards.md). Connection decision D70: [decisions-connection.md](decisions-connection.md).
 
 ## Open questions
 

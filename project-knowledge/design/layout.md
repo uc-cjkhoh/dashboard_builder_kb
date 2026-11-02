@@ -168,9 +168,6 @@ The dashboard tab (`.view--board`, padding 0, no scroll of its own) is a two-col
 **Canvas:** 12 columns with rows of `calc(var(--ctl-h) * 2)` and `var(--s2)` gaps. Widgets are absolutely
 positioned from the pure `board-layout.js`.
 
-- Below 720px of canvas width, widgets stack full width in reading order.
-- At viewport ≤ 760px the panel moves above the canvas (max-height 9rem, scrolling).
-
 **Widget:** a surface card (`--r`, `--elev-2`) with:
 
 - a `--surface-2` header (grab cursor; the page's `:focus-visible` ring on a focused widget);
@@ -179,20 +176,6 @@ positioned from the pure `board-layout.js`.
   `--danger-solid` border and a `--danger-bg` label with an icon and text.
 
 Behaviour: [dashboards.md](../features/workbook/dashboards.md).
-
-## Phone layout (≤ 640px)
-
-- The shell keeps its fixed frame.
-- The sidebar starts on its rail and opens over the content. This is not remembered; a wide screen
-  keeps the user's choice.
-- The worksheet becomes one column: the data header (a **Fields** button, then Columns / Rows / Marks
-  with 84px labels, tools wrapping), then the chart card at ≥ 380px tall. `.ws-main` scrolls inside itself.
-- The field pane opens as an overlay from **Fields** (`.is-fields-open`) and closes on a tap outside it
-  or `Esc`.
-- The view bar wraps: chart type, then sort and the icon group.
-
-These are responsive CSS rules (`dashboard.css`), not visibility toggles; `hidden` stays the only
-show/hide switch for state.
 
 ## Full screen & print
 

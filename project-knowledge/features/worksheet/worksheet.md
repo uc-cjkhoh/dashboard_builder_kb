@@ -27,7 +27,7 @@ Data sits on top; view controls sit on the chart ([design/layout.md](../../desig
    - the one chart-type control (`chartTypePicker`, [worksheet-charts.md](worksheet-charts.md#chart-type-control));
    - sort picker · Format · Export · Refresh · **Full screen** (icon buttons with tooltips and `aria-label`s).
 
-   Below the view bar come the Format card, the result notice and the chart. Full screen, print and the phone layout: [layout.md](../../design/layout.md#phone-layout--640px).
+   Below the view bar come the Format card, the result notice and the chart. Full screen and print: [layout.md](../../design/layout.md#full-screen--print).
 
 ### Worksheet chrome (P23)
 

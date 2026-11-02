@@ -47,7 +47,7 @@ previews rows, and profiles columns.
   - The filter resets when the table list reloads.
 - **Look and tooltips.**
   - Chip icons are inline SVG (`Core/icons.js`).
-  - A **grip** (`.table-chip__grip`) appears on hover / focus (always on touch) as the drag affordance.
+  - A **grip** (`.table-chip__grip`) appears on hover / focus as the drag affordance.
   - The chip's tooltip says "Drag <table> onto the canvas"; the `＋` button's says "Add to the canvas (or drag the table)".
   - Chips are tier-2 glass controls ([tokens.md](../../design/tokens.md#controls-on-glass--three-tiers-and-a-state-ladder)).
 
@@ -75,7 +75,7 @@ previews rows, and profiles columns.
 ## Column profile / field details
 
 - **Opening it.** Each field row on a canvas entity card has a **Profile button** (`.col-row__profile`, analytics icon,
-  `aria-label` "Profile <column>"; shown on hover / focus, always on touch).
+  `aria-label` "Profile <column>"; shown on hover / focus).
   It opens the **profile dialog** (`Schema/column-profile-dialog.js`, rules in `column-profile-model.js`).
   The request is `POST /api/databases/{db}/tables/{table}/profile` ([api.md](../../reference/api.md)), read-only.
 - **Field details:** Name, Type (raw ClickHouse type), Kind (the display category) and Role
