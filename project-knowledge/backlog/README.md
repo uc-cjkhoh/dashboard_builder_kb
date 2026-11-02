@@ -30,9 +30,9 @@ Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5
 
 ## Recommended order
 
-1. Calculation aggregations, logic, text and date functions — the engine's tree path already exists.
+1. Calculation function remainders (logic, text, date) — the engine's tree path already exists.
 2. Table-calculation polish — builds on the function set.
-3. Data-model breadth (joins, union, groups, split, hierarchies) — independent of the engine; join types come before P43.
+3. Data-model breadth (compound joins, union and split remainders, groups, hierarchies) — independent of the engine; compound joins come before P43.
 4. Chart gaps and formatting — client-only, ordered by priority.
 5. Actions, navigation, P38 and P39 remainder — need dashboards and, for sets, P25.
 6. LOD — needs the core engine and written filter-order rules.

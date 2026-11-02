@@ -120,7 +120,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Dashboard/field-choices.js` — pure: `choicesOf`, `sameRef`, `switchField`, `removeChoice` (a slot's field choices, P40)
 - `Dashboard/placement-model.js` — pure: `defaultShelf(role)` (measures to Rows, dimensions to Columns) for the `＋` button and double-click
 - `Dashboard/pill-options.js` — pure: `fieldPillOptions` / `filterPillOptions` (the entries of a pill's context popup), `filterSummary`, `markGrid` (Marks slots in rows of three)
-- `Dashboard/field-group.js` — the one collapsible `<details class="ws-group">` of the field pane (Calculated fields, Hierarchies, Marks, tables)
+- `Dashboard/field-group.js` — the one collapsible `<details class="ws-group">` of the field pane (Marks, tables)
 - `Dashboard/fields-pane-model.js` — pure: the field pane's hide / show state (`fieldsPaneView`, `readCollapsed`, storage key)
 - `Dashboard/field-copy-model.js` — `fieldCopies(field)`: the Copy items on a worksheet field's ⋯ menu (name, column name, formula)
 - `Dashboard/hierarchy-model.js` — pure (T03-29):
