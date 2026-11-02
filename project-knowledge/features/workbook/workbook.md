@@ -115,7 +115,7 @@ The menu holds:
 
 Two more parts save with the workbook but are not managed from this menu:
 
-- **Hierarchies** (T03-29) are managed from the field pane's Hierarchies group
+- **Hierarchies** (T03-29) are managed in the Hierarchies dialog, opened from the sidebar's drill icon
   ([worksheet-encodings.md](../worksheet/worksheet-encodings.md#named-hierarchies)).
   - They save as the optional `hierarchies` field of version 2, omitted when there are none.
   - A file without it (every older file) opens with none and **no issue**. `parseWorkbook` ignores fields it doesn't know, so the field needs no version bump.

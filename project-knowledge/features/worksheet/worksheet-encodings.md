@@ -191,7 +191,7 @@ A **named hierarchy** (T03-29) is a reusable drill path kept on the workbook: `{
 
 - **Rules:** 2–6 levels, all from one table, no repeated column (the same rules as the Drill tool). At most **20** per workbook. A name of 1–60 characters, unique case-insensitively.
 - **Not allowed as a level:** a calculated field (the calc refusal text) or a field with a type cast ("A field with a type cast can't be a hierarchy level").
-- **Managing them.** The sidebar's drill icon on a worksheet tab opens the Hierarchies dialog (`Dashboard/hierarchy-dialog.js`); **New hierarchy** and **Hierarchies…** open it too.
+- **Managing them.** The sidebar's drill icon on a worksheet tab opens the Hierarchies dialog (`Dashboard/hierarchy-dialog.js`). Its own **+ New hierarchy** button starts a new one.
   - Each row has **Use** (sets the worksheet's drill levels), **Edit** and **Delete** (Delete confirms).
   - Editing: a name, a table, and an ordered level list built with an "Add a level" picker and per-level **Up / Down / Remove** buttons (labelled, keyboard-operable; focus stays on the control just used).
 - **Applying.** **Use** on a dialog row **replaces the sheet's drill** with `{ levels, depth: 0, path: [] }` — the structure a hand-built drill has, each level carrying its column's category — so the chart, breadcrumb and click-to-drill behave identically.
