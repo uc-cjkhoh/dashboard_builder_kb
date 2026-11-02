@@ -119,7 +119,7 @@ dashboard_builder/          (this KB)
 │   │   ├── worksheet/      #   worksheet · worksheet-charts · worksheet-encodings · calculated-fields · field-settings
 │   │   └── workbook/       #   tabs · dashboards · workbook
 │   ├── reference/          # api (+ -calculated-fields) · clickhouse-integration (+ clickhouse-calculations) · data-model · frontend-modules · glossary
-│   │   └── decisions/      #   decisions (D1–D25 + lookup) · -calculated-fields · -dashboards · -connection
+│   │   └── decisions/      #   decisions (D1–D25 + lookup) · -calculated-fields · -dashboards · -connection · -logic
 │   ├── operations/         # development · deployment · source-table-guidance (+ git-ignored credentials.local.md)
 │   ├── backlog/            # undone work by topic · recommended order · design specs
 │   ├── updates/            # generated change logs

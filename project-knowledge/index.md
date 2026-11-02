@@ -66,6 +66,7 @@ matching whatever you're touching.
 | [decisions-calculated-fields.md](reference/decisions/decisions-calculated-fields.md) | D26–D60, D65–D68, D73: calculations, parameters, groups, split / unpivot |
 | [decisions-dashboards.md](reference/decisions/decisions-dashboards.md) | D61–D64, D69, D71–D72: dashboards, hierarchies, option controls |
 | [decisions-connection.md](reference/decisions/decisions-connection.md) | D70: recent connection sources |
+| [decisions-logic.md](reference/decisions/decisions-logic.md) | D75–D77: `NULL`, `IN` / `BETWEEN`, keyword `IF` |
 
 ## operations/ — build, run, deploy
 

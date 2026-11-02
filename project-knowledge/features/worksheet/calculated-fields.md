@@ -37,7 +37,7 @@ ref       := "[" name "]" | "[@" parameter "]"                   (a workbook par
 ### What a formula can contain
 
 - **Operators** `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`, `COUNTD`, `MEDIAN`, `STDDEV`, `VARIANCE`, `PERCENTILE`, `ATTR`. Function names are case-insensitive. The function table lives in `calc-types.js`.
-- **Logic** ([below](#logic-functions)): comparisons, `AND` / `OR` / `NOT`, `IF` / `IIF` / `CASE`, `IFNULL`, `ISNULL`, `ZN`, text literals.
+- **Logic** ([below](#logic-functions)): comparisons, `AND` / `OR` / `NOT`, `IN`, `BETWEEN`, `IF` / `IIF` / `CASE`, `IFNULL`, `ISNULL`, `ZN`, text, `TRUE` / `FALSE` and `NULL` literals.
 - **Text** ([below](#text-functions)): `TEXT` (alias `STR`), `LOWER`, `UPPER`, `TRIM`, `LTRIM`, `RTRIM`, `LEN`, `LEFT`, `RIGHT`, `MID`, `FIND`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `ICONTAINS`, `ISTARTSWITH`, `IENDSWITH`, `SPLIT`.
 - **Date** ([below](#date-functions)): `DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY`, `DATE`.
 - **References:** `[table.column]` (`[db.table.column]` when two databases hold the same table name), or `[Name]` for another calculation. Calculations can refer to calculations. The browser expands every reference into one tree before sending, so the server never sees a calculation name.
@@ -64,20 +64,20 @@ A text or number field's menu **Clean…** adds ONE calculated field. The data i
 
 ### Logic functions
 
-- **Text literal** `'open'`: a quote inside is doubled (`'it''s'`). At most 100 characters. It is sent as data, never as SQL text. There are no date or boolean literals (compare two date fields; use a boolean field as a condition).
+- **Text literal** `'open'`: a quote inside is doubled (`'it''s'`). At most 100 characters. It is sent as data, never as SQL text. There is no date literal: write `DATE('2024-01-01')`.
 - **Comparison** `= != <> < <= > >=` (`<>` is `!=`) takes two numbers, two texts or two dates — never a mix and never a boolean (`Comparison needs two values of the same type — …`). Text compares exactly (case and accents count).
 - **Precedence**, loosest first: `OR`, `AND`, `NOT`, comparison, `+ -`, `* /`. So `1 + 2 > 2` works without parentheses.
-- **`AND` / `OR` / `NOT`** need booleans (a comparison, `ISNULL`, a boolean field) and give a boolean.
-- **`IF(cond, a, b)`** (also `IIF`) and **`CASE WHEN c THEN a [WHEN …] [ELSE d] END`**:
+- **`AND` / `OR` / `NOT`** need booleans (a comparison, `ISNULL`, a boolean field, `TRUE` / `FALSE`) and give a boolean. A boolean is never compared with `=`: write the field itself.
+- **`x IN (a, b, …)`** / **`NOT IN`** ([D76](../../reference/decisions/decisions-logic.md#d76--in-is-a-list-node-of-bound-literals-at-most-50-between-is-two-comparisons)): `x` is a number or text; the 1 to 50 values are number or text literals of the same type written in the formula (a number or text `[@Parameter]` works), each bound as data. A field, a date, a mixed type or a longer list is refused. **`x BETWEEN a AND b`** / **`NOT BETWEEN`** is `x >= a AND x <= b` (ends included; number, text or date).
+- **`IF(cond, a, b)`** (also `IIF`), **`IF c THEN a [ELSEIF d THEN b]… [ELSE e] END`** and **`CASE WHEN c THEN a [WHEN …] [ELSE d] END`** (all one `case` node, [D77](../../reference/decisions/decisions-logic.md#d77--the-keyword-if-is-another-spelling-of-case-when)):
   - The simple form `CASE [f] WHEN 'x' THEN a … END` tests `[f] = 'x'`. The subject is copied into every arm, so each arm costs its nodes again against the node limit.
   - Conditions are booleans. Every THEN and the ELSE must have **one type** (number, text, date or boolean); otherwise `All results must be the same type — … is text, not number.` shows at the offending branch.
   - The first true WHEN wins. A CASE with no ELSE is empty (NULL) when nothing matches.
 - **`IFNULL(a, b)`** is `a`, or `b` when `a` is empty (same type). **`ZN(a)`** is `IFNULL(a, 0)`. **`ISNULL(a)`** is true when `a` is empty. Division by zero is still empty, so `IFNULL(a / b, 0)` repairs it.
 - **NULL:**
-  - A condition that is NULL counts as not true: `IF` takes its else, `CASE` tries the next WHEN.
-  - A comparison with NULL is NULL (shown as a NULL group, not `false`).
-  - `AND` / `OR` / `NOT` are three-valued: `NULL AND false` is `false`, `NULL OR true` is `true`, `NOT NULL` is NULL.
-  - Aggregates still skip NULLs.
+  - A condition that is NULL counts as not true: `IF` takes its else, `CASE` tries the next WHEN. A comparison or `IN` with a NULL value is NULL (shown as a NULL group, not `false`).
+  - **`NULL` literal** ([D75](../../reference/decisions/decisions-logic.md#d75--null-has-no-type-of-its-own-it-takes-the-type-of-the-results-beside-it)) is only an `IF` / `CASE` result or an `IFNULL` side, and takes the type of the other results (`IF c THEN 'x' ELSE NULL END` is text). Anywhere else it is refused; `x = NULL` points at `ISNULL(x)`, and a formula with no non-NULL result has no type.
+  - `AND` / `OR` / `NOT` are three-valued: `NULL AND false` is `false`, `NULL OR true` is `true`, `NOT NULL` is NULL. Aggregates still skip NULLs.
 - **Aggregate or row-level:** an `IF`, `CASE`, comparison or `IFNULL` is an aggregate calculation when any part is an aggregate and every other part is an aggregate or a constant (`IF(SUM([a]) > 100, 'high', 'low')`). A row-level part beside an aggregate is the usual mixing error. `SUM(IF([s] = 'open', [amount], 0))` is a conditional sum.
 
 ### Text functions
@@ -176,7 +176,7 @@ The check yields a type (number, text, date, boolean) and whether the formula is
 
 ### Limits
 
-Formula length, tree depth, node count, name length, literal and text-function argument limits live in `Core/validate.js` `LIMITS` and `CALC_LIMITS` in `calc-types.js`, mirrored by the server's `CalcLimits` ([api.md § Limits](../../reference/api.md#limits)). A `CASE` counts one node plus every condition and result. Anything over a limit is refused with a message, never clamped.
+Formula length, tree depth, node count, name length, literal and text-function argument limits live in `Core/validate.js` `LIMITS` and `CALC_LIMITS` in `calc-types.js`, mirrored by the server's `CalcLimits` ([api.md § Limits](../../reference/api.md#limits)). A `CASE` counts one node plus every condition and result; an `IN` one plus its value and each list value (at most `inList`, 50). Anything over a limit is refused with a message, never clamped.
 
 ## The dialog
 

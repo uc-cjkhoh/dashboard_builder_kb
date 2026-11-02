@@ -12,6 +12,7 @@ open question, promote it to a decision.
 | D26–D60, D65–D68, D73 (calculated fields, parameters, member labels, groups, split / unpivot) | [decisions-calculated-fields.md](decisions-calculated-fields.md) |
 | D61–D64, D69, D71–D72, D74 (dashboards, hierarchies, option controls, desktop-only) | [decisions-dashboards.md](decisions-dashboards.md) |
 | D70 (recent connection sources) | [decisions-connection.md](decisions-connection.md) |
+| D75–D77 (`NULL`, `IN` / `BETWEEN`, keyword `IF`) | [decisions-logic.md](decisions-logic.md) |
 
 ## Platform & safety
 

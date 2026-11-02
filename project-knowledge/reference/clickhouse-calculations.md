@@ -29,7 +29,7 @@ A `calc` tree becomes SQL in four steps; no formula text and no literal is ever 
      exactly as a plain measure is. A row-level measure is then wrapped by its pill aggregation; an aggregate tree is used as is;
      a dimension groups by its row-level expression.
    - **Logic nodes:** `(a = b)` (also `!= < <= > >=`), `and(a, b)`, `or(a, b)`, `not(a)`, `if(c, a, b)` (IF/IIF),
-     `multiIf(c1, a1, …, else)` (CASE; `NULL` last without an ELSE), `ifNull(a, b)`, `isNull(a)`. A NULL condition is
+     `multiIf(c1, a1, …, else)` (CASE; `NULL` last without an ELSE), `ifNull(a, b)`, `isNull(a)`, `true` / `false` / `NULL` keywords, `(a IN ({p0}, {p1}, …))` (every value a bound `Float64` or `String`; a NULL value gives NULL). A NULL condition is
      not true: IF takes its else, CASE the next WHEN (pinned by the live smoke test).
    - **Text functions** (`fn` nodes, every argument compiled once in source order): `toString(x)` (`TEXT`; `STR` parses to the same `text` node), `lowerUTF8`, `upperUTF8`, `trimBoth`/`trimLeft`/`trimRight`, `toFloat64(lengthUTF8(…))`, `leftUTF8`/`rightUTF8(t, {UInt32})`, `substringUTF8(t, {UInt32}, {UInt32})` (`MID`), `toFloat64(positionUTF8(t, s))` (`FIND`), `replaceAll`, `concat`, `(position(t, s) > 0)`, `startsWith`,
      `endsWith`, the case-insensitive twins `(positionCaseInsensitiveUTF8(t, s) > 0)` and `startsWith`/`endsWith(lowerUTF8(t), lowerUTF8(s))` (new function names `ICONTAINS` etc., not a flag, so the wire shape stays `fn` + `args`), `if(isNull(t), NULL, arrayElementOrNull(splitByString({sep:String}, assumeNotNull(t)), {k:UInt32}))`.
