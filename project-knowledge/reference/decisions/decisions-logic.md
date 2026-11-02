@@ -1,6 +1,6 @@
 # Decisions — calculation logic
 
-Continues [decisions.md](decisions.md). This file holds D75–D77 (`NULL`, `IN` / `BETWEEN`, keyword `IF`). Behaviour:
+Continues [decisions.md](decisions.md). This file holds D75–D77 (`NULL`, `IN` / `BETWEEN`, keyword `IF`) and D78 (`MAKEDATE`, `DATENAME`). Behaviour:
 [calculated-fields.md](../../features/worksheet/calculated-fields.md#logic-functions). Edit an entry in place when it changes.
 
 ### D75 — `NULL` has no type of its own; it takes the type of the results beside it
@@ -43,3 +43,12 @@ depth 1 of the parentheses (or an unclosed one) is the function; anything else i
 function and retrying as the keyword form on failure: it re-parses nested `IF (…) THEN` twice per level, so 22 levels took
 44 s and the 500-character limit allows about 30. The cost now is one token scan per `IF (`.
 - No `ELSE` gives NULL, like `CASE`. `ELSEIF` after `ELSE` is a parse error.
+
+### D78 — `MAKEDATE` is NULL unless the date exists; `DATENAME` is English
+- **`MAKEDATE(y, m, d)`** takes three number expressions. The engine's `makeDate32` rolls 30 Feb over to 1 Mar and gives
+  1970-01-01 for month 13 or day 0, so the compiler guards it: whole numbers, year 1901 to 2298 (inside the `DATEADD`
+  window), month 1 to 12, day 1 to 31, and the built date's day equals the day asked for. Anything else, or a NULL part, is
+  NULL. **Rejected:** a bad date as an error (the values are data, not the formula); clamping to the month end.
+- **`DATENAME(part, d)`** takes `'weekday'` or `'month'` and always answers in English: `dateName` does not read the server
+  locale, so the same workbook reads the same everywhere. Other parts are refused (`YEAR`, `MONTH` already give numbers).
+- **`DATETRUNC`** returns one `DateTime64` type for every unit, so results of different units can share an `IF`.

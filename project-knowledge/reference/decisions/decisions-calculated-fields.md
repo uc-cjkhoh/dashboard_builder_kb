@@ -219,11 +219,10 @@ A date argument that is text or a number is an error that points at `DATE()`, so
 - **`WEEKDAY` is ISO:** Monday 1 to Sunday 7, unlike Tableau's Sunday-is-1.
 - Parts return `toFloat64`, like every calculation number. NULL in, NULL out.
 
-### D60 — No `TODAY()` / `NOW()`, no `MAKEDATE` yet
+### D60 — No `TODAY()` / `NOW()`
 - **No `TODAY` / `NOW`:** a calculation is a function of the data. Caching, saved workbooks and exports assume the same query
   gives the same answer, and `TODAY` / `NOW` would change that. They wait for a decision (a parameter-style "as of" value).
-- **No `MAKEDATE`:** `makeDate` returns `1970-01-01` for a month 13 or day 32 and rolls `2023-02-29` to 1 March. It needs guards
-  (and number-argument kinds) that are not worth building yet.
+- `MAKEDATE` is built, guarded ([D78](decisions-logic.md#d78--makedate-is-null-unless-the-date-exists-datename-is-english)).
 
 ### D65 — A parameter is read as `[@Name]` and becomes a literal on the client
 Parameters get their own marker, `[@Name]`, which is not dot-split.

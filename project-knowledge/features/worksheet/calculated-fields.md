@@ -39,7 +39,7 @@ ref       := "[" name "]" | "[@" parameter "]"                   (a workbook par
 - **Operators** `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`, `COUNTD`, `MEDIAN`, `STDDEV`, `VARIANCE`, `PERCENTILE`, `ATTR`. Function names are case-insensitive. The function table lives in `calc-types.js`.
 - **Logic** ([below](#logic-functions)): comparisons, `AND` / `OR` / `NOT`, `IN`, `BETWEEN`, `IF` / `IIF` / `CASE`, `IFNULL`, `ISNULL`, `ZN`, text, `TRUE` / `FALSE` and `NULL` literals.
 - **Text** ([below](#text-functions)): `TEXT` (alias `STR`), `LOWER`, `UPPER`, `TRIM`, `LTRIM`, `RTRIM`, `LEN`, `LEFT`, `RIGHT`, `MID`, `FIND`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `ICONTAINS`, `ISTARTSWITH`, `IENDSWITH`, `SPLIT`.
-- **Date** ([below](#date-functions)): `DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY`, `DATE`.
+- **Date** ([below](#date-functions)): `DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY`, `ISOYEAR`, `DATENAME`, `DATETRUNC`, `MAKEDATE`, `DATE`.
 - **References:** `[table.column]` (`[db.table.column]` when two databases hold the same table name), or `[Name]` for another calculation. Calculations can refer to calculations. The browser expands every reference into one tree before sending, so the server never sees a calculation name.
 - **Division by zero** gives NULL, never an error. A formula with **no field references** (`1+2`) is valid but needs a field elsewhere on the sheet to group or total.
 
@@ -122,23 +122,23 @@ Row-level functions over dates (same `ROW_FUNCTIONS` table and generic `fn` node
 | `DATEDIFF(unit, d1, d2)` | number | `d2` minus `d1`, in whole `unit`s, counted as **calendar boundaries crossed**: `DATEDIFF('month', 31 Jan, 1 Feb)` is 1 and `DATEDIFF('year', 31 Dec, 1 Jan)` is 1. Negative when `d2` is earlier. Weeks start on Monday (Tableau's default week starts on Sunday, so a `'week'` difference can differ from Tableau's by one around a Sunday) |
 | `DATEADD(unit, n, d)` | date | `d` moved by `n` units. A month or year step past the end of a shorter month lands on its last day (31 Jan + 1 month is 29 Feb 2024; 29 Feb 2024 + 1 year is 28 Feb 2025). The result may be later than a `Date` column's own 2149 limit. It is **NULL** when it falls outside 1900-01-03 to 2299-12-29 (never a wrapped or clamped date) |
 | `YEAR(d)` / `MONTH(d)` / `DAY(d)` / `QUARTER(d)` | number | the calendar year, month 1-12, day of the month 1-31, quarter 1-4 |
-| `WEEK(d)` | number | the **ISO 8601 week** 1-53 (weeks start Monday; week 1 holds the year's first Thursday, so 31 Dec 2020 and 1 Jan 2021 are week 53 and 30 Dec 2024 is week 1) |
+| `WEEK(d)` / `ISOYEAR(d)` | number | the **ISO 8601 week** 1-53 (weeks start Monday; week 1 holds the year's first Thursday, so 31 Dec 2020 and 1 Jan 2021 are week 53 and 30 Dec 2024 is week 1) / the year that owns that week (30 Dec 2024 is 2025, 3 Jan 2021 is 2020) |
 | `WEEKDAY(d)` | number | ISO day of the week: **Monday 1 to Sunday 7** (Tableau's `DATEPART('weekday')` counts Sunday as 1, so `WEEKDAY(d) = 7` is a Sunday here) |
+| `DATENAME(part, d)` | text | the **English** name: `'weekday'` gives Monday to Sunday, `'month'` January to December (fixed, never the server's locale); the part is a text literal, any case, and any other word is an error |
+| `DATETRUNC(unit, d)` | date | `d` cut back to the start of its `unit` (same units as `DATEDIFF`; weeks start Monday): `DATETRUNC('month', 5 Mar 2024)` is 1 Mar 2024. A calculated date dimension to group by month, quarter or year |
+| `MAKEDATE(y, m, d)` | date | the date with that year, month and day; each argument is any number expression. **NULL, never a guessed date,** unless all three are whole numbers, the year is 1901 to 2298, the month 1 to 12 and the day exists in that month (30 Feb, 29 Feb 2023 and 29 Feb 2100 are NULL; the engine itself would answer 1 Mar or 1970-01-01). A NULL part gives NULL |
 | `DATE(t)` | date | the text `t` read as a calendar date (`2024-03-05`, `20240229`, `2024-03-05 10:30:00`); NULL when it is not one. The time of day is dropped |
 
 - **Unit and amount are literals written in the formula.**
-  - The unit is a **text literal** (`'day'`, any case) from `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`. Anything else (a field, a number, another word) is an error listing them.
+  - The unit (`DATEDIFF`, `DATEADD`, `DATETRUNC`) is a **text literal** (`'day'`, any case) from `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`. Anything else (a field, a number, another word) is an error listing them.
   - The `DATEADD` amount is a whole number from -100000 to 100000 (`-7` is fine), never a field or computed value. Out of range is an error, not a clamp (as `LEFT`'s length, [D54](../../reference/decisions/decisions-calculated-fields.md#d54--length-position-and-separator-are-literals-rejected-out-of-range)).
 - **Date versus date-time:** the engine's *date* type covers both.
-  - On a date-time column, `DATEDIFF('hour', …)` counts hour boundaries (22:30 to 01:00 next day is 3) and `DATEADD('hour', …)` keeps the time of day.
-  - On a plain date column, a time unit reads midnight to midnight (`DATEDIFF('hour', 1 Jan, 2 Jan)` is 24), and `DATEADD('hour', 5, d)` becomes a date-time at 05:00.
+  - On a date-time column, `DATEDIFF('hour', …)` counts hour boundaries (22:30 to 01:00 next day is 3) and `DATEADD('hour', …)` keeps the time of day. On a plain date column, a time unit reads midnight to midnight (`DATEDIFF('hour', 1 Jan, 2 Jan)` is 24), and `DATEADD('hour', 5, d)` becomes a date-time at 05:00.
   - A date-time at midnight displays as a date, as everywhere in the app. The server's own time zone applies to date-time columns without one.
 - **`DATE(t)` rules** — the same guard as the date type cast:
-  - Text made only of digits, spaces, signs, commas and dots is NULL unless it is `YYYYMMDD` (`'12345'` is NULL, not the 5th of this month).
-  - An impossible day (`2024-02-30`), a word, and a year outside 1970 to 2148 are NULL, never a clamped date.
-- **`WEEK` is not the week date part.** The date part and bucket "week" on a plain date field is the **Monday that starts the week** (a date); `WEEK(d)` is the ISO week *number*. Weeks 52/53 and 1 can belong to the neighbouring ISO year, and there is no `ISOYEAR` yet, so group by `YEAR` plus `WEEK` only away from the year turn.
-- **Bucketing a calculated date:** a calculated `DATEADD` / `DATE` dimension groups **per distinct value**. It is never date-bucketed or given a date part (a calculated dimension takes no `datePart` or `dateBucket`; [D33](../../reference/decisions/decisions-calculated-fields.md#d33--calculated-fields-are-refused-wherever-a-plain-column-is-assumed)). To group by month or year, use `YEAR` / `MONTH` / `QUARTER` of it (a number dimension).
-- **Roles:** the number functions give a row-level number (`SUM(WEEK([o.placed]))` works); `DATEADD` and `DATE` give a date dimension (`MIN` / `MAX` take it).
+  - Text made only of digits, spaces, signs, commas and dots is NULL unless it is `YYYYMMDD` (`'12345'` is NULL, not the 5th of this month). An impossible day (`2024-02-30`), a word, and a year outside 1970 to 2148 are NULL, never a clamped date.
+- **`WEEK` is not the week date part.** The date part and bucket "week" on a plain date field is the **Monday that starts the week** (a date); `WEEK(d)` is the ISO week *number*. Weeks 52/53 and 1 can belong to the neighbouring ISO year, so group by `ISOYEAR` plus `WEEK`, not `YEAR` plus `WEEK`, across the year turn.
+- **Bucketing a calculated date:** a calculated `DATEADD` / `DATETRUNC` / `MAKEDATE` / `DATE` dimension groups **per distinct value**. It is never date-bucketed or given a date part (a calculated dimension takes no `datePart` or `dateBucket`; [D33](../../reference/decisions/decisions-calculated-fields.md#d33--calculated-fields-are-refused-wherever-a-plain-column-is-assumed)). To group by month or year, use `DATETRUNC` or `YEAR` / `MONTH` / `QUARTER` of it. **Roles:** the number functions give a row-level number (`SUM(WEEK([o.placed]))` works); `DATEADD`, `DATETRUNC`, `MAKEDATE` and `DATE` give a date dimension (`MIN` / `MAX` take it); `DATENAME` a text dimension.
 
 ### Parameters
 

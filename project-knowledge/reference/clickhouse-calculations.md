@@ -38,7 +38,10 @@ A `calc` tree becomes SQL in four steps; no formula text and no literal is ever 
      - `addYears`/`addQuarters`/`addMonths`/`addWeeks`/`addDays`/`addHours`/`addMinutes`/`addSeconds(d, {n:Int32})` (fixed name per unit, unit never in SQL), applied to `toDateTime64(d, 0)` and
        kept only strictly between 1900-01-03 and 2299-12-29 UTC, else NULL (a plain `Date` would wrap and a `DateTime` clamp to 1970 on overflow).
      - `toFloat64(toYear|toMonth|toDayOfMonth|toQuarter|toISOWeek|toDayOfWeek(d))`.
-     - `DATE(t)` = `TypeCast.ParseDate`: the cast's digit guard, then `toDate` of `parseDateTime64BestEffortOrNull(t, 0)`, kept only between 1970-01-02 and 2149-01-01 (else NULL).
+     - `toFloat64(toISOYear(d))`; `dateName('weekday'|'month', toDateTime64(d, 0))` (English, locale-free; the part is whitelisted and written as a fixed word, nothing bound).
+    - `DATETRUNC`: `dateTrunc('<unit>', toDateTime64(d, 0))` with the whitelisted unit as a fixed word. The year to week units answer a `Date32`, so they are wrapped in `toDateTime64(…, 0)` and every unit returns one `DateTime64` type.
+    - `MAKEDATE(y, m, d)`: `makeDate32` rolls an impossible day over (30 Feb is 1 Mar) and answers 1970-01-01 for a bad month, so the call is guarded: `if(y = floor(y) AND m = floor(m) AND d = floor(d) AND y >= 1901 AND y <= 2298 AND m >= 1 AND m <= 12 AND d >= 1 AND d <= 31 AND toDayOfMonth(x) = d, toDateTime64(x, 0), NULL)` with `x = makeDate32(toInt32(y), toInt32(m), toInt32(d))`. The day round trip catches the rolled dates; a NULL part makes the condition NULL, so the answer is NULL.
+    - `DATE(t)` = `TypeCast.ParseDate`: the cast's digit guard, then `toDate` of `parseDateTime64BestEffortOrNull(t, 0)`, kept only between 1970-01-02 and 2149-01-01 (else NULL).
    - **Booleans:** a boolean-typed calculation is wrapped in `toBool(...)`. As a dimension it is `toString(...)` of that, so keys read `true` / `false` (a plain Bool field keeps `True` / `False`).
 
 **One compile, one parameter list.**
