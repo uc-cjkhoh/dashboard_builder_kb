@@ -96,8 +96,8 @@ every chart from `--chart-*` tokens. Table, Text and KPI stay native DOM.
 
 ### D19 — MVC in feature folders
 ASP.NET Core MVC with **one folder per feature** under `Features/`: controller, view partial
-(`_<Feature>.cshtml`), stylesheet and ES modules together. Features: Shell, Connection, Schema, Canvas,
-Relations, Tabs, Dashboard. Shared server infrastructure stays in `ClickHouse/`; the shared frontend in
+(`_<Feature>.cshtml`), stylesheet and ES modules together. Features are listed in the
+[code map](../../ARCHITECTURE.md#code-map). Shared server infrastructure stays in `ClickHouse/`; the shared frontend in
 `Features/Core/`. API controllers subclass `Features/ApiControllerBase.cs` (`NotConnected` /
 `SafeError`) and return `IResult`.
 - **Why:** a single 1k-line `site.css` and a flat `js/` had outgrown easy navigation. Co-locating a

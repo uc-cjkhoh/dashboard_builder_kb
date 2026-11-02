@@ -36,6 +36,7 @@ matching whatever you're touching.
 | [worksheet-charts.md](features/worksheet/worksheet-charts.md) | Chart types, orientation, ECharts adapter, export |
 | [worksheet-encodings.md](features/worksheet/worksheet-encodings.md) | Marks, Filters, click-to-filter, Drill, Pages, date range |
 | [calculated-fields.md](features/worksheet/calculated-fields.md) | Formulas, dialog, field-pane group, roles, refusals, error state, the explainer |
+| [field-settings.md](features/worksheet/field-settings.md) | Per-field data type cast and member labels |
 
 ### features/workbook/ — tabs, dashboards, and saving the whole workbook
 
@@ -49,8 +50,10 @@ matching whatever you're touching.
 
 | Doc | Topic |
 |---|---|
-| [api.md](reference/api.md) | Every endpoint and status code |
+| [api.md](reference/api.md) | Every endpoint, status code and limit |
+| [api-calculated-fields.md](reference/api-calculated-fields.md) | The `calc` tree: nodes, role and typing rules |
 | [clickhouse-integration.md](reference/clickhouse-integration.md) | Driver, TLS, the exact SQL, identifier safety, type mapping |
+| [clickhouse-calculations.md](reference/clickhouse-calculations.md) | How a `calc` tree compiles; exact vs approximate aggregates |
 | [data-model.md](reference/data-model.md) | Server and client state shapes, incl. the worksheet `sheet` |
 | [frontend-modules.md](reference/frontend-modules.md) | Module map, wiring, event bus, `api.js` / `ui.js` helpers |
 | [glossary.md](reference/glossary.md) | Domain terms |
@@ -107,7 +110,7 @@ Overview: [design/overview.md](design/overview.md).
 
 ## Not here
 
-- **Phases P0–P20 as built, step by step** → the frozen [archive/build-plan.md](archive/build-plan.md)
+- **Phases P0–P20 as built, step by step, and old run logs** → the frozen [archive/](archive/README.md)
   (not maintained).
 
 ## Agent behavior

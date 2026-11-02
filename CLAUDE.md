@@ -73,7 +73,7 @@ src/DashboardBuilder/
 │                           #   ConnectionRegistry, CsvUtil, *Models.cs
 └── Features/               # one folder per feature: controller + _View.cshtml + .css + .js
     ├── ApiControllerBase.cs  ApiErrors.cs   # RunAsync / SafeError; the one { error, field? } shape
-    ├── Shell/  Core/  Connection/  Schema/  Canvas/  Relations/  Tabs/  Board/  Dashboard/  Workbook/
+    ├── Shell/  Core/  Connection/  Schema/  Canvas/  Relations/  Rows/  Tabs/  Board/  Dashboard/  Calc/  Workbook/
 tests/DashboardBuilder.Tests/   # xUnit
 tests/js/                       # node --test, for the pure JS modules
 ```
@@ -116,14 +116,14 @@ dashboard_builder/          (this KB)
 │   ├── design/             # overview · tokens · layout · components · motion-accessibility
 │   ├── features/           # one file per app feature, in three groups:
 │   │   ├── data-source/    #   connection · schema-browser · canvas · query-sources · relationships
-│   │   ├── worksheet/      #   worksheet · worksheet-charts · worksheet-encodings · calculated-fields
+│   │   ├── worksheet/      #   worksheet · worksheet-charts · worksheet-encodings · calculated-fields · field-settings
 │   │   └── workbook/       #   tabs · dashboards · workbook
-│   ├── reference/          # api · clickhouse-integration · data-model · frontend-modules · glossary
+│   ├── reference/          # api (+ -calculated-fields) · clickhouse-integration (+ clickhouse-calculations) · data-model · frontend-modules · glossary
 │   │   └── decisions/      #   decisions (D1–D25 + lookup) · -calculated-fields · -dashboards · -connection
 │   ├── operations/         # development · deployment · source-table-guidance (+ git-ignored credentials.local.md)
 │   ├── backlog/            # undone work by topic · recommended order · design specs
 │   ├── updates/            # generated change logs
-│   └── archive/            # frozen P0–P20 build plan — not maintained
+│   └── archive/            # frozen P0–P20 build plan, old debug log — not maintained
 └── .claude/                # hooks (kb-verify, update-log, reap-chrome), settings, skills
 ```
 
@@ -132,7 +132,7 @@ dashboard_builder/          (this KB)
 | Task | Code | Doc |
 |---|---|---|
 | Add/adjust a ClickHouse query | `ClickHouse/ClickHouseGateway.cs` | [clickhouse-integration.md](project-knowledge/reference/clickhouse-integration.md) |
-| Add an API endpoint | `Features/*/…Controller.cs` (subclass `ApiControllerBase`) | [api.md](project-knowledge/reference/api.md) |
+| Add an API endpoint | `Features/*/…Controller.cs` (subclass `ApiControllerBase`) | [api.md](project-knowledge/reference/api.md) (calculation trees: [api-calculated-fields.md](project-knowledge/reference/api-calculated-fields.md)) |
 | Validate an input / add a limit | `ClickHouse/RequestValidation.cs` + `Features/Core/validate.js` (keep in step) | [api.md § Limits](project-knowledge/reference/api.md#limits) |
 | Connection flow | `ClickHouse/ConnectionRegistry.cs`, `Features/Connection/` | [connection.md](project-knowledge/features/data-source/connection.md) |
 | Drag/drop, entity cards | `Features/Canvas/canvas.js` | [canvas.md](project-knowledge/features/data-source/canvas.md) |

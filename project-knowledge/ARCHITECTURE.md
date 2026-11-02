@@ -88,6 +88,7 @@ each feature owns its controller, view partial, CSS and JS in one folder. Source
 | `Features/Core/` | `core.css` (tokens + shared components), `api.js`, `ui.js`, `validate.js`, `icons.js`, `menu.js`, `store.js`, `format.js`, `sheet-schema.js`, vendored ECharts |
 | `Features/Connection/`, `Schema/` | sidebar features, each with its API controller |
 | `Features/Canvas/`, `Relations/`, `Tabs/`, `Board/` | client-only features (no controller); `Board/` holds the dashboard tab's body (`board.js`, `board-widget.js`, `board-panel.js`) with the pure `board-model.js` (widget rules) and `board-layout.js` (geometry); pure rule modules `empty-state.js`, `relation-rules.js` |
+| `Features/Rows/`, `Calc/` | row previews, union / unpivot and source columns (controllers + dialogs); calculated fields (parser, type check, dialog, groups) |
 | `Features/Dashboard/` | the worksheet editor (`dashboards.js`), the instantiable query-and-render lifecycle (`worksheet-view.js`), the drawing of a result (`worksheet-render.js` + `render-*.js`, no editor state), the pure query plan (`sheet-plan.js`) and result shaping (`result-model.js`), pure rules (`filter-rules.js`, `toolbar-rules.js`, `contrast.js`), query gate + cache (`query-runner.js`), ECharts adapter (`chart.js`), `QueryController` |
 | `Features/Workbook/` | auto-save, restore, Export/Import (`workbook.js`) + the file format and its validation (`workbook-model.js`) |
 | `tests/DashboardBuilder.Tests/`, `tests/js/` | xUnit suite; `node --test` suite for the pure JS modules |
