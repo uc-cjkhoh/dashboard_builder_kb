@@ -227,10 +227,10 @@ A date argument that is text or a number is an error that points at `DATE()`, so
 
 ### D65 — A parameter is read as `[@Name]` and becomes a literal on the client
 Parameters get their own marker, `[@Name]`, which is not dot-split.
-- **Why a marker:** `[Name]` already means a calculation and `[table.column]` a field (E8, E14: names may not contain `.`),
+- **Why a marker:** `[Name]` already means a calculation and `[table.column]` a field ([D42](#d42--reference-syntax): names may not contain `.`),
   while a parameter name may hold anything.
 - **Resolved at parse time** against the workbook's parameters. An unknown one is a resolver error, so a deleted parameter
-  reads like any other dangling reference (E15).
+  reads like any other dangling reference ([D47](#d47--a-broken-calculation-stays)).
 - **Substituted on the client.** The value replaces the reference in the expanded tree **before** type-checking, as `num` /
   `str` / `DATE(str)`. So there is no server change, every value stays a bound literal, and the request (and so the cache key)
   changes with the value.
@@ -241,7 +241,7 @@ Parameters get their own marker, `[@Name]`, which is not dot-split.
 
 ### D66 — Deleting a parameter a formula reads asks; renaming rewrites the formulas
 Like deleting a calculation a sheet uses, deleting a parameter that a formula mentions asks first. Afterwards the calculation
-shows the E15 state with its formula untouched, so re-adding the name heals it.
+shows the broken-calculation state ([D47](#d47--a-broken-calculation-stays)) with its formula untouched, so re-adding the name heals it.
 - **Why:** refusing outright would block a legitimate clean-up; silently rewriting would hide the damage.
 - The scan is textual (`[@Name]` anywhere in the formula, including inside a text literal), so it can only over-ask.
 - A rename rewrites `[@Old]` the way a calculation rename rewrites `[Old]`.

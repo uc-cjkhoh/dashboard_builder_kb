@@ -31,13 +31,11 @@ anything here.**
   sub-topic into a new file in the same subfolder and leave a short markdown link to it.
 - **Two top-level folders, kebab-case filenames.** `agent-behavior/` holds how agents work on this
   project; `project-knowledge/` holds what the project is. A topic lives in exactly one of them, in a
-  subfolder per concern:
-  - [agent-behavior/](../README.md): `workflow/`, `kb/`, `operations/`, `run-logs/`.
-  - [project-knowledge/](../../project-knowledge/index.md): `engineering/`, `design/`, `features/`,
-    `reference/`, `operations/`, `backlog/`, `updates/`, `archive/`. Feature docs group into
-    `data-source/`, `worksheet/` and `workbook/`; decisions live in `reference/decisions/`.
-  - `archive/` is the exception. It holds the frozen build plan for phases P0–P20 (the original
-    build phases), a historical artifact kept as-is and not maintained.
+  subfolder per concern. The folder tree is kept in one place only: the
+  [KB directory map in CLAUDE.md](../../CLAUDE.md#kb-directory-map). Update it when you add, move or
+  remove a folder.
+  - `project-knowledge/archive/` is the exception to these rules. It holds the frozen build plan for
+    phases P0–P20 (the original build phases), a historical artifact kept as-is and not maintained.
 
 ## When you make a change
 

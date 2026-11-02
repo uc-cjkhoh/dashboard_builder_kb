@@ -100,6 +100,8 @@ UI: shadcn/ui NOVA · Icons: Lucide · Animation: Motion · Drag and drop: dnd-k
 
 ## KB directory map
 
+The one copy of the folder tree; other docs link here.
+
 ```
 dashboard_builder/          (this KB)
 ├── CLAUDE.md  README.md    # entry index (kept at root for Claude Code) · router to the two folders

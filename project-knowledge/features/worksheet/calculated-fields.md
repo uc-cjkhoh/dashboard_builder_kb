@@ -147,7 +147,7 @@ Row-level functions over dates (same `ROW_FUNCTIONS` table and generic `fn` node
   - Text made only of digits, spaces, signs, commas and dots is NULL unless it is `YYYYMMDD` (`'12345'` is NULL, not the 5th of this month).
   - An impossible day (`2024-02-30`), a word, and a year outside 1970 to 2148 are NULL, never a clamped date.
 - **`WEEK` is not the week date part.** The date part and bucket "week" on a plain date field is the **Monday that starts the week** (a date); `WEEK(d)` is the ISO week *number*. Weeks 52/53 and 1 can belong to the neighbouring ISO year, and there is no `ISOYEAR` yet, so group by `YEAR` plus `WEEK` only away from the year turn.
-- **Bucketing a calculated date:** a calculated `DATEADD` / `DATE` dimension groups **per distinct value**. It is never date-bucketed or given a date part (a calculated dimension takes no `datePart` or `dateBucket`, E12). To group by month or year, use `YEAR` / `MONTH` / `QUARTER` of it (a number dimension).
+- **Bucketing a calculated date:** a calculated `DATEADD` / `DATE` dimension groups **per distinct value**. It is never date-bucketed or given a date part (a calculated dimension takes no `datePart` or `dateBucket`; [D33](../../reference/decisions/decisions-calculated-fields.md#d33--calculated-fields-are-refused-wherever-a-plain-column-is-assumed)). To group by month or year, use `YEAR` / `MONTH` / `QUARTER` of it (a number dimension).
 - **Roles:** the number functions give a row-level number (a measure or dimension; `SUM(WEEK([o.placed]))` works). `DATEADD` and `DATE` give a date dimension (`MIN` / `MAX` take it). `IF(MONTH([o.placed]) = 12, …)` and `DATEDIFF(…) > 30` work.
 - **Not built:** `TODAY()` / `NOW()` (a result would change between runs, which breaks caching), `MAKEDATE`, fiscal calendars and fiscal year start, `ISOYEAR`, date-part bucketing of a calculated date, `DATENAME` / `DATETRUNC`, a unit, amount or part that is a field (a `[@Parameter]` works), `DATEPARSE` with a format, time zones.
 
@@ -169,7 +169,7 @@ A formula reads a workbook parameter ([worksheet-encodings.md](worksheet-encodin
 - **Autocomplete:** typing `[@` offers only the workbook's parameters (`parameter · number`), narrowed by what follows.
 - **Changing a value** re-plans the open worksheet and every dashboard widget. The request carries the new literal — a different request key, so a fresh query, not a cached one. The sheet shows a control for each parameter its calculated pills read (the same controls as for filters). Calculated pills are re-typed when a parameter's type changes.
 - **Rename:** renaming a parameter rewrites `[@Old]` in every formula, and renaming a calculation rewrites `[Old]`, both outside text literals (`'[@Old]'` stays text).
-- **Delete:** deleting a parameter that a formula mentions **asks first**, naming the calculations. If confirmed, the calculation keeps its formula and shows the E15 state `Calculation 'X' can't be computed: Parameter [@Y] was deleted or doesn't exist.` (no query is sent) until a parameter with that name exists again.
+- **Delete:** deleting a parameter that a formula mentions **asks first**, naming the calculations. If confirmed, the calculation keeps its formula and shows the broken-calculation [error state](#error-state) `Calculation 'X' can't be computed: Parameter [@Y] was deleted or doesn't exist.` (no query is sent) until a parameter with that name exists again.
 - The workbook saves formula text only (format unchanged).
 
 ### Roles and types
@@ -292,7 +292,7 @@ Code: `group-dialog.js`; rules in `group-model.js`.
 It is an ordinary calculated dimension afterwards: a chip in the pane (Edit… reopens this dialog, Duplicate copies the groups), a pill, and a text value in formulas (`[region (groups)]`).
 
 - A member in no group keeps its own value (without the label). NULL stays NULL.
-- A group-calculation pill takes no click-selection (E12), and member labels do not apply to it.
+- A group-calculation pill takes no click-selection ([D33](../../reference/decisions/decisions-calculated-fields.md#d33--calculated-fields-are-refused-wherever-a-plain-column-is-assumed)), and member labels do not apply to it.
 
 ### How it compiles
 
