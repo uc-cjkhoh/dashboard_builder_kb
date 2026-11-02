@@ -44,14 +44,17 @@ To remove a link, click its badge, then Delete.
 Both paths end in the same `proposeLink()` in `relations.js` (check with `dropDecision()`, then the dialog), so the same links are refused
 for the same reasons.
 
-1. Table-column rows are focusable (`tabindex="0"`, `role="button"`, an `aria-label` with column, type, table and the next step,
-   `aria-pressed` on the picked one); a union or unpivot's rows are not. `↑` / `↓` move between the rows of a card.
-2. `Enter` or `Space` on a row picks it as the source. It shows a solid accent outline and the word "From".
-3. `Tab` to a row of another card (or click there). A status line (`.rel-keyhint`, `role="status"`) above the how-to pill says what
-   `Enter` will do, or why that column is refused (same table, kind mismatch, already related).
-4. `Enter` or `Space` on that row opens the join + cardinality dialog (a kind mismatch opens the type warning). `Enter` on the source again, or `Esc`, cancels the pick.
+1. Table-column rows are named groups (`role="group"`, `aria-label` "column, type, in table", `aria-describedby` a hidden help line;
+   not buttons, since a row holds the Profile button, which stays a tab stop). Tabindex roves: one row per card is the tab stop
+   (the last focused, else the first), so `Tab` reaches the next card. `↑` / `↓` / `Home` / `End` move within a card; `]` / `[` jump to the next / previous card (wrapping, left to right).
+   A union or unpivot's rows are not part of this.
+2. `Enter` or `Space` on a row picks it as the source (`aria-current`). It shows a solid accent outline and the word "From".
+3. Move to a row of another card (arrows, `]`, `Tab`, or click). The status line (`.rel-keyhint`, `role="status"`, always rendered,
+   visually hidden while empty, wraps) says what `Enter` will do, or leads with why that column is refused (same table, kind mismatch, already related), and names `[` `]`.
+4. `Enter` or `Space` on that row opens the join + cardinality dialog (a kind mismatch opens the type warning); after the link is made
+   focus returns to that row, now in its key strip. `Enter` on the source again, `Esc` anywhere on the page, moving focus out of the column rows, removing a table or changing view cancels the pick.
 
-`link-keys.js` (pure) holds the key map, `stepIndex()`, the status wording and the row labels. Focus shows as an inset ring on the row.
+`link-keys.js` (pure) holds the key map, `stepIndex()`, `cardIndex()`, the status wording and the row labels. Focus shows as an inset ring on the row.
 
 ## What may be linked
 

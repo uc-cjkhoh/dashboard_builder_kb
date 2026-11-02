@@ -69,7 +69,7 @@ understand state.
   stay until dismissed; others close after 5 s.
 - **Keyboard / non-drag paths:**
   - a `＋` on each table chip adds it to the canvas;
-  - relationships: `Enter` on a focused column row picks it, `Enter` on a row of another card relates them ([relationships.md](../features/data-source/relationships.md#drawing-a-link--keyboard));
+  - relationships: `Enter` on a focused column row picks it, `Enter` on a row of another card relates them (`↑` `↓` `Home` `End` within a card, `]` `[` between cards, `Esc` cancels) ([relationships.md](../features/data-source/relationships.md#drawing-a-link--keyboard));
   - a `＋` on each field adds it to a shelf;
   - `F2` / `Enter` renames a tab;
   - `←`/`→` on a focused resize handle resizes the sidebar or field pane;
