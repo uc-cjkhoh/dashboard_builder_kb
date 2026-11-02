@@ -86,3 +86,7 @@ Gotchas that have bitten (or will bite) this app. Read before touching the area 
 - **A cache hit means no query.** Presentation-only changes re-render from the worksheet's result
   cache. If a change *should* re-query, it must change the plan (see
   [worksheet.md § Query lifecycle](../features/worksheet/worksheet.md#query-lifecycle)).
+- **A browser check that adds two tables must relate them** (`tests/live/model.mjs` `relateTables`), or the
+  field pane stays empty and the check times out at "field pane filled". Calculated fields and hierarchies
+  are not in the pane: drive them through the sidebar dialogs, and close any popup or dialog before a real
+  mouse click on a mark.

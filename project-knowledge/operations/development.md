@@ -70,10 +70,16 @@ number column, and `POST /api/query {}` (400 "'from' is required.").
 - `tests/live/calc-smoke.mjs` tests calculated fields against the shared test ClickHouse server. It
   needs credentials, so it is a manual check; re-run it before every deploy.
 - `tests/live/calc-ui.mjs` needs only the dev app.
-- `node tests/live/run-ui-all.mjs` starts the dev app once (port `UI_PORT`, default 5193;
+- `node tests/live/run-ui-all.mjs` starts the dev app once (a free port, or `UI_PORT` when set and free;
   `ONLY=calc,rows` filters) and runs every `tests/live/*-ui.mjs` browser check against it. It then stops
-  the app by port and prints a pass / fail line per check. Run it from the solution root before merging
-  a change to the worksheet.
+  the app by port and prints a pass / fail line per check. The full run takes more than ten minutes, so start
+  it in the background. Run it from the solution root before merging a change to the worksheet; it must end
+  `fail=0`.
+- `tests/live/model.mjs` holds the setup the checks share. `relateTables` draws a relationship on the canvas
+  and is called after two tables load, because a table card with no relationship is held out of the field
+  pane once the model has two cards. `NEW_CALC`, `PAGE_CHIP`, `CALC_NAMES` and `CALC_LIST_TEXT` reach
+  calculated fields, which live in the sidebar's Calculated fields dialog. They open it only while needed,
+  because a dialog left open blocks real mouse and key input.
 - `tests/js/calc-limits.test.mjs` keeps the three copies of the calculation limits equal.
 
 ## Build & publish
