@@ -4,6 +4,14 @@ Functional changes (server, models, validation, calculations, charts, workbook).
 
 ## 2026-11-02
 
+- Calculated filters: reset operator on type change, drop relative on open, hostile-name test, header fix (`cb23872`)
+- Browser check for calculated filters; no share option on a calculated filter (`9909894`)
+- Calculated filter in the worksheet: drop, members, ops, notes (`a9991b1`)
+- Calculated field as a row-level filter: server model, validation, WHERE compile (D82) (`9f0af57`, `3d38621`)
+- Gantt mark: interval bars from a start measure and a length measure (`acdeab1`)
+- Compound preview: bring same-kind parts to a common type; stricter UI check (`e9c94e7`)
+- Compound join keys: extra column pairs on a relationship, key suggestion (`0f915d3`)
+- Calculated fields: MAKEDATE (guarded), ISOYEAR, DATENAME, DATETRUNC (`48b5d27`)
 - Calculated fields: decide the IF form without backtracking (`6d5fa2d`)
 - Calculated fields: keyword IF, TRUE/FALSE, NULL, IN and BETWEEN (`8354b2e`)
 - feat: add FIND, MID, LTRIM, RTRIM and case-insensitive ICONTAINS/ISTARTSWITH/IENDSWITH calculation functions (`649d3dc`)

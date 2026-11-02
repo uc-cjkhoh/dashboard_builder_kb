@@ -4,6 +4,11 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-11-02
 
+- Stories fix round: nav updated in place and focus kept after Previous/Next/move/chip click, editor kept through redraws, trim before caption length check, close confirm names stories, print sizes the chart, reconnect re-run (`86c4d8e`)
+- P24d Stories: story tab kind — ordered captioned steps over worksheets / dashboards, step strip, Previous / Next, reorder, caption edit, print; workbook save/restore with bounded import (`1031798`)
+- Gantt: skip non-finite ends, calendar-day lengths, fixed legend, label margin, axis time (`2099ca1`)
+- Performance recording: perf button before the appearance toggle, safe subscribers, time only post-fetch draws, keep dialog scroll (`af43c7f`)
+- Performance recording: in-tab timing log, hooks in the worksheet view, Performance dialog (`bd672e5`)
 - fix: keyboard relate review round (roving tabindex, groups not buttons, always-rendered status, focus and cancel rules) (`412f686`)
 - feat: relate two columns from the keyboard (Enter picks, Enter on another table's column relates) (`787bbec`)
 - Desktop-only: remove phone/tablet layouts, device preview and touch-only rules (`82045b4`)
