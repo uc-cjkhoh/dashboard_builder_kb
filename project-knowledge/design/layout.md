@@ -103,7 +103,9 @@ A glass bar across the top of the content area (`.canvas__bar`). From left to ri
 2. The quiet autosave text.
 3. The **Workbook** overflow menu ([tabs.md](../features/workbook/tabs.md),
    [workbook.md](../features/workbook/workbook.md)).
-4. Right-most, the **appearance toggle** (`#scheme-btn`, `Shell/scheme-toggle.js`). It is an icon button
+4. The **performance** gauge button (`#perf-btn`, `Shell/perf-panel.js`) opens the timings dialog
+   ([frontend-modules.md](../reference/frontend-modules.md)); it sits flush against the next button, no overlap.
+5. Right-most, the **appearance toggle** (`#scheme-btn`, `Shell/scheme-toggle.js`). It is an icon button
    whose glyph shows the current choice (monitor / sun / moon; label "Appearance: System"). It opens a
    System / Light / Dark radio menu ([tokens.md § Light and dark](tokens.md#light-and-dark)).
 

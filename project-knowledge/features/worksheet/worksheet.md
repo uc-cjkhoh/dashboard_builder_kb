@@ -195,7 +195,7 @@ Every shelf, encoding or format change calls `commit()` → `worksheet:changed` 
 
 ### What happens next
 
-Code: `Dashboard/query-runner.js`, unit-tested in `tests/js/`.
+Code: `Dashboard/query-runner.js`, unit-tested in `tests/js/`. Each fetch and draw is timed into the Performance dialog (`Core/perf-log.js`; render time = the synchronous draw only).
 
 1. **Latest wins.** `runChart` takes a ticket from a gate. Starting a new query **aborts** the previous request, and the server stops it too ([clickhouse-integration.md](../../reference/clickhouse-integration.md#database-level-guards)). Any answer that arrives for a superseded ticket is dropped, so a slow old result can never overwrite a newer chart. Leaving for the Data Source cancels the in-flight query.
 2. **Cache before query.** The request (endpoint + full plan) is the cache key. The last **16** results per worksheet are kept. Presentation-only changes (legend, decimals, axis titles, data labels, colour-by-category) and paging back through the Pages shelf therefore re-render instantly with **no** ClickHouse query. Anything that changes the plan (fields, filters, sort, Top-N, chart family) queries.
