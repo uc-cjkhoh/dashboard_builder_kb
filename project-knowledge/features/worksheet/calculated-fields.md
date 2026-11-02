@@ -2,21 +2,15 @@
 
 A **calculated field** is a named formula over fields of the data source, used like a field: `SUM([orders.amount]) / SUM([orders.qty])` on a shelf, in a mark slot, in a Top-N rank.
 
-The browser keeps the formula text. Before a query it expands and type-checks the formula into a tree, which ClickHouse computes on the read-only, bounded path ([clickhouse-integration.md](../../reference/clickhouse-integration.md#calculated-fields--the-compile-path); wire shape in [api.md](../../reference/api.md#calculated-fields-calc)).
+The browser keeps the formula text. Before a query it expands and type-checks the formula into a tree, which ClickHouse computes on the read-only, bounded path ([compile path](../../reference/clickhouse-calculations.md#the-compile-path); wire shape in [api-calculated-fields.md](../../reference/api-calculated-fields.md)).
 
 - **Code:** `Features/Calc/` ([frontend-modules.md](../../reference/frontend-modules.md)). The dialog and pane group are wired from `Dashboard/dashboards.js`.
-- **Rationale:** [decisions.md](../../reference/decisions/decisions.md) D26–D47.
 
 ## At a glance
 
-- **What it is:** a named formula over data-source fields, used like any field (shelf, mark slot, Top-N rank).
-- **Where it runs:** the browser keeps formula text, then expands and type-checks it into a **tree**. The server receives the tree, never text, and compiles it to bounded, bound-value SQL.
-- **Role is derived:** aggregate or row-level, never both. The server re-derives it and rejects a mismatch.
-- **Safe by construction:** division by zero is NULL, numbers widen to `Float64`, literals are bound and length-limited, function names come from a whitelist.
-- **Broken ≠ deleted:** a calculation that can't compute is kept; its sheets send no query and say why.
-- **This file is self-contained** for behaviour (grammar, functions, dialog, pane group, errors, groups). Rationale per rule is in [decisions-calculated-fields.md](../../reference/decisions/decisions-calculated-fields.md).
-
-**Sections:** Formulas · The dialog · Field pane group · What a calculated pill is · Error state · Group fields · Non-null count · How this is computed
+- **Where it runs:** the server receives the expanded tree, never formula text, and compiles it to bounded, bound-value SQL. Role is derived (aggregate or row-level, never both) and re-derived by the server.
+- **Broken is not deleted:** a calculation that can't compute is kept; its sheets send no query and say why.
+- Rationale per rule: [decisions-calculated-fields.md](../../reference/decisions/decisions-calculated-fields.md).
 
 ## Formulas
 
@@ -35,7 +29,7 @@ aggregate := FN "(" expr ")" | "PERCENTILE" "(" expr "," number ")"
 ref       := "[" name "]" | "[@" parameter "]"                   (a workbook parameter, see Parameters below)
 ```
 
-- **Numbers** are decimals with an optional exponent: `12`, `1.5`, `.5`, `1.`, `1e3`. No `1,000`. A non-finite `1e999` is an error.
+- **Numbers** are decimals with an optional exponent (`12`, `.5`, `1e3`); no `1,000`; a non-finite `1e999` is an error.
 - **Argument types:** `SUM` / `AVG` / `MEDIAN` / `STDDEV` / `VARIANCE` / `PERCENTILE` take a number. `MIN` / `MAX` take a number, date or text. `COUNT` / `COUNTD` / `ATTR` take any type. Arithmetic needs numbers.
 - An aggregate inside an aggregate is refused.
 - A field of a category other than numeric, text, temporal or boolean can't be used.
@@ -47,16 +41,14 @@ ref       := "[" name "]" | "[@" parameter "]"                   (a workbook par
 - **Text** ([below](#text-functions)): `TEXT` (alias `STR`), `LOWER`, `UPPER`, `TRIM`, `LEN`, `LEFT`, `RIGHT`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `SPLIT`.
 - **Date** ([below](#date-functions)): `DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY`, `DATE`.
 - **References:** `[table.column]` (`[db.table.column]` when two databases hold the same table name), or `[Name]` for another calculation. Calculations can refer to calculations. The browser expands every reference into one tree before sending, so the server never sees a calculation name.
-- **Division by zero** gives an empty (NULL) value, never an error.
-- **No field references** (`1+2`) is valid. Such a formula needs a field from a table elsewhere on the sheet to have anything to group or total.
+- **Division by zero** gives NULL, never an error. A formula with **no field references** (`1+2`) is valid but needs a field elsewhere on the sheet to group or total.
 
 ### Statistics
 
 - **`MEDIAN([f])`** is the exact median of the non-NULL values: linear interpolation between the two middle values, like Excel `PERCENTILE.INC` (1, 2, 3, 4 gives 2.5).
 - **`PERCENTILE([f], p)`** is the same interpolation at fraction `p` (p25 of 1..4 is 1.75). `p` is a **literal** number 0..1, not a field or a formula. `PERCENTILE([f], 0.5)` equals `MEDIAN`; 0 is the minimum, 1 the maximum.
 - **`STDDEV` and `VARIANCE`** are the **sample** statistics (n − 1).
-- **Empty results:** `STDDEV` / `VARIANCE` of fewer than two values, and `MEDIAN` / `PERCENTILE` of no value, are empty (NULL, shown as a dash), never 0 or NaN.
-- A percentile of a plain field needs no formula: the pill's `Percentile…` aggregation ([worksheet.md](worksheet.md#shelves--pills)) runs the same SQL. A calculated pill does not list it.
+- **Empty results:** `STDDEV` / `VARIANCE` of fewer than two values, and `MEDIAN` / `PERCENTILE` of no value, are empty (NULL, shown as a dash), never 0 or NaN. A plain field's pill has its own `Percentile…` aggregation ([worksheet.md](worksheet.md#aggregation)); a calculated pill does not list it.
 - **`ATTR([f])`** (Tableau's attribute) is the value when the group has exactly one distinct non-NULL value, else empty (NULL; Tableau shows `*`, here a dash). NULLs are ignored, so a group of `p, p, NULL` is `p`. It keeps the field's type, so a text field stays a text measure (table, text and KPI views only).
 
 ### Clean… (query-time cleaning)
@@ -87,7 +79,6 @@ A text or number field's menu **Clean…** adds ONE calculated field. The data i
   - `AND` / `OR` / `NOT` are three-valued: `NULL AND false` is `false`, `NULL OR true` is `true`, `NOT NULL` is NULL.
   - Aggregates still skip NULLs.
 - **Aggregate or row-level:** an `IF`, `CASE`, comparison or `IFNULL` is an aggregate calculation when any part is an aggregate and every other part is an aggregate or a constant (`IF(SUM([a]) > 100, 'high', 'low')`). A row-level part beside an aggregate is the usual mixing error. `SUM(IF([s] = 'open', [amount], 0))` is a conditional sum.
-- **Not built:** the keyword form `IF c THEN a ELSEIF … END` (write `IF(…)` or `CASE`), date and boolean literals, `NULL` as a word (use `ISNULL`), `IN`, `BETWEEN`.
 
 ### Text functions
 
@@ -117,7 +108,6 @@ Row-level functions over text. Names are case-insensitive; the table is `ROW_FUN
   - `COUNTD(LOWER([c.name]))` and `SUM(IF(CONTAINS([c.name], 'x'), 1, 0))` work.
   - A text function over an aggregate (`LOWER(MAX([c.name]))`) is an aggregate. Mixing with a bare row-level field is the usual error.
   - A row-level text or boolean result (`LOWER`, `CONTAINS`) is a **dimension**. `LEN` is a row-level number (measure or dimension).
-- **Not built:** regular expressions, `FIND` / `POSITION`, `MID` / `SUBSTRING`, `LTRIM` / `RTRIM`, `STARTSWITH` / `CONTAINS` ignoring case, a length, position or separator that is a field or computed value (a `[@Parameter]` works, see Parameters), `TEXT` with a format string or a boolean argument.
 
 ### Date functions
 
@@ -148,8 +138,7 @@ Row-level functions over dates (same `ROW_FUNCTIONS` table and generic `fn` node
   - An impossible day (`2024-02-30`), a word, and a year outside 1970 to 2148 are NULL, never a clamped date.
 - **`WEEK` is not the week date part.** The date part and bucket "week" on a plain date field is the **Monday that starts the week** (a date); `WEEK(d)` is the ISO week *number*. Weeks 52/53 and 1 can belong to the neighbouring ISO year, and there is no `ISOYEAR` yet, so group by `YEAR` plus `WEEK` only away from the year turn.
 - **Bucketing a calculated date:** a calculated `DATEADD` / `DATE` dimension groups **per distinct value**. It is never date-bucketed or given a date part (a calculated dimension takes no `datePart` or `dateBucket`; [D33](../../reference/decisions/decisions-calculated-fields.md#d33--calculated-fields-are-refused-wherever-a-plain-column-is-assumed)). To group by month or year, use `YEAR` / `MONTH` / `QUARTER` of it (a number dimension).
-- **Roles:** the number functions give a row-level number (a measure or dimension; `SUM(WEEK([o.placed]))` works). `DATEADD` and `DATE` give a date dimension (`MIN` / `MAX` take it). `IF(MONTH([o.placed]) = 12, …)` and `DATEDIFF(…) > 30` work.
-- **Not built:** `TODAY()` / `NOW()` (a result would change between runs, which breaks caching), `MAKEDATE`, fiscal calendars and fiscal year start, `ISOYEAR`, date-part bucketing of a calculated date, `DATENAME` / `DATETRUNC`, a unit, amount or part that is a field (a `[@Parameter]` works), `DATEPARSE` with a format, time zones.
+- **Roles:** the number functions give a row-level number (`SUM(WEEK([o.placed]))` works); `DATEADD` and `DATE` give a date dimension (`MIN` / `MAX` take it).
 
 ### Parameters
 
@@ -187,18 +176,11 @@ The check yields a type (number, text, date, boolean) and whether the formula is
 
 ### Limits
 
-- **Where they live:** `Core/validate.js` `LIMITS` (`calculations`, `calcFormula`, `calcName`) and `CALC_LIMITS` in `calc-types.js` (formula length, depth, nodes, text literal length 100, text-function length/position 1000, separator 20, `CONCAT` arguments 10).
-- **Server mirror:** `CalcLimits` mirrors depth, nodes, name length, literal length and these.
-- A `CASE` counts one node plus every condition and result.
-- A formula over the length limit, a tree over the depth or node limit, a name over the length limit and a workbook over the calculation count are refused with a message. None is clamped.
+Formula length, tree depth, node count, name length, literal and text-function argument limits live in `Core/validate.js` `LIMITS` and `CALC_LIMITS` in `calc-types.js`, mirrored by the server's `CalcLimits` ([api.md § Limits](../../reference/api.md#limits)). A `CASE` counts one node plus every condition and result. Anything over a limit is refused with a message, never clamped.
 
 ## The dialog
 
-**Where it opens.** The sidebar's calculator icon on a worksheet tab opens the Calculated fields dialog.
-
-- It has one row per calculation — its chip with the add-to-shelf plus and context menu — and an **Edit** button. It redraws as calculations change.
-- Calculations are not dragged from this list; the plus is how a calculation reaches a shelf.
-- **New calculated field** (in that dialog) and **Edit…** open one editing dialog. Code: `calc-dialog.js`; all logic in `calc-dialog-model.js`.
+The list dialog is in [Field pane group](#field-pane-group). **New calculated field** and **Edit…** open one editing dialog. Code: `calc-dialog.js`; all logic in `calc-dialog-model.js`.
 
 The editing dialog has:
 
@@ -206,13 +188,12 @@ The editing dialog has:
 - **Formula** — a text box.
   - **Field autocomplete:** typing `[` opens a list of fields and other calculations (a calculation never offers itself). Arrow keys move; Enter or Tab (after arrowing) accepts; Esc closes the list and not the dialog.
   - **Function autocomplete:** typing the start of a function name (a letter prefix outside `[ ]` and outside a text literal, e.g. `LO`) offers up to 12 matching functions in the same list, each with its signature (`LOWER(text)`). Not offered when the caret is inside a word. Accepting inserts `LOWER(` with the caret after the bracket; before an existing `(` no second one is added. `AND`, `OR`, `NOT` and `CASE` insert the word and a space.
-  - **Robust input:** a fresh formula text is always a string. CRLF is normalised; control characters and over-long text give a message, never an exception.
+  - **Robust input:** CRLF is normalised; control characters and over-long text give a message, never an exception.
 - **Functions** — a button under the formula opens a help panel (`aria-expanded`; Esc closes the panel and not the dialog).
   - A search box filters the glossary (name, group, plain-words sentence, signature). The list is grouped Aggregate, Logic, Text, Date.
   - Hovering or focusing a row shows its detail: signature, what it does, what it takes, what it gives, one example formula and the empty-value (NULL) rule.
   - Clicking a row inserts its signature at the caret (replacing a selection). **Insert example** inserts the example of the function last focused with the keyboard or clicked (hovering only previews).
   - After an insert, focus returns to the formula box, so Esc then closes the dialog. The dialog body scrolls so Cancel / Save stay visible.
-  - Operators (`+ - * / = != < <= > >=`) are not listed as functions.
   - Code: the glossary (`function-help.js`) derives names, arity and result types from `calc-types.js`. A test fails when a function has no entry or an entry has no function, and checks that every example formula parses and type-checks.
 - **Live message** — the first problem, in plain words, with `(at character N)` and a caret mark when the parser knows the position. Unknown field and cycle messages name the cause.
 - **Role chip** — icon plus text, never colour alone: `Aggregate · number`, `Row-level · text`, `Row-level · boolean`, "No formula yet", or "Can't be saved".
@@ -230,7 +211,7 @@ Calculations are not in the field pane itself. On a worksheet tab, the sidebar's
 | Delete… | Refused with a toast `Used by calculation 'B'.` while another calculation refers to it. When worksheets or shared Top-N filters use it, a confirm says how many, and Delete clears its pills (and a sort or Top-N ranking aimed at it) from them. Otherwise it deletes at once |
 
 - **Broken calculation** (its field left the model, an imported cycle): shows an **Error** badge instead of the role chip, with its message as the tooltip. It cannot be dragged or added.
-- **Adding:** the **+** puts a calculation on a shelf; calculations are not dragged from this list. The **+** goes to Rows for a measure and Columns for a dimension.
+- **Adding:** the **+** puts a calculation on a shelf (Rows for a measure, Columns for a dimension); calculations are not dragged from this list.
 
 ## What a calculated pill is
 
@@ -243,7 +224,7 @@ A pill is `{ calc: id, db: "", table: "", column: <name at last save>, category,
 
 **Where it goes.** Calculated pills go on Rows, Columns, Color, and the Size, Label, Path and Detail / Tooltip slots. They may be a Top-N ranking measure and a sort target.
 
-- A calculated dimension is never date-grouped: its pill shows no date-part picker or step buttons, and a saved `datePart` is removed (on sync and on open).
+- A calculated dimension is never date-grouped: no date-part picker, and a saved `datePart` is removed.
 - A calculated **measure's** aggregation menu offers only sum, avg, min, max, distinct count and non-null count (`CALC_AGGS`, mirroring the server's `CalcCatalog.RowLevelAggregations`). It never offers `count`, which the server refuses for a calculation; a saved `count` resets to sum on open.
 
 **Top-N by a calculation.** A Top-N filter ranked by a calculation stores `topBy: { db: "", table: "", column, calc: id, agg? }` and is saved and restored like any other.
@@ -266,11 +247,10 @@ Click-to-filter is **off** when the primary dimension (the drill level, else the
 
 ## Error state
 
-A calculation that can't be computed is kept, not dropped. Causes: an unknown or removed field, a missing table, a cycle, or a calculation that no longer exists.
+A calculation that can't be computed is kept, not dropped (an unknown or removed field, a missing table, a cycle, a deleted calculation).
 
-- Any sheet that uses it (a pill, or a Top-N ranked by it) sends **no query**. It shows `Calculation 'X' can't be computed: <reason>` in the chart slot and for CSV export.
-- Fix or delete the calculation and the view recomputes.
-- A sheet whose only pills are field-less calculations shows the hint "Add a field from a table — a calculation with no field in it has nothing to group or total." (no query).
+- Any sheet that uses it (a pill, or a Top-N ranked by it) sends **no query**. It shows `Calculation 'X' can't be computed: <reason>` in the chart slot and for CSV export. Fix or delete the calculation and the view recomputes.
+- A sheet whose only pills are field-less calculations (`1+2`) shows "Add a field from a table — a calculation with no field in it has nothing to group or total." and sends no query.
 
 ## Group fields
 
@@ -304,10 +284,7 @@ It is an ordinary calculated dimension afterwards: a chip in the pane (Edit… r
 
 ## Non-null count
 
-**Non-null count** is a valid aggregation for every field category (`aggsFor`), shown as `non-null <name>` everywhere.
-
-- The server names the result column that way (`countNonNull`, `count(col)`), so the chart, the CSV header and a compare result agree.
-- A calculation's `COUNT(...)` is the same aggregate.
+**Non-null count** is a valid aggregation for every field category (`aggsFor`), shown as `non-null <name>` everywhere (the server names the result column that way, so chart, CSV header and compare agree). A calculation's `COUNT(...)` is the same aggregate.
 
 ## How this is computed
 

@@ -54,11 +54,11 @@ Risks are listed in [platform.md](platform.md#open-risks).
 - Read-only against ClickHouse; every identifier validated against the live catalog and quoted; every value bound; every result bounded ([golden-rules.md](../engineering/golden-rules.md), rules 1–3).
 - No server-side persistence unless [platform.md](platform.md) records a decision.
 - Single user, browser-held state; ClickHouse is the only data source; no uploads, extracts, accounts or publication ([out-of-scope.md](out-of-scope.md)).
-- Self-hosted, framework-free frontend, no CDN; a new library is vendored with a written reason.
+- Self-hosted, framework-free frontend, no CDN ([rule 10](../engineering/golden-rules.md#10-self-hosted-framework-free-frontend)); a new library is vendored with a written reason.
 - A workbook stores specifications and metadata, never data, credentials or executable code.
 - Every state-changing edit is undoable; the grain and active filters stay visible in words; everything draggable has a keyboard path; unavailable options say why.
 - Not a Tableau clone: no `.twb`/`.hyper` compatibility, no Tableau branding, no claim of identical regression or forecast output.
-- Design tokens only, `hidden` for visibility, never colour alone.
+- The design rules and golden rules 6, 7 and 9 (tokens, `hidden`, never colour alone) apply.
 - Done means [definition-of-done.md](../../agent-behavior/workflow/definition-of-done.md): update the feature doc and delete the entry here.
 
 ## Known unknowns

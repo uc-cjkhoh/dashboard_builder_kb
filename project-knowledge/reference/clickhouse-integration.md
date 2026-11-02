@@ -112,7 +112,7 @@ builder runs ([api.md § Limits](api.md#limits)).
 - **Raw rows** — the columns are catalog-checked (default: the first 200) and filters use
   `BuildSingleTableFilters`. There is **no ORDER BY**. `n` is 1..1000 (rejected outside), and an extra probe
   row sets `truncated`. Each column is selected as `if(isNull(c), NULL, left(toString(c), 1001))`, so a
-  cell is cut to 1000 characters (+ `…`) inside ClickHouse. Rows × columns ≤ 50,000.
+  cell is cut inside ClickHouse ([limits](api.md#rows)).
 - **Join preview** (`JoinPreviewAsync`, `ClickHouse/JoinPreview.cs`, [api.md](api.md#relationship-preview)) —
   one `SELECT` per side, run together, over `(SELECT {col} AS k FROM {db}.{table} LIMIT n)` grouped by key.
   It counts rows, NULL rows, distinct keys, max repeat, and `k IN (the other table's first n keys)`. Text
@@ -133,8 +133,7 @@ builder runs ([api.md § Limits](api.md#limits)).
 - **Ordering:** `sort:{column, desc}` names a generated alias (`k{n}`/`v{n}`), validated against the
   request's counts. The remaining dimension keys follow ascending. Default: ascending by the first
   dimension (or first measure).
-- **Limit:** default 50; 1..5000, else 400 (CSV export 1..100,000 —
-  [D24](decisions/decisions.md#d24--showing-all-data-bounded-requests-paging-other-date-grouping)). It is sent as limit **+ 1** (`ProbeLimit(n, max)`). If the probe row comes
+- **Limit:** validated ([api.md § Limits](api.md#limits)), then sent as limit **+ 1** (`ProbeLimit(n, max)`). If the probe row comes
   back, it is dropped and the result is flagged `truncated` (`TrimProbeRow`), and the client shows a
   notice. The box plot does the same. Unit-tested in `TruncationTests`.
 - **Paging:** `offset` adds `OFFSET m` to the same ordered query (the Table view's pages). The order ends
@@ -180,114 +179,21 @@ builder runs ([api.md § Limits](api.md#limits)).
   `sum(x)` → `sum(x * t0._sample_factor)`. A refused sampled query re-runs unsampled. The response's `approx` says what was done. Exercised live (a `SAMPLE BY` table, plain and
   calculated measures, a calculated Top-N rank) by `tests/live/calc-smoke.mjs`.
 - **Compression:** API responses are Brotli/gzip-compressed (fastest level, `Program.cs`).
-- **Response:** `QueryResult { rowDimensions, columnDimensions, measures, rows:[{keys, values}], truncated, total?, other?, bucket? }`.
-  `values` are numbers, strings (`min` / `max` of a text or date column — read by the measure's category) or `null`
-  (NULL, or `NaN` / `∞` from an aggregate over no rows). The client pivots it ([worksheet.md](../features/worksheet/worksheet.md#table-view--a-true-rows--columns-crosstab)).
-- **Errors:** invalid identifier, table-not-in-query, `sum` / `avg` on a non-numeric column, or a value
-  that doesn't fit its column → 400 ([api.md](api.md#errors)).
+- **Response:** `QueryResult` and its `values` rules are in [api.md](api.md#measure-values-and-aggregations); the client pivots it ([worksheet.md](../features/worksheet/worksheet.md#table-view--a-true-rows--columns-crosstab)).
 
-### Calculated fields — the compile path
+### Calculated fields and aggregates
 
-A `calc` tree on a dimension, measure or Top-N `topBy` ([api.md § Calculated fields](api.md#calculated-fields-calc))
-becomes SQL in four steps; no formula text and no literal is ever written into SQL.
-
-1. **Request rules** (`RequestRules.ValidateQuery`, no catalog): tree depth ≤ 12 and ≤ 200 nodes
-   (`CalcValidator.CheckLimits`), label ≤ 60, the role rules (aggregate tree ↔ `agg` null; row-level
-   measure needs a value aggregation; no aggregate in a dimension; no `datePart`; no `calc` on a join key).
-2. **Catalog** (gateway `CompileCalcAsync` → `ResolveCalcRefsAsync`):
-   - Every `field` node (`CalcFields`) is first checked against the tables already in the query (`from` and
-     joins). A field on any other table is a 400 "Field references a table not in the query." whether or not
-     the column exists. This runs before any catalog lookup, so a calculation never causes a `DESCRIBE` of a
-     table outside the query.
-   - The field then goes through `ColumnsOf` + `QualifyAsync`: `DESCRIBE`-validated (already cached for tables
-     in the query), quoted by `Identifier.cs`, aliased `t0` / `tN`. So a calculation may reference any table in
-     the query, including a left-joined one (its unmatched side is NULL under `join_use_nulls`).
-   - A column the catalog doesn't know on such a table is left out, so the validator names it ("Unknown field t.c.").
-3. **Validate** (`ClickHouse/Calc/CalcValidator.cs`): types the tree bottom-up from the column categories
-   (number, text, date, boolean; anything else is refused) and derives aggregate vs row-level. A bad tree is
-   rejected with a `CalcException` (a plain sentence plus the node path, `measures[0].calc.l.arg`), which the
-   gateway reports as a 400. The gateway re-checks the role and the `sum` / `avg`-needs-a-number rule against
-   the derived type (`CalcMeasureSql`, `CalcDimensionSql`).
-4. **Compile** (`ClickHouse/Calc/CalcCompiler.cs`):
-   - **Numbers and literals:** numeric columns are widened with `toFloat64(...)` (no unsigned wrap, no integer or `Decimal` rounding).
-     `a / b` → `(a / nullIf(b, 0))` (division by zero is NULL, never `inf`). Each number literal is bound as `{c{n}p{m}:Float64}`
-     and each text literal as `{c{n}p{m}:String}`; `c{n}` is unique per compiled calculation in the request.
-   - **Aggregates** go through the shared `AggregateSql` (table below), so a calculated `SUM` is scaled and a `COUNTD` estimated
-     exactly as a plain measure is. A row-level measure is then wrapped by its pill aggregation; an aggregate tree is used as is;
-     a dimension groups by its row-level expression.
-   - **Logic nodes:** `(a = b)` (also `!= < <= > >=`), `and(a, b)`, `or(a, b)`, `not(a)`, `if(c, a, b)` (IF/IIF),
-     `multiIf(c1, a1, …, else)` (CASE; `NULL` last without an ELSE), `ifNull(a, b)`, `isNull(a)`. A NULL condition is
-     not true: IF takes its else, CASE the next WHEN (pinned by the live smoke test).
-   - **Text functions** (`fn` nodes, every argument compiled once in source order): `toString(x)` (`TEXT`; `STR` parses to the same `text` node), `lowerUTF8`, `upperUTF8`, `trimBoth`, `toFloat64(lengthUTF8(…))`, `leftUTF8`/`rightUTF8(t, {UInt32})`, `replaceAll`, `concat`, `(position(t, s) > 0)`, `startsWith`,
-     `endsWith`, `if(isNull(t), NULL, arrayElementOrNull(splitByString({sep:String}, assumeNotNull(t)), {k:UInt32}))`.
-   - **Date functions:**
-     - `toFloat64(dateDiff({unit:String}, a, b))`. `dateDiff` on a `Date` with a time unit reads midnight to midnight (24 hours a day).
-     - `addYears`/`addQuarters`/`addMonths`/`addWeeks`/`addDays`/`addHours`/`addMinutes`/`addSeconds(d, {n:Int32})` (fixed name per unit, unit never in SQL), applied to `toDateTime64(d, 0)` and
-       kept only strictly between 1900-01-03 and 2299-12-29 UTC, else NULL (a plain `Date` would wrap and a `DateTime` clamp to 1970 on overflow).
-     - `toFloat64(toYear|toMonth|toDayOfMonth|toQuarter|toISOWeek|toDayOfWeek(d))`.
-     - `DATE(t)` = `TypeCast.ParseDate`: the cast's digit guard, then `toDate` of `parseDateTime64BestEffortOrNull(t, 0)`, kept only between 1970-01-02 and 2149-01-01 (else NULL).
-   - **Booleans:** a boolean-typed calculation is wrapped in `toBool(...)`. As a dimension it is `toString(...)` of that, so keys read `true` / `false` (a plain Bool field keeps `True` / `False`).
-
-**One compile, one parameter list.**
-
-- Each calculation is compiled once. Its SQL string is reused in the page, the total (`count()` over the
-  grouped query), the Other statement and inline in the Top-N subquery.
-- Every statement is sent with the request's one `parameters` list (filter values `p{i}` and calculation
-  literals `c{n}p{m}`). The auto date-grain probe reuses only the date expression and the `WHERE`, so it is
-  sent just the parameters its SQL names (`ParametersUsedBy`).
-- A calculated dimension is never date-grouped: `dateBucket` takes the first *real* temporal dimension
-  wherever the calculation sits.
-- The result cache key includes the tree, so two requests that differ only in a calculation never share a result.
-- **Tests:** `CalcCompilerTests`, `CalcValidatorTests`, `CalcRulesTests`, `CalcGatewayTests`, `CalcJsonTests`, and the
-  shared fixture (also run by `node --test`). Live tests run against the dev app and a real ClickHouse; the script creates and drops the tables
-  and checks results against hand-written `SELECT`s or hand-computed values: `tests/live/calc-smoke.mjs`
-  (`test_cj.calc_smoke_*`), `logic-smoke.mjs` (`bk_logic`), `text-smoke.mjs` (`bk_text`).
-
-**Compile spikes** (`node tests/live/calc-spikes.mjs`, SELECT only, inline sources). A bound parameter inside a
-`SELECT` / `GROUP BY` expression works (also `GROUP BY` the full expression). `toFloat64` over `UInt32`,
-`Decimal(18,2)` and `Nullable(Float64)` works: there is no unsigned wrap (`toFloat64(UInt32 2) - toFloat64(Decimal 10.00)` is
-`-8`), and a NULL operand makes the result NULL. `sum(x) / nullIf(sum(y), 0)` with every `y` = 0 returns JSON `null`;
-`nullIf` keeps the SQL NULL for other writers and downstream arithmetic.
-
-**Aggregates, exact and approximate** (`AggregateSql` — one function for plain and calculated measures;
-"sampled" = `approximate` on a base table with a sampling key, read `SAMPLE 0.1`):
-
-| Aggregate (formula → wire) | Exact | Sampled | Approximate, unsampled |
-|---|---|---|---|
-| `SUM` → `sum` | `sum(x)` | `sum(x * t0._sample_factor)` | `sum(x)` |
-| rows → `count` (plain measures only) | `count()` | `sum(t0._sample_factor)` | `count()` |
-| `COUNT` → `countNonNull` | `count(x)` | `sum(if(isNotNull(x), t0._sample_factor, 0))` | `count(x)` |
-| `AVG`, `MIN`, `MAX` → `avg`, `min`, `max` | as written | unscaled | as written |
-| `COUNTD` → `countDistinct` | `uniqExact(x)` | `uniq(x)` | `uniq(x)` |
-| `MEDIAN`, `PERCENTILE` (also the plain `median` / `percentile` measure) | `quantileExactInclusive(0.5)(x)`, `quantileExactInclusive({p:Float64})(x)` (interpolating) | unscaled | as exact |
-| `STDDEV`, `VARIANCE` → `stddev`, `variance` | `if(count(x) < 2, NULL, stddevSamp(x))` (`varSamp`) | unscaled | as exact |
-| `ATTR` → `attr` | `if(uniqExact(x) = 1, min(x), NULL)` | unscaled | as exact |
-
-- The last four rows are never scaled: on a sampled table they run over the sample (estimates).
-- The percentile fraction is the only user value, and it is bound: `AggNode.P` or a plain measure's `MeasureRef.P` as `mp{n}`, a Top-N's `topBy.P` as `tp{i}`
-  (`Float64`, 0..1 checked again in `BindFraction`; ClickHouse accepts a query parameter as a parametric aggregate's argument). Function names are fixed text.
-- `count(x) < 2` keeps a one-value group NULL (bare `stddevSamp` is NaN, which JSON cannot carry). `min(x)`,
-  not `any`, ignores NULL rows in `attr`. `PlainRankSql` (Top-N) uses the same writer.
-
-**Top-N rank, exact vs approximate.** A rank by a plain measure is always exact and unscaled
-(`PlainRankSql`; only the order matters). A rank by a calculation compiles through the table above, so in
-approximate mode it uses `uniq` for `COUNTD` and scaled sums on a sampled table. The two ranks are not
-aligned, on purpose. Likewise `approx.distinct` in the response ignores a `COUNTD` inside a Top-N `topBy`
-(it reflects the result's measures only).
+A `calc` tree compiles in four steps (request rules, catalog, validate, compile) with one parameter list per request; the aggregate table (exact, sampled, approximate) and Top-N rank rules are in [clickhouse-calculations.md](clickhouse-calculations.md).
 
 ### Shared defences in the builders
 
-- **Whitelists:** aggregations `count/sum/avg/min/max/countDistinct/countNonNull/median/percentile/stddev/variance/attr`
-  (`countDistinct` → `uniqExact`, `countNonNull` → `count(col)`; `median`, `percentile`, `stddev`, `variance` need a numeric
-  column, `attr` any column but a compound one; `percentile` also needs the bound `p`); calculation node kinds,
-  operators and functions (`CalcValidator`, `CalcCatalog`); operators `= != > >= < <= in notin between` (plus text match and top-N).
-- **Typed bound values** (`FilterValues.Coerce`, `ClickHouse/RequestValidation.cs`): before binding, the value is
-  converted to the column's category from the same `DESCRIBE`. Number → `{p0:Float64}` (plain decimal only);
-  date / datetime → ISO text bound as `String` (a `Date` / `Date32` column rejects a time part); boolean →
-  `UInt8`; text → `String`. Compound / other types can't be filtered. Binding is via
-  ClickHouse.Client's `AddParameter` (`using ClickHouse.Client.Utility`). `in` and `notin` bind `Array(Float64)` /
-  `Array(String)` / `Array(UInt8)`, ≤ 500 values; `between` binds two bounds and requires From ≤ To. A value
-  that doesn't fit is a 400, never a ClickHouse 502.
+- **Whitelists:** aggregations ([api.md](api.md#measure-values-and-aggregations); `countDistinct` → `uniqExact`,
+  `countNonNull` → `count(col)`), calculation node kinds, operators and functions (`CalcValidator`, `CalcCatalog`), and
+  filter operators `= != > >= < <= in notin between` (plus text match and top-N).
+- **Typed bound values** (`FilterValues.Coerce`, `ClickHouse/RequestValidation.cs`): the rules are
+  [api.md § Typed filter values](api.md#typed-filter-values). Binding is via ClickHouse.Client's `AddParameter`
+  (`using ClickHouse.Client.Utility`): number → `{p0:Float64}`, date / datetime → `String`, boolean → `UInt8`,
+  text → `String`; `in` / `notin` bind `Array(Float64)` / `Array(String)` / `Array(UInt8)`.
 - **Rejected on the server, not silently ignored:** an empty `in` / `notin`, a half or inverted range, an unknown operator.
   The client never sends a blank filter, so to the user an empty filter is still "ignored".
 - **Pure, unit-tested helpers** (reached via `InternalsVisibleTo`): `BuildCondition`,

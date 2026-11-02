@@ -22,15 +22,11 @@ create, change or delete schema or data).
   chart — not edit data). A leaked or over-scoped connection can't change the server.
 - **Enforced twice.** Our SQL builders emit only reads, *and* every query carries ClickHouse's own
   `readonly=2`, so the server itself refuses a write even if a builder bug produced one. The same
-  settings add a server-side time limit and cancel-on-disconnect
-  ([clickhouse-integration.md](../clickhouse-integration.md#database-level-guards)).
+  settings add a server-side time limit and cancel-on-disconnect.
 - **Why `readonly=2`, not 1:** level 1 also forbids changing settings, which would reject the driver's
   own per-request settings and our time limit. Level 2 still blocks every write and DDL.
-- **A server that refuses a setting doesn't block connecting.** The connection steps down at connect
-  time. A profile constraint (code 452, usually on the time limit) drops only `max_execution_time`. An
-  account already locked read-only (code 164) runs with no settings, because the server is guarding it.
-  Only if `readonly` itself is constrained does read-only rest on our SQL builders alone
-  ([guards](../clickhouse-integration.md#database-level-guards)).
+- **A server that refuses a setting doesn't block connecting:** the connection steps down at connect time
+  ([guards and step-down](../clickhouse-integration.md#database-level-guards)).
 - Golden rule: [rule 1](../../engineering/golden-rules.md#1-the-server-is-read-only-against-clickhouse).
 
 ### D2 — Thin, session-scoped proxy; no application database
@@ -55,9 +51,7 @@ in one helper (`ClickHouse/Identifier.cs`).
 
 ### D10 — Connect over TLS only: HTTPS port `8443`
 `secure` is on by default and `8443` is the default port.
-- **Why:** the target ClickHouse exposes only its secure ports — `8443` (HTTPS, used) and `9440` (native
-  TLS, unused per D3). Plaintext `8123`/`9000` are unavailable.
-- A local throwaway container may still use plain `8123` for testing.
+- **Why:** the target ClickHouse exposes only its secure ports ([ports](../clickhouse-integration.md#driver--connection)).
 
 ### D11 — TLS certificate validation: safe-by-default, explicit per-connection opt-in
 A secure connection **validates the server certificate** against the host trust store. The user may opt
@@ -133,16 +127,11 @@ Spec: [design/overview.md](../../design/overview.md), [tokens.md](../../design/t
   The focus ring is neutral ink, and a focused input keeps a neutral border with an accent underline, so
   focus never looks like an invalid field.
 - **Glass only where nothing sits beneath it but the wash.** On a blurred panel over content, the text
-  underneath reads through the text on top. So anything that floats (menus, popovers, toasts, dialogs) is
-  solid. `@supports` and `prefers-reduced-transparency` fall back to an opaque `--surface-2`.
-- **Light / dark is a viewer preference:** System (follows `prefers-color-scheme`, the default) / Light /
-  Dark. It is remembered per browser and never saved in the workbook, because it is how *this* viewer
-  wants to read, not part of the shared analysis. One `data-scheme` attribute drives the tokens
-  ([tokens.md § Light and dark](../../design/tokens.md#light-and-dark)).
-- **Icons:** one self-hosted inline-SVG set (`Core/icons.js`) replaces Unicode glyph icons; no icon font.
-- **Calm motion:** no hover-lift transforms, shimmer or pulse. Durations are 150 / 200 / 250 ms, all
-  zeroed under `prefers-reduced-motion`.
-- **`--ink-3` is `#5b6b81`**, darker than the Fluent grey, to reach ≥ 4.5:1 on `--surface-2`.
+  underneath reads through the text on top, so anything that floats is solid ([tokens.md](../../design/tokens.md)).
+- **Light / dark is a viewer preference**, remembered per browser and never saved in the workbook: it is how
+  *this* viewer wants to read, not part of the shared analysis ([tokens.md § Light and dark](../../design/tokens.md#light-and-dark)).
+- **Icons:** one self-hosted inline-SVG set (`Core/icons.js`); no icon font. **Calm motion:** no hover-lift,
+  shimmer or pulse ([motion-accessibility.md](../../design/motion-accessibility.md#motion)).
 - **Rejected:** a from-scratch view rewrite (risk in the 1.8k-line `dashboards.js`) and a colour-only
   reskin (doesn't reduce visual weight). The module graph and markup stayed; the token block was
   replaced and each stylesheet re-pointed by meaning.
@@ -161,7 +150,7 @@ Worksheets and dashboards are built *from* it ([D61](decisions-dashboards.md)). 
 one Tableau-style worksheet** — a field pane plus shelves you drag fields onto.
 - **Joins are executed.** Fields from different tables join automatically along the drawn
   relationships. The client finds a join path (breadth-first search over the relationship graph);
-  `QueryAsync` builds aliased, identifier-safe `INNER JOIN`s.
+  `QueryAsync` builds aliased, identifier-safe joins of each relationship's type.
 - Fan-out on the many side is the user's declared intent; cardinality is not enforced. Unrelated tables
   show a "draw a relationship" warning.
 - **Rejected:** one independent entity canvas per subtab — the statement asks to "build a dashboard
@@ -175,21 +164,16 @@ Table gets an extra header level.
 - **Constraints:** colour-split needs one measure (otherwise a hint). Types outside `COLOR_USES` show a
   lane note rather than mis-querying. Combinations stay capped by the query `LIMIT`. Past 8 values the
   ramp repeats and the legend disambiguates.
-- **Pill tint:** `--enc-*` violet separates encoding pills from dimensions (`--dim-*` blue) and measures
-  (`--meas-*` teal).
 - **Rejected:** a dedicated server `color` field — it is just a group-by.
 
 ### D15 — Statistical charts, export and richer filters stay on read-only, bounded, bound-param paths
 - **Heatmap and treemap** reuse the multi-dimension `/api/query`.
 - **Histogram and box plot** are the only new shapes. They are single-table (a distribution is one
-  column), so they take their own endpoints rather than complicating `QueryAsync`. Bins are clamped
-  1..100; the max value is clamped into the last bin.
+  column), so they take their own endpoints rather than complicating `QueryAsync`.
 - **Export:** SVG/PNG are client-only. CSV reuses `QueryAsync`, and `CsvUtil` adds a formula-injection
   guard because exported cells open in spreadsheets.
 - **Filters:** `in` (from a bounded distinct-values query) and `between` bind as typed parameters via
-  the pure `BuildCondition`. An empty `in` or a partial range is a no-op, never `IN ()`.
-- **Testing:** the safety-critical builders are pure functions unit-tested with hostile input, so SQL
-  and parameter shapes are asserted without a live server.
+  the pure `BuildCondition`.
 - **Not supported:** histogram/box-plot CSV (their shape isn't a `QueryRequest`).
 
 ### D16 — Click-to-filter is a select-then-act worksheet selection
@@ -221,7 +205,6 @@ the bound-filter path — **no new endpoints or query shapes**.
   Bar-gradient is not supported.
 - **Gantt Bar and Density marks are not built** (no clean bounded shape). **Maps are out of scope** —
   no geo data source, tiles or projection; that would need its own decision.
-- **Pages autoplay respects `prefers-reduced-motion`** (Play omitted; stepping always works).
 - The encodings live in one **icon toolbar** with a single open editor, not stacked lanes, so the
   header stays short as channels are added.
 
@@ -254,10 +237,8 @@ no accounts.
 - **Never stored:** the connection, host credentials or any password. A workbook reopens against
   whatever server the session is connected to.
 - **Keyed by server + user** so a workbook built against one server never auto-opens against another.
-- **Trade-off:** not shared across browsers or users; cleared with the browser's site data. Export is
-  the backup and the way to share.
-- **Rejected:** server-side JSON files keyed by session. Sessions are in memory and reset on restart,
-  so it would add storage without durability.
+- **Trade-off:** not shared across browsers or users; cleared with the site data. Export is the backup.
+- **Rejected:** server-side JSON files keyed by session (sessions reset on restart: storage without durability).
 - Detail: [workbook.md](../../features/workbook/workbook.md).
 
 ### D23 — Validation contract: validate on both sides, server authoritative, reject don't clamp
@@ -267,20 +248,15 @@ at the field) and authoritatively on the server (`ClickHouse/RequestValidation.c
 - **Reject rather than silently clamp, drop or coerce.** Dropping extra filters, truncating `in` lists,
   clamping `Limit` or ignoring a sort alias would each produce wrong results without a word. Instead
   each is a 400 with a sentence naming the input. Internal clamps remain only as defence in depth.
-- **One error shape** `{ error, field? }` with honest codes: 400 invalid input · 404 unknown schema name ·
-  409 not connected · 413 body > 256 KB · 502 ClickHouse failure · 504 timeout · 500 our bug (with a trace
-  ref). No type names or credentials ever reach the body.
-- **Typed filter values:** a value is parsed by its column's category before binding. A mismatch is a
-  400, not a ClickHouse 502. Temporal values are ISO throughout, so shown values round-trip as filters.
-- **The server filter cap is 20; the client's is 8.** The worksheet appends the shared filters (≤ 4),
-  the drill path (≤ 5), the page, the selection and the date range to the user's filters, so a server
-  cap of 8 would reject legitimate views with a 400.
+- **One error shape** `{ error, field? }` with honest codes ([api.md § Errors](../api.md#errors)); a typed filter
+  value that doesn't fit its column is a 400, not a ClickHouse 502 ([typed values](../api.md#typed-filter-values)).
+- **The server filter cap is higher than the client's** because the worksheet appends its own filters
+  ([limits](../api.md#limits)), so a server cap equal to the client's would reject legitimate views.
 - **The client mirrors the server's limits** (`LIMITS` ↔ `ApiLimits`). Drops that would break a view cap
   are refused with a toast. There is no automated drift test between the two.
 - **Workbooks are validated field by field.** Repairs are reset-to-default **and reported** (issues
   dialog), hard failures refuse the file, and an unreadable stored workbook is backed up, never
   overwritten.
-- **No unused endpoints:** `…/aggregate`, `…/preview` and `…/count` had no callers and do not exist.
 - **Known gaps:** an unmatched `/api/*` route returns an empty-body 404; the client rejects IPv6 zone IDs
   the server accepts.
 
@@ -297,7 +273,6 @@ at the field) and authoritatively on the server (`ClickHouse/RequestValidation.c
     default), so a long time range returns months, not millions of timestamps.
   - Past 1,000 categories an axis zooms (slider), and past 1,500 marks the chart draws on canvas.
 - **CSV export** asks for the whole result up to **100,000** rows (`MaxExportRows`), no Top-N.
-- **Responses are compressed** (Brotli/gzip, fastest level); JSON pages shrink 5–10×.
 - **Rejected:** a no-`LIMIT` "All" (rejected at the user's request — one group-by on a high-cardinality
   key could return millions of groups); virtualised table rendering (the crosstab's merged row headers
   don't survive it — the table redraws from the loaded rows instead, fine to tens of thousands of rows).
@@ -308,17 +283,12 @@ at the field) and authoritatively on the server (`ClickHouse/RequestValidation.c
 Worksheet results are kept **in the server's memory for 60 seconds** per server + user + exact request
 (`IMemoryCache`, ~256 size units; the key never holds the password).
 - **Why:** two dashboards, two users of the same account, or a quick back-and-forth reuse one
-  ClickHouse query.
-- **Refresh** sends `fresh` to bypass and replace the entry. A cached result says so on the info line.
+  ClickHouse query. `fresh` bypasses and replaces the entry; a cached result says so on the info line.
 - The cache is per process (a restart empties it) and holds only results the user could already see —
   no application database (D2 stands).
 
-**Approximate mode** (Format) trades exactness for speed and is always labelled:
-- `uniq` for distinct counts;
-- a 10% `SAMPLE` (counts and sums scaled by `_sample_factor`) on a base table that declares a sampling key.
-- If the server refuses the sampled query, it runs once more unsampled (logged).
-
-Calculated-field decisions D26–D60, D65–D68 and D73: [decisions-calculated-fields.md](decisions-calculated-fields.md). Dashboard decisions D61–D64, D69, D71–D72 and D74: [decisions-dashboards.md](decisions-dashboards.md). Connection decision D70: [decisions-connection.md](decisions-connection.md).
+**Approximate mode** (Format) trades exactness for speed and is always labelled; what it changes in SQL is in
+[clickhouse-integration.md](../clickhouse-integration.md#the-queries-all-read-only).
 
 ## Open questions
 

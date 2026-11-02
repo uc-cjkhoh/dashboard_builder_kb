@@ -32,7 +32,7 @@ for every field category, so the same word covers a field and a calculation's `C
 A Top-N rank by a plain measure stays exact. A rank by a calculation uses `uniq` / scaled sums in approximate mode, and
 `approx.distinct` ignores a `COUNTD` inside `topBy`.
 - **Why not align them:** it would change plain Top-N results or make a ranking depend on the sample. The difference is
-  documented in [clickhouse-integration.md](../clickhouse-integration.md#calculated-fields--the-compile-path) instead.
+  documented in [clickhouse-integration.md](../clickhouse-calculations.md#the-compile-path) instead.
 
 ### D32 — Save is gated; a row-level number picks its role
 The dialog's Save is disabled until the draft parses, resolves, type-checks and expands without a cycle (the same compile the
@@ -98,7 +98,7 @@ A calculation may reference another. The browser expands references into one tre
 ### D44 — One aggregate compile
 Plain and calculated measures share one function (aggregate name + SQL expression + `sampled` + `approximate` → SQL).
 Approximate mode scales a calculated `SUM` by `_sample_factor` and uses `uniq` for `COUNTD`, exactly as for a plain measure
-([table](../clickhouse-integration.md#calculated-fields--the-compile-path)).
+([table](../clickhouse-calculations.md#the-compile-path)).
 
 ### D45 — `countNonNull` is a whitelisted aggregation
 `count(col)` sits beside `count` (all rows), which keeps its meaning, so saved workbooks are unchanged. `COUNT([f])` in a

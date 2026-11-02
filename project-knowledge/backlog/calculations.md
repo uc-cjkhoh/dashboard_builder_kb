@@ -2,18 +2,12 @@
 
 Calculation work not yet built. Entries are in dependency order. Format: [README.md](README.md#how-to-read-an-entry).
 
-Already built ([calculated-fields.md](../features/worksheet/calculated-fields.md)):
-
-- calculated fields with `+ − * /` and `SUM`/`AVG`/`MIN`/`MAX`/`COUNT`/`COUNTD`/`MEDIAN`/`STDDEV`/`VARIANCE`/`PERCENTILE`/`ATTR` over fields;
-- text functions: `TEXT`/`STR`, `LOWER`, `UPPER`, `TRIM`, `LEN`, `LEFT`, `RIGHT`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `SPLIT`;
-- parameters in formulas as `[@Name]`;
-- date functions: `DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY`, `DATE`;
-- on plain measures: median, percentile (a percent box on the pill), standard deviation, variance and ATTR.
+Built behaviour (functions, parameters, statistics on plain measures): [calculated-fields.md](../features/worksheet/calculated-fields.md).
 
 Rules for new work:
 
 - Every new function goes through the whitelisted expression tree, never formula text on the server.
-- The endpoint also takes LOD (level of detail) terms, extra join types and a function whitelist, with the same limits and response shape. It never accepts SQL text.
+- LOD (level of detail) terms and any new function whitelist entry keep the endpoint's limits and response shape. It never accepts SQL text.
 
 - **Logic functions remainder** — Open: the keyword form `IF c THEN a ELSEIF d THEN b ELSE e END`, date and boolean literals, a `NULL` literal (use `ISNULL`/`IFNULL` today), `IN`/`BETWEEN` in formulas. Needs: none.
 - **Text functions remainder** — Open: regular expressions, `FIND` / `MID` / `LTRIM` / `RTRIM`, case-insensitive `CONTAINS` / `STARTSWITH` / `ENDSWITH` (write `LOWER` on both sides today), and a `LEFT` / `RIGHT` length or `SPLIT` position or separator that is a field or computed value (a `[@Parameter]` works). Needs: none.

@@ -29,7 +29,7 @@ What "done" means for the undone work. A release exits when its journeys pass wi
 |---|---|---|
 | First uncached chart | P95 ≤ 5 s on a designated benchmark table | Hardware and table documented when measured; not a promise for arbitrary servers. |
 | Cached filter interaction | P95 ≤ 1 s | Bounded group count. |
-| Marks | Aggregate or cap beyond 10,000 marks | The cap is 5000 groups today; reconcile ([platform.md](platform.md#decisions-to-settle)). |
+| Marks | Aggregate or cap beyond 10,000 marks | Today's cap and the open question: [platform.md](platform.md#decisions-to-settle). |
 
 - **Safety additions:** parse GeoJSON defensively; make no network request except to the app origin; keep workbook files free of credentials.
 - **Tests:** unit tests for operators, nulls, aggregation, date and week logic, AST validation and limits; golden fixtures with exact SQL and results (duplicates, nulls, joins, missing dates, aliases, rejected functions); `node --test` for table calculations, regression, forecast, seeded k-means and workbook upgrade; visual checks for axis scales, continuous vs discrete dates, legends, map overlap, export size; a live smoke against a throwaway ClickHouse ([development.md](../operations/development.md)).

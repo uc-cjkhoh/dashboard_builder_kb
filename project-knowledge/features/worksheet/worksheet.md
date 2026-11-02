@@ -9,11 +9,7 @@ Each worksheet tab is one Tableau-style worksheet: a field pane beside shelves y
 ## At a glance
 
 - **What it is:** one Tableau-style worksheet per tab. Drag fields onto **Columns** / **Rows** (and Marks slots); the view is a chart or a crosstab.
-- **One request:** the sheet becomes a single bounded `POST /api/query` (`buildPlan`), run latest-wins with a short-lived cache. Truncation is always announced.
-- **Limits are enforced at drop time and on the server** — rejected, never clamped.
-- **Joins** follow the drawn relationships. No path → a warning, never a malformed query.
-- **Calculated fields** behave like fields; a broken one sends no query.
-- **This file is self-contained** for worksheet behaviour. Follow a link only for chart types ([worksheet-charts.md](worksheet-charts.md)) or Marks / Filters / Drill / Pages ([worksheet-encodings.md](worksheet-encodings.md)).
+- **One request:** the sheet becomes a single bounded `POST /api/query` (`buildPlan`), run latest-wins with a short-lived cache; limits are rejected, never clamped.
 
 **Sections:** Layout · Shelves & pills · Calculated fields on the worksheet · Drop-time limits · Building the query · Query lifecycle · Cross-table joins · View data · Table view · Sort · Format
 
@@ -63,38 +59,9 @@ Style: the fields are the focus. Each table is a solid tile (`.ws-table`: `--lin
   - **Copy name** (T02-28) puts the display name on the clipboard; **Copy column name** puts the real column when renamed. A calculated field's popup also has **Copy formula** (not for a group).
 - Settings are per workbook (`fields` in the file; store `fieldMeta`).
 
-### Data type cast (T02-34)
+### Data type cast and member labels
 
-The popup also has **Data type**: *Original*, or the casts that make sense for the column (`castChoices`) — text → Number / Date; number or date → Text; boolean → Text / Number; anything else → Text. The setting is `cast`: `text` | `number` | `date`.
-
-- **The server converts in the query**, so the field groups, aggregates, filters and ranks (Top-N) as its new type.
-- **A value that doesn't fit becomes empty (NULL)**, never an error. Filters on it therefore drop it (`notin` keeps it).
-- **The field takes the new category everywhere.** It moves to Dimensions / Measures, offers that type's aggregations, operators and date parts, and shows an **as Number** tag (icon + text) on its chip and pills. Changing a cast re-categorises the pills, filters, drill levels and shared filters that read the field (`syncCastCategories`).
-- **Not supported:** calculated fields have their own type and take no cast. Histogram and box plot don't support a cast field yet (a hint, no request).
-- **Stored values still show in places:** the filter value picker lists the stored text. View data leaves out filters and a selected mark on a cast field (it reads stored values) and says so.
-- Code: `Dashboard/cast-model.js`, `ClickHouse/TypeCast.cs`.
-
-### Member labels (T02-29)
-
-**Edit member labels…** (not offered on date fields) opens a dialog listing the field's top members — the bounded distinct-values read, first 200 — with one label input each.
-
-- **Input rules:**
-  - A label is ≤ 80 characters. Blank, or equal to the value, means no label.
-  - Labels are **unique within a field**. A label equal to another member's label or raw value is refused, naming that member. A file with such labels opens with the first kept and the rest dropped and reported.
-  - A value over 100 characters can't be labelled.
-  - **Reset all** clears them. Enter moves down the list; Esc discards.
-- **Stored** as the field setting `memberAliases` (`{ [rawValue]: label }`, ≤ 200 entries, key ≤ 100 characters; `Dashboard/member-labels.js`).
-- **Display only.** Queries, grouping, sorting, filters, drill and selections keep the raw value.
-- **Where a label shows**, each **by key position** (`withMemberLabels`: two fields may label the same raw value differently):
-  - category axes, pie slices and legends, colour-split series;
-  - heatmap / treemap / Sankey / small-multiples labels;
-  - tooltips — the default head, the template's `<table.column>` field and Tooltip fields, all still HTML-escaped;
-  - crosstab headers and the Label mark.
-- **Filters:** a filter card / `in` picker shows the label with the raw value as secondary text and title. Ticking a member stores the raw value.
-- **Chips:** a click-selection chip, the legend selection chip, the drill breadcrumb and the dashboard filter chip name the member by its label when it is picked. The stored label text does not follow a later edit.
-- **Unaffected:** member colours stay keyed by the raw member. CSV export and View data carry raw values (and group names), never labels.
-- **Not labelled:** calculated or group dimensions, date-part keys, bucketed numeric keys, NULL, Pages.
-- Maps are null-prototype objects read with own-key checks, so a member called `constructor` or `__proto__` is an ordinary member.
+The popup also has **Data type** (a query-time cast, `cast`: `text` | `number` | `date`) and **Edit member labels…** (display-only labels). Both are in [field-settings.md](field-settings.md).
 
 ## Shelves & pills
 
@@ -102,7 +69,6 @@ The popup also has **Data type**: *Original*, or the casts that make sense for t
 - **Reorder** by dragging a pill's grip (⠿) within a shelf or across to the other one. Dropping onto a pill inserts before it; dropping onto empty space appends. Dimension order sets nesting / category order; measure order sets series order.
 - **Invariant: measures always sit behind dimensions** on a shelf. `normaliseShelf` re-sorts after every drop, role change or add, keeping relative order within each group.
 - **Role** defaults from type (numeric → measure, else dimension) and can be changed per pill from its popup. `roleOf(f)` resolves it.
-- **Pill tints:** dimension blue (`--dim-*`), measure teal (`--meas-*`), Marks encodings violet (`--enc-*`).
 - **Invalid pills.** A pill whose settings can't be sent (a filter with an unparseable value, a column no longer in the catalog) is **invalid**. It shows a dashed `--danger-line` border, a warning icon and a tooltip with the reason. It is left out of the query, never silently altered.
 
 ### Pill options
@@ -127,11 +93,9 @@ A measure pill's aggregation radios offer only what the column's type supports (
 | otherwise (boolean, compound) | `count/countDistinct/countNonNull` |
 
 - `countDistinct` maps to ClickHouse `uniqExact`.
-- `median` interpolates between the two middle values (like Excel `PERCENTILE.INC`).
-- `stddev` / `variance` are the sample statistics (empty for one value).
+- Aggregation meanings (median interpolation, sample statistics): [api.md](../../reference/api.md#measure-values-and-aggregations).
 - `attr` is the single value of a group, or empty ([calculated-fields.md](calculated-fields.md#formulas)).
 - Changing a pill's role to a type that doesn't support its aggregation resets it and says so.
-- The server rejects `sum` / `avg` on a non-numeric column with a 400.
 
 **Percentile** — numeric fields only. A text column cast to a number counts; uncast text is refused, as for `median`.
 
@@ -185,18 +149,9 @@ A pill's **⇄** button opens a *Choices* editor. Drop up to 8 fields there (the
 
 ## Calculated fields on the worksheet
 
-A calculated field ([calculated-fields.md](calculated-fields.md)) is a pill like any other:
-
-- It goes on Rows, Columns, Color and the Size / Label / Path / Detail / Tooltip slots.
-- It can rank a Top-N filter or be the sort target. A stored sort follows the pill when its aggregation changes.
-- It shows its live name and no field-choice switch.
+A calculated field is a pill like any other; where it goes, where it is refused and its error state are in [calculated-fields.md](calculated-fields.md#what-a-calculated-pill-is).
 
 It is not a column. `buildPlan` hands pills to the pure seam `Calc/calc-plan.js` (`wireDim`, `wireMeasure`, `topByRef` / `wireTopBy`, `planTables`), which emits the expanded `calc` tree in place of `db` / `table` / `column`. The tables a calculation reads join the query's table list like any field.
-
-- A calculation that can't be computed sends no query. The chart slot (and CSV export) shows `Calculation 'X' can't be computed: …` (`calcProblem`).
-- A sheet whose only pills are field-less calculations (`1+2`) shows the hint "Add a field from a table — a calculation with no field in it has nothing to group or total."
-- A measure named for a calculation uses its name; a plain non-null count reads `non-null <name>`.
-- Click-to-filter is off while the primary dimension is a calculation. Filters, Pages, drill, the date range, shared filters, selection, Shape and Angle refuse a calculated pill.
 
 ## Drop-time limits
 
@@ -211,7 +166,7 @@ Adding a field that would push a view over a cap is **refused with a toast namin
 | Drill levels | 6 |
 
 - **The counts are conservative.** They ignore the chart type, so a stale encoding the current chart doesn't use still counts and can make a drop at the cap refuse. Remove it to free the slot.
-- **The server enforces the same view caps** with 400s ([api.md](../../reference/api.md#limits)). It allows more filters (20) because the worksheet appends the shared filters (≤ 4), the drill path (≤ 5), the page, the selection and the date range to the user's 8.
+- **The server enforces the same view caps** with 400s ([api.md](../../reference/api.md#limits)). It allows more filters than the 8 here because the worksheet appends its own ([limits](../../reference/api.md#limits)).
 
 ## Building the query
 
@@ -259,7 +214,7 @@ Code: `Dashboard/query-runner.js`, unit-tested in `tests/js/`.
 
 ## Cross-table joins
 
-Fields may come from **different tables**. The client finds a **join path** — a breadth-first search (BFS) over the drawn relationship graph — and the server builds aliased `INNER JOIN`s along it.
+Fields may come from **different tables**. The client finds a **join path** — a breadth-first search (BFS) over the drawn relationship graph — and the server builds aliased joins along it, each of its relationship's join type ([relationships.md](../data-source/relationships.md)).
 
 - Tables with no connecting relationship → a "draw a relationship" warning, never a malformed query.
 - A union or unpivot card is read alone ([query-sources.md](../data-source/query-sources.md)).
@@ -328,11 +283,11 @@ A collapsible **Format** card (`formatPanel`, state on `sheet.format`) changes p
 |---|---|
 | Number format | auto / compact / currency / percent + decimals (0–3 in the UI; a workbook may carry up to 10) |
 | Date format | for date-like dimension labels |
-| Top-N | Caps the chart query's `LIMIT`: All, 5, 10, 20, 50, 100, or **= a number parameter** (P32, clamped to 1–5000). **All** (the default) asks for up to 5000 groups. A set value keeps that many in sort order, so ascending and descending show different groups when there are more. A one-dimension bar / pie / donut / treemap then adds an **Other (N more)** mark (muted ink, not clickable) aggregating the rest. The server rejects a limit outside 1..5000. Also sets the histogram bin count |
+| Top-N | Caps the chart query's `LIMIT`: All, 5, 10, 20, 50, 100, or **= a number parameter** (P32, clamped to 1–5000). **All** (the default) asks for up to 5000 groups. A set value keeps that many in sort order, so ascending and descending show different groups when there are more. A one-dimension bar / pie / donut / treemap then adds an **Other (N more)** mark (muted ink, not clickable) aggregating the rest. Also sets the histogram bin count |
 | Target | KPI: a goal for the first measure — progress bar + "% of target" ([worksheet-encodings.md](worksheet-encodings.md#date-range--comparison)). Gauge: the arc's maximum. Bullet: the target tick and bands ([worksheet-charts.md](worksheet-charts.md#chart-types)) |
 | A fall is good | with a Date range comparison: a fall shows as good (`--up`), a rise as bad |
 | Conditional formatting | Table / Text: colour scale, data bars and rules per measure ([Table view](#table-view--a-true-rows--columns-crosstab)) |
-| Approximate (faster) | `uniq` distinct counts and, on a table with a sampling key, a 10% sample scaled up (counts and sums only). Median, percentile, standard deviation, variance and ATTR are computed on the sample and not scaled, so they are estimates; the info line says so when such a measure is shown. Labelled on the info line ([D25](../../reference/decisions/decisions.md#d25--a-short-lived-server-result-cache-and-approximate-mode)) |
+| Approximate (faster) | `uniq` distinct counts and, on a table with a sampling key, a 10% sample ([exact vs sampled](../../reference/clickhouse-calculations.md#aggregates-exact-and-approximate)); median, percentile, standard deviation, variance and ATTR are estimates, and the info line says so. Labelled on the info line ([D25](../../reference/decisions/decisions.md#d25--a-short-lived-server-result-cache-and-approximate-mode)) |
 | Fit | Standard / Fit width / Fit height / Entire view (also in the ⋯ sheet actions) |
 | Group dates | Charts: group the first date/time dimension by Auto (default — exact when ≤ 400 values, else the finest grain with ≤ 400 buckets), Exact, Hour, Day, Week, Month, Quarter or Year. A grouped axis isn't click-filterable |
 | Legend | show / position |
