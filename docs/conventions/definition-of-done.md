@@ -41,9 +41,14 @@ A change is done only when every box holds.
 
 ## Integration
 
-- [ ] **Always merge to `main` after tests pass or an error is fixed.** Once the suites above are green
-      (or a failing test or error has been fixed and they are green again), merge the work branch into
-      `main` locally — no waiting for a separate go-ahead — then run the suites again on the merged result.
+- [ ] **Merge to `main` once the suites are green.** This is a standing authorisation for this app repo
+      only; it does not carry over to any other repo. Once the suites above are green (or a failing test
+      or error has been fixed and they are green again), merge the work branch into `main` locally with no
+      separate go-ahead, run the suites again on the merged result, then remove the worktree and delete
+      the merged branch.
+- [ ] **Stop and ask instead** if the main tree has uncommitted changes that overlap the merge (never
+      stash or commit the user's work without asking), the branch is protected, a remote or team flow
+      exists, or the change goes beyond what the branch was for. Never push.
 
 ## Status dashboard
 
