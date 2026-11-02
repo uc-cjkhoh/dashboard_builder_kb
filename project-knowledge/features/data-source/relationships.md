@@ -5,7 +5,7 @@ It is the **user's declaration**, used for joins and layout. ClickHouse never cr
 ([golden rule 5](../../engineering/golden-rules.md#5-relationships-are-logical-declarations-not-database-facts)).
 Shape: [data-model.md](../../reference/data-model.md#relationship).
 
-**Code:** `Features/Relations/` — `relations.js`, `relation-rules.js`, `link-drag.js`, `link-keys.js`, `relations.css`.
+**Code:** `Features/Relations/` — `relations.js`, `relation-rules.js`, `link-drag.js`, `link-keys.js`, `key-pairs.js`, `key-pairs-ui.js`, `relations.css`.
 
 A **union or unpivot card** ([query-sources.md](query-sources.md)) takes no relationship. Its rows aren't draggable, and dropping a
 table column on one toasts "A union or unpivot can't be related to a table yet."
@@ -13,9 +13,10 @@ table column on one toasts "A union or unpivot can't be related to a table yet."
 ## At a glance
 
 - **Drag a column onto a column** of another card to relate them, then pick the join type and cardinality in a dialog. [From the keyboard](#drawing-a-link--keyboard) the same link is made with Enter on two columns.
-- **One relationship per column.** Kinds must match (number↔number, text↔text, date↔date, boolean↔boolean).
+- **One relationship per column** (extra key pairs included). Kinds must match (number↔number, text↔text, date↔date, boolean↔boolean).
 - **Every table card needs a partner** once there are two or more; an unrelated card is held out of worksheets.
 - **Join type** is inner, left, right or full, worded with the table names.
+- **A relationship can match on several column pairs** ([compound key](#compound-keys-and-key-suggestion)): up to four, joined with AND.
 - **Check this join** previews match rates and key repeats; its warnings never block saving.
 - **Cardinality is intent, not a data guarantee** — joins can still fan out.
 
@@ -168,6 +169,29 @@ The dialog's **Join** choice is worded with the two tables. The link runs from t
 - **Refused (400):** a top-N filter on a view with a right or full join; right/full joins on a connection whose server refuses settings
   (`join_use_nulls` is required).
 - Approximate mode reads such a view exactly (no sample).
+
+## Compound keys and key suggestion
+
+The relationship dialog (new link and edit) has an **Also match on** section above **Check this join**. The link's first pair is the one dragged
+or picked; the section adds up to **three more pairs**, so the join is `a.k1 = b.k1 AND a.k2 = b.k2 …` (4 in all; more is refused,
+`LIMITS.joinExtraPairs` ↔ `ApiLimits.MaxJoinPairs`). Saved with the dialog's cardinality choice, like the join type.
+
+- **Suggestions.** Buttons "+ Add Region = region" offer free column pairs with the same name (exact first, else ignoring case and `_` `-` spaces)
+  and the same kind. Nothing is added until one is pressed. Pure: `suggestPairs()` in `key-pairs.js`.
+- **By hand.** Two selects (one per table, free columns only, each with its kind) and **Add pair**. A pair of different kinds, a column already
+  in a relationship or an already matched column is refused with a line of text beside a warning icon (`addPair()`).
+- **Remove.** Each added pair is a row `a = b` with a Remove button.
+- **Keyboard.** Relate two columns [from the keyboard](#drawing-a-link--keyboard); the dialog then opens with focus inside it, and the
+  suggestion buttons, selects (arrow keys), Add pair and Remove are all native controls reached with `Tab` and `Enter`.
+- **On the canvas.** Every pair's columns are pinned in the key strips and take the accent wash; one line (the first pair) is drawn.
+  The badge counts the keys ("N:1 · 2 keys", "N:1 · left · 3 keys").
+- **In worksheets.** The join sends the extra pairs (`joins[].pairs`, swapped when the link is crossed second-to-first); the server ANDs them into `ON`
+  ([clickhouse-integration.md](../../reference/clickhouse-integration.md#worksheet-query-queryasync)).
+- **Check this join** reads the pairs as they stand in the dialog; the result names the key "a + b". A NULL in any part is a NULL key.
+- **Saved** as optional `pairs` on the relationship ([workbook.md](../workbook/workbook.md)); a file without it is a one-pair link. On open, a malformed pair,
+  one past the limit or one reusing a column already in a relationship is skipped with an import issue.
+
+Not done: no pair added by dragging or relating two more columns of already-related tables.
 
 ## Check this join (join safety preview)
 

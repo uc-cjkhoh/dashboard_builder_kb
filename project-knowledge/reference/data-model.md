@@ -78,6 +78,7 @@ A **logical** link — the database neither creates nor validates it
 | `to` | `{ entityId, column }` — a column on entity B |
 | `cardinality` | `1:1` · `1:N` · `N:1` · `N:M` — intent, not a data guarantee |
 | `joinType` | `inner` (default) / `left` / `right` / `full` (P31, T02-12/13) — which side keeps its unmatched rows (FROM = left, TO = right) |
+| `pairs` | optional `[{ from, to }]` — extra column pairs of a compound key (at most 3), on A's and B's entities; their columns count as in this relationship |
 | `joinFixed` | `true` once saved by the join dialog: the sides are the link's own. Absent or false with `left`: a link saved before the dialog set it; it keeps the base side |
 
 A column is in at most one relationship. With two or more table cards, each card should be in one; a card
@@ -209,7 +210,7 @@ What [workbook.md](../features/workbook/workbook.md) saves to `localStorage` and
 {
   format: "dashboard-builder-workbook", version: 2 (integer ≥ 1; version 1 files still open), savedAt: ISO-8601,
   entities:      [ { id, db, table, x, y, joinKeys: [column], source? } ],   // source: a union / unpivot entity (its table = source.name); re-validated on open, a bad one skipped
-  relationships: [ { from: { entityId, column }, to: { entityId, column }, cardinality, joinType } ],
+  relationships: [ { from: { entityId, column }, to: { entityId, column }, cardinality, joinType, pairs? } ],
   worksheets:    [ { name, sheet } ],      // sheet as above, minus pages.members
   dashboards:    [ { name, widgets: [ { kind: "sheet", sheet: worksheetIndex, x, y, w, h }
                                     | { kind: "text", heading, body, x, y, w, h } ],

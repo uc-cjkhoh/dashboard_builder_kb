@@ -125,7 +125,7 @@ builder runs ([api.md § Limits](api.md#limits)).
 
 - **Joins:** the base table is `t0`. Each join edge attaches a table aliased `tN` in order, so any
   dimension, measure or filter can live on any included table. An edge is `INNER`/`LEFT`/`RIGHT`/`FULL JOIN`
-  (`type`, `JoinKeyword`). An outer one ends the request `SETTINGS join_use_nulls = 1` (right/full without it: 400).
+  (`type`, `JoinKeyword`). A compound key's `pairs` are catalog-validated and ANDed into `ON` (`JoinOn`; tests `CompoundJoinTests`, `tests/live/compound-smoke.mjs`). An outer one ends the request `SETTINGS join_use_nulls = 1` (right/full without it: 400).
   Filters are `WHERE`, so a NULL-extended side's rows drop. Right/full reject `top` (400) and skip `SAMPLE`. Tests: `JoinTypeTests`.
 - **Dimensions** arrive split by shelf — `rowDimensions[]` then `columnDimensions[]` — and group in that
   order, so each row's keys are `[rowDim…, colDim…]`. `measures[]` aggregate as `v0, v1, …`. No measures

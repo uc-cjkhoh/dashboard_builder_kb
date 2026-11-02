@@ -42,7 +42,8 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Relations/relations.js` — drag- and keyboard-to-relate (`link-keys.js`), links, cardinality, pinned keys — [relationships.md](../features/data-source/relationships.md)
 - `Relations/join-preview-model.js`, `Relations/join-check.js` — pure wording and declared-vs-observed comparison of a join preview (`describePreview`, `observedCardinality`, `pct`, `previewRequest`); the dialog's "Check this join" section (DOM, `textContent` only)
 - `Relations/link-route.js` — pure: `linkSides` (which card edge each end uses), `linkRoute` (the elbow's corner points, lanes, badge spot), `roundedPath` — the link geometry
-- `Relations/relation-rules.js` — pure: `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked; `JOIN_TYPES`, `normalizeJoinType`, `joinChoices`, `planJoinType`, `joinBadge` — join types
+- `Relations/key-pairs.js`, `Relations/key-pairs-ui.js` — a compound key: pure `suggestPairs`, `addPair`, `compoundName`, `MAX_EXTRA_PAIRS`; the dialog's "Also match on" section (native controls, `textContent` only)
+- `Relations/relation-rules.js` — pure (`relEnds` lists every column a link uses, extra pairs included): `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked; `JOIN_TYPES`, `normalizeJoinType`, `joinChoices`, `planJoinType`, `joinBadge` — join types
 
 ### Tabs/ and Board/ — tabs and the dashboard board
 

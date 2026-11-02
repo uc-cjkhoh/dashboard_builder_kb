@@ -141,7 +141,7 @@ naming the sheet and field ("Sheet "Sales": unknown chart type "radar" — reset
 | Part | Rule |
 |---|---|
 | Tables | `id`, `db`, `table` non-empty text; ids and `db.table` unique (first kept); position finite and ≥ 0 else reset to 0; `joinKeys` (written for older builds: the columns the relationships use) is read but not used; at most **100** tables |
-| Relationships | both endpoints reference a kept table; cardinality one of `1:1`, `1:N`, `N:1`, `N:M`; `joinType` one of `inner`, `left`, `right`, `full` (anything else reads as `inner`); at most **200** |
+| Relationships | both endpoints reference a kept table; cardinality one of `1:1`, `1:N`, `N:1`, `N:M`; `joinType` one of `inner`, `left`, `right`, `full` (anything else reads as `inner`); optional `pairs` (a compound key's extra `{ from, to }` column names; at most **3**, none reusing a column in any relationship — a bad one is skipped with an issue; absent = one pair); at most **200** |
 | Worksheets / dashboards | each an object (others skipped and reported); name 1–60 characters (else reset to "Worksheet" / "Dashboard"); a non-list means none are opened |
 | Tab order | `tabs` entries `{ kind, index }` pointing at a kept worksheet or dashboard, no repeats — others skipped; tabs it leaves out are added at the end; absent = worksheets then dashboards (no issue); at most **50 tabs of both kinds**, the rest dropped |
 | Dashboard widgets | see [Dashboard widgets](#dashboard-widgets) below |

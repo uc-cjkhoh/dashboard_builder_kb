@@ -123,3 +123,14 @@ Decided 2026-11-02 by the owner. The app targets desktop browsers only.
 - **Why:** the phone layout was judged complete from CSS alone and never run on a device, so keeping it meant carrying an
   unverified claim, and every region paid for rules that desktop users never meet.
 - **Rejected:** keeping the CSS "best effort" (untested rules rot); per-device layouts (T08-05), now out of scope.
+
+### D79 — A compound join key is the first pair plus up to three extra pairs
+Decided 2026-11-02 (autonomous build). A relationship may match on more than one column pair.
+- **Shape:** the relationship keeps `from` / `to` (the first pair, which draws the line) and gains optional `pairs: [{ from, to }]`, column names on the same two tables.
+  A file without `pairs` is an ordinary one-pair link, so v2 workbooks open unchanged and the version stays 2.
+- **Limit:** 4 pairs in all (3 extra), refused with a 400, never clamped (`ApiLimits.MaxJoinPairs`, `LIMITS.joinExtraPairs`).
+- **Columns:** an extra pair's columns follow the one-relationship-per-column rule, so they are pinned and washed like the first pair's.
+- **Preview:** a compound key is read as one string of its parts, NULL when any part is NULL (a tuple can't be Nullable), so a NULL part never matches.
+- **Suggestions:** same name (exact, else ignoring case and `_` `-` spaces) and the same kind; offered in the dialog, never added silently.
+- **Rejected:** a `pairs` list that replaces `from` / `to` (every consumer of a link's ends would change at once); keyboard "add to the existing link" by relating
+  two more columns of already-related tables (it would change what that gesture means today).
