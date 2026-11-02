@@ -39,7 +39,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 
 - `Canvas/canvas.js` — drop handling, entity cards, card movement, empty state — [canvas.md](../features/data-source/canvas.md)
 - `Canvas/empty-state.js` — pure: `emptyState({connected, databaseSelected})` → the sentence, button and control to focus
-- `Relations/relations.js` — drag-to-relate, links, cardinality, pinned keys — [relationships.md](../features/data-source/relationships.md)
+- `Relations/relations.js` — drag- and keyboard-to-relate (`link-keys.js`), links, cardinality, pinned keys — [relationships.md](../features/data-source/relationships.md)
 - `Relations/join-preview-model.js`, `Relations/join-check.js` — pure wording and declared-vs-observed comparison of a join preview (`describePreview`, `observedCardinality`, `pct`, `previewRequest`); the dialog's "Check this join" section (DOM, `textContent` only)
 - `Relations/link-route.js` — pure: `linkSides` (which card edge each end uses), `linkRoute` (the elbow's corner points, lanes, badge spot), `roundedPath` — the link geometry
 - `Relations/relation-rules.js` — pure: `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked; `JOIN_TYPES`, `normalizeJoinType`, `joinChoices`, `planJoinType`, `joinBadge` — join types

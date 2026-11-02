@@ -5,14 +5,14 @@ It is the **user's declaration**, used for joins and layout. ClickHouse never cr
 ([golden rule 5](../../engineering/golden-rules.md#5-relationships-are-logical-declarations-not-database-facts)).
 Shape: [data-model.md](../../reference/data-model.md#relationship).
 
-**Code:** `Features/Relations/` — `relations.js`, `relation-rules.js`, `relations.css`.
+**Code:** `Features/Relations/` — `relations.js`, `relation-rules.js`, `link-drag.js`, `link-keys.js`, `relations.css`.
 
 A **union or unpivot card** ([query-sources.md](query-sources.md)) takes no relationship. Its rows aren't draggable, and dropping a
 table column on one toasts "A union or unpivot can't be related to a table yet."
 
 ## At a glance
 
-- **Drag a column onto a column** of another card to relate them, then pick the join type and cardinality in a dialog.
+- **Drag a column onto a column** of another card to relate them, then pick the join type and cardinality in a dialog. [From the keyboard](#drawing-a-link--keyboard) the same link is made with Enter on two columns.
 - **One relationship per column.** Kinds must match (number↔number, text↔text, date↔date, boolean↔boolean).
 - **Every table card needs a partner** once there are two or more; an unrelated card is held out of worksheets.
 - **Join type** is inner, left, right or full, worded with the table names.
@@ -21,7 +21,7 @@ table column on one toasts "A union or unpivot can't be related to a table yet."
 
 ## Drawing a link — drag a column
 
-Relationships are made by **drag and drop only**. There are no connector handles and no join-key checkboxes;
+Relationships are made by **drag and drop or from the keyboard**. There are no connector handles and no join-key checkboxes;
 the columns a relationship uses are simply the ones it joins.
 
 1. Drag a column row (`.col-row`, `draggable`; payload MIME type `application/x-ch-column`) and drop it on a row of another card.
@@ -38,7 +38,20 @@ To remove a link, click its badge, then Delete.
 
 **The how-to line.** While any table card has no relationship, a pill at the foot of the Data Source (`.rel-guide`) says
 "Drag a column onto a column in another table to relate them." It goes once every card has one.
-There is no keyboard path for creating a link yet (see [backlog](../../backlog/README.md)).
+
+## Drawing a link — keyboard
+
+Both paths end in the same `proposeLink()` in `relations.js` (check with `dropDecision()`, then the dialog), so the same links are refused
+for the same reasons.
+
+1. Table-column rows are focusable (`tabindex="0"`, `role="button"`, an `aria-label` with column, type, table and the next step,
+   `aria-pressed` on the picked one); a union or unpivot's rows are not. `↑` / `↓` move between the rows of a card.
+2. `Enter` or `Space` on a row picks it as the source. It shows a solid accent outline and the word "From".
+3. `Tab` to a row of another card (or click there). A status line (`.rel-keyhint`, `role="status"`) above the how-to pill says what
+   `Enter` will do, or why that column is refused (same table, kind mismatch, already related).
+4. `Enter` or `Space` on that row opens the join + cardinality dialog (a kind mismatch opens the type warning). `Enter` on the source again, or `Esc`, cancels the pick.
+
+`link-keys.js` (pure) holds the key map, `stepIndex()`, the status wording and the row labels. Focus shows as an inset ring on the row.
 
 ## What may be linked
 
