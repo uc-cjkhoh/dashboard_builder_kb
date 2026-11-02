@@ -130,7 +130,8 @@ Decided 2026-11-02 (autonomous build). A relationship may match on more than one
   A file without `pairs` is an ordinary one-pair link, so v2 workbooks open unchanged and the version stays 2.
 - **Limit:** 4 pairs in all (3 extra), refused with a 400, never clamped (`ApiLimits.MaxJoinPairs`, `LIMITS.joinExtraPairs`).
 - **Columns:** an extra pair's columns follow the one-relationship-per-column rule, so they are pinned and washed like the first pair's.
-- **Preview:** a compound key is read as one string of its parts, NULL when any part is NULL (a tuple can't be Nullable), so a NULL part never matches.
+- **Preview:** a compound key is read as one string of its parts, NULL when any part is NULL (a tuple can't be Nullable), so a NULL part never matches. Numbers are read as Float64 and dates as DateTime64 before stringifying, so same-kind parts of different types still match as the join's coercion does (exact beyond 2^53 is not promised).
+- **Query path:** the query endpoint validates names and the pair count only; a kind mismatch is left to ClickHouse.
 - **Suggestions:** same name (exact, else ignoring case and `_` `-` spaces) and the same kind; offered in the dialog, never added silently.
 - **Rejected:** a `pairs` list that replaces `from` / `to` (every consumer of a link's ends would change at once); keyboard "add to the existing link" by relating
   two more columns of already-related tables (it would change what that gesture means today).
