@@ -192,11 +192,11 @@ A **named hierarchy** (T03-29) is a reusable drill path kept on the workbook: `{
 - **Rules:** 2–6 levels, all from one table, no repeated column (the same rules as the Drill tool). At most **20** per workbook. A name of 1–60 characters, unique case-insensitively.
 - **Not allowed as a level:** a calculated field (the calc refusal text) or a field with a type cast ("A field with a type cast can't be a hierarchy level").
 - **Managing them.** The sidebar's drill icon on a worksheet tab opens the Hierarchies dialog (`Dashboard/hierarchy-dialog.js`); **New hierarchy** and **Hierarchies…** open it too.
-  - Each row has **Use** (sets the worksheet's drill levels), **Edit** and **Delete** (Delete confirms). Each hierarchy is a chip with its level count.
+  - Each row has **Use** (sets the worksheet's drill levels), **Edit** and **Delete** (Delete confirms).
   - Editing: a name, a table, and an ordered level list built with an "Add a level" picker and per-level **Up / Down / Remove** buttons (labelled, keyboard-operable; focus stays on the control just used).
-- **Applying.** Drag a chip onto the **Drill** tool (its slot or its open panel), or press its plus button. This **replaces the sheet's drill** with `{ levels, depth: 0, path: [] }` — the structure a hand-built drill has, each level carrying its column's category — so the chart, breadcrumb and click-to-drill behave identically.
+- **Applying.** **Use** on a dialog row **replaces the sheet's drill** with `{ levels, depth: 0, path: [] }` — the structure a hand-built drill has, each level carrying its column's category — so the chart, breadcrumb and click-to-drill behave identically.
 - **The sheet gets a copy** of the levels. Renaming, editing or deleting the hierarchy later never changes a sheet that already used it.
-- **Broken chips.** A chip whose table isn't in the Data Source, or whose column no longer exists, shows a "No table" / "Missing field" badge and can't be applied. A column cast after the hierarchy was made refuses with the cast message. The dialog's Edit keeps a level whose column has vanished; the chip shows "Missing field" until it is removed or replaced.
+- **Refusals.** A column cast after the hierarchy was made refuses with the cast message, and a column no longer in the table refuses too. The dialog's Edit keeps a level whose column has vanished until it is removed or replaced.
 - Hierarchies are client-side only (the server never sees one) and save with the workbook ([workbook.md](../workbook/workbook.md)).
 
 ### Expand / collapse headers

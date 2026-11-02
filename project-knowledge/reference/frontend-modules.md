@@ -124,8 +124,8 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Dashboard/fields-pane-model.js` — pure: the field pane's hide / show state (`fieldsPaneView`, `readCollapsed`, storage key)
 - `Dashboard/field-copy-model.js` — `fieldCopies(field)`: the Copy items on a worksheet field's ⋯ menu (name, column name, formula)
 - `Dashboard/hierarchy-model.js` — pure (T03-29):
-  - `checkHierarchyName`, `checkLevels` (2–6, one table, no calc / cast), `checkHierarchy`, `cleanHierarchies` (import clean-up), `hierarchyStatus` (dangling columns), `drillFromHierarchy` (→ `sheet.drill`), `CAST_REFUSAL`
-- `Dashboard/hierarchy-group.js` / `hierarchy-dialog.js` — T03-29: the field pane's Hierarchies group (chips, `HIERARCHY_MIME` drag, plus button) and the Hierarchies dialog
+  - `checkHierarchyName`, `checkLevels` (2–6, one table, no calc / cast), `checkHierarchy`, `cleanHierarchies` (import clean-up), `drillFromHierarchy` (→ `sheet.drill`), `CAST_REFUSAL`
+- `Dashboard/hierarchy-dialog.js` — T03-29: the Hierarchies dialog (rows with Use, Edit, Delete)
   - `store.js` holds `hierarchies` + `setHierarchies` / `addHierarchy` / `updateHierarchy` / `removeHierarchy` (`hierarchies:changed`)
 - `Dashboard/history.js` — pure (P23): per-worksheet undo / redo stacks of sheet snapshots (50), keyed by tab id
 - `Dashboard/cast-model.js` — pure (T02-34): `castChoices`, `effectiveCategory`, `withCasts` (adds `cast` to the plan), `syncCastCategories`, `statCastProblem`
@@ -271,8 +271,6 @@ Grouped by feature folder; each entry is the module, then what it owns.
 
 - **Visibility:** `show(el)` / `hide(el)` / `toggle(el, visible)` flip the `hidden` attribute — never
   `style.display`.
-- **`setPill(el, state, text)`** — `idle | connecting | connected | failed` → `pill--muted/warn/ok/danger`
-  plus an icon and label. The text is written as a text node, never HTML. It currently has no caller.
 - **`copyText(text, what)`** — writes to the clipboard and toasts "Copied <what>." (or a danger toast when the browser blocks it).
 - **`toast(message, kind)`** — `ok | danger | info`. `info` / `ok` auto-hide after 5 s; **`danger` stays
   until dismissed** (a close button). The visible `#toast` is not a live region; messages are announced
