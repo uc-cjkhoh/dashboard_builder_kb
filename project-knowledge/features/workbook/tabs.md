@@ -52,7 +52,7 @@ The close icon (`.tab__close`, `aria-label` "Close <name>") closes a tab.
   from those dashboards." Once closed, its widgets are removed from them, and each dashboard is notified with `dashboard:changed`.
 - **A worksheet on no dashboard** confirms only when it holds content.
 - **A dashboard with widgets** confirms ("The worksheets on it are not affected."). Closing a dashboard never touches a worksheet.
-- **A worksheet or dashboard shown by story steps** leaves those steps (each story is notified with `story:changed`); no extra confirm.
+- **A worksheet or dashboard shown by story steps** leaves those steps (each story is notified with `story:changed`); the confirm names the stories, and a worksheet or dashboard shown only by stories confirms too.
 - **A story with steps** confirms ("The worksheets and dashboards it shows are not affected.").
 
 ### Duplicate
