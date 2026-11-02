@@ -18,7 +18,6 @@ Chart, authoring and formatting work not yet built. Format: [README.md](README.m
 - **Continuous dates and double-click on other panes** (IDs: T01-04, T01-15; priority P1) — partial: a number toggles Continuous (measure) / Discrete (dimension) from its pill popup, and double-clicking a field in the field pane places it on its default shelf. Missing: a Continuous / Discrete choice for a date (a date part still picks the grouping; there is no continuous date axis toggle on the pill), and double-click placement from the calculated-fields dialog and Hierarchies group. Needs: none.
 - **Start screen and recent sources** (IDs: T01-14; priority P1) — partial: import, autosave restore and recent connections (host, port, user; no password) exist; no start screen listing recent workbooks or sample data. Needs: none.
 - **Analytics pane** (IDs: T07-01; priority P2) — partial: the Analytics card has draggable / pressable items (reference line, band, trend, forecast) that add at a default; missing: a separate always-visible pane, items placed per measure or per chart (a line sits on one chosen measure), and items for a table (totals stay checkboxes). Needs: none.
-- **Performance recording** (IDs: T01-30; priority P2) — Open: no query or render timing capture. Needs: none.
 
 ## Formatting and presentation
 

@@ -20,6 +20,8 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Shell/app.js` — bootstrap
   - hydrates `[data-icon]` placeholders, installs the global `error` / `unhandledrejection` handlers (danger toast "Something went wrong — try again."; aborted queries and the benign `ResizeObserver loop` notice are ignored), wires every module's `init*`, listeners before the initial status check
 - `Shell/scheme-toggle.js` — the tab bar's appearance toggle: System / Light / Dark radio menu (`Core/menu.js`), glyph + label follow the choice
+- `Shell/perf-panel.js` — the tab bar's gauge button opens the Performance dialog: recent query / render timings newest first (time UTC, kind, query ms, rows, cache hit or miss, render ms) with a one-line summary, **Copy as text** (tab-separated) and **Clear**; a native `<dialog>` (Esc closes, focus returns to the button); updates live while open
+- `Core/perf-log.js` — pure: a bounded in-memory ring (200) of timing entries `{ at, kind, ms, rows, cached, renderMs }`; only whitelisted numbers / kind are kept — never a request, SQL, value or credential; browser memory only, gone with the tab. `Dashboard/worksheet-view.js` records each fetch (`ms`, rows, cache hit) and each draw (`renderMs`)
 - `Shell/sidebar.js` — resizable sidebar (`Core/resizer.js` handle → `--sidebar-w`, capped at 30vw) + collapse-to-rail toggle (remembered in `localStorage`); exports `expandSidebar()`
 
 ### Connection/
