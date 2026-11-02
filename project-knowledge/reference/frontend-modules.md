@@ -158,7 +158,8 @@ Grouped by feature folder; each entry is the module, then what it owns.
   - `parseTooltip`, `checkTooltipText`, `tooltipHtml` (escaped parts only), `tooltipCatalog` — [worksheet-encodings.md](../features/worksheet/worksheet-encodings.md#tooltip-text-t01-19-and-the-tooltip-modal)
 - `Dashboard/tooltip-style.js` — pure:
   - `TIP_SIZES`, `TIP_COLOURS` (palette key → CSS token), `checkTooltipStyle`, `lineStyleCss`, and the modal's line model (`toLines`, `fromLines`, `moveLine`, `addLine`, `removeLine`, `insertField`) — [worksheet-encodings.md](../features/worksheet/worksheet-encodings.md#tooltip-text-t01-19-and-the-tooltip-modal)
-- `Dashboard/tooltip-dialog.js` — DOM: the "Edit tooltip…" modal (lines editor + live preview)
+- `Dashboard/tooltip-formats.js` — pure: `checkTooltipFormats`, `pruneFormats`, `tipLookup` (raw value -> text with per-field formats, reusing `Core/format.js`), `sampleLookup`, `looksDate`
+- `Dashboard/tooltip-dialog.js` — DOM: the "Edit tooltip…" modal (lines editor, field formats, live preview)
 - `Dashboard/period-model.js` — pure (P35):
   - `resolveRange` / `compareRange` (presets, previous period, last year), `rangeFilter`, `rangeLabel`, `changeOf` / `toneOf` / `pctText`, `alignCompare`, `targetProgress` — [worksheet-encodings.md](../features/worksheet/worksheet-encodings.md#date-range--comparison)
 - `Dashboard/conditional-model.js` — pure (P37):

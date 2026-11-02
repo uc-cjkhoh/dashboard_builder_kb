@@ -137,6 +137,7 @@ Nothing here reaches the server; dashboards add no endpoint
   selection: null | {...}, drill: null | {...}, pages: null | {...},
   collapsed: { rows: [key], cols: [key] },   // T03-29 collapsed crosstab headers; the key exists only once one is collapsed
   tooltipText: null | string,   // T01-19 tooltip template with <Field> placeholders (≤ 300; null = automatic)
+  tooltipFormats?: { [field]: { number?, decimals?, date? } },   // T01-19 per-field tooltip formats (≤ 24 fields); absent = the view's formats
   memberColors: {},              // T01-20 { "table.column": { member: "#rrggbb" } } (format.paletteReverse: bool, T03-33; format.colorRamp brand|blue|green|amber|violet, colorMin / colorMax number|null, T03-19)
   title: null | string, caption: null | string, showTitle: boolean,   // P23 (null = automatic)
   showFilterCards: boolean,                                          // P30

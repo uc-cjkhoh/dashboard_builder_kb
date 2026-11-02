@@ -69,11 +69,12 @@ The Tooltip tool panel also holds a **Tooltip text** editor: free text with `<Fi
   - sizes only from the type scale; colours only palette keys, mapped to `var(--ink)`, `var(--accent-ink)`…, so they follow the theme. No hex; nothing user-typed reaches a `style` attribute;
   - at most 12 lines;
   - an invalid style is dropped with an issue; a style without a template is ignored.
-- **Keeping styles on their lines:**
-  - Clearing the text clears the style.
-  - Applying trims leading / trailing blank lines together with their styles.
-  - Editing the plain **Tooltip text** box keeps the styles (re-aligned by line index) only while the line count is unchanged. If it changes, the styles are cleared and the note says so.
-  - A template of more than 12 lines (possible from the plain textarea) opens in the modal with Apply blocked and the reason shown until lines are removed.
+- **Keeping styles on their lines:** clearing the text clears the style; applying trims leading / trailing blank lines with their styles; editing the plain **Tooltip text** box keeps styles (re-aligned by line index) only while the line count is unchanged, otherwise clears them and says so. A template of more than 12 lines (from the plain textarea) opens with Apply blocked and the reason shown.
+- **Field formats** (a **Field formats** group under the lines, one row per `<field>` in the template that can be formatted):
+  - A measure gets a **Number format** (View format, Auto, Compact, Currency, Percent) and **Decimals** (auto, 0-10); a date group-by (its sample parses as a Date / DateTime) gets a **Date format** (View format, Date, Date and time, Month, Year). Other group-bys get no row. "View format" = today's behaviour.
+  - They reuse the worksheet Format code (`makeValueFormatter` / `makeCategoryFormatter`, `Core/format.js`), starting from the view's format (a currency symbol still applies). The preview and every chart tooltip that renders the template (cartesian, pie / donut, scatter without Shape) format from the raw value through `tipLookup` (`Dashboard/tooltip-formats.js`).
+  - Stored as `tooltipFormats` `{ [field]: { number?, decimals?, date? } }`, only for fields still in the template (the key exists once one is formatted). `checkTooltipFormats` on import: known values only, decimals an integer 0-10, at most `LIMITS.tooltipFormats` = 24 fields, names ≤ 200 characters; an invalid spec is dropped with an issue, never clamped; ignored without a template.
+  - Not built: styling a single field token or word inside a line (style stays per line).
 
 ### Marks rules
 
