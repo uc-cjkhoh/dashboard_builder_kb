@@ -119,6 +119,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
   - chart-type field rules (`CHART_NEEDS`, `chartIssue`, the shared hint texts, `roleOf`) and the chart-type menu's cues — `issueFor`, `bestType`, `showMeOptions` — [worksheet-charts.md](../features/worksheet/worksheet-charts.md#chart-type-control)
 - `Dashboard/toolbar-rules.js` — pure: `visibleTools(chartType, tools)` — which Marks slots are quiet — [worksheet-encodings.md](../features/worksheet/worksheet-encodings.md#marks-slots)
 - `Dashboard/field-choices.js` — pure: `choicesOf`, `sameRef`, `switchField`, `removeChoice` (a slot's field choices, P40)
+- `Dashboard/placement-model.js` — pure: `defaultShelf(role)` (measures to Rows, dimensions to Columns) for the `＋` button and double-click
 - `Dashboard/pill-options.js` — pure: `fieldPillOptions` / `filterPillOptions` (the entries of a pill's context popup), `filterSummary`, `markGrid` (Marks slots in rows of three)
 - `Dashboard/field-group.js` — the one collapsible `<details class="ws-group">` of the field pane (Calculated fields, Hierarchies, Marks, tables)
 - `Dashboard/fields-pane-model.js` — pure: the field pane's hide / show state (`fieldsPaneView`, `readCollapsed`, storage key)

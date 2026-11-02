@@ -49,7 +49,7 @@ Beside the data header and chart card, the **field pane** holds, top to bottom: 
 - **Resize** by dragging its right edge, or `←`/`→` on the handle.
 - **Hide / show** with the first button of the view bar; the worksheet takes the room. It sets `aria-expanded` and is remembered in `localStorage` as `dashboardbuilder.fields.collapsed`, like the sidebar rail. On a phone the pane keeps its own **Fields** overlay.
 - **Calculated fields** and **Hierarchies** are not in the pane. While a worksheet is open they are two icons in the sidebar body ([layout.md](../../design/layout.md#sidebar)), each opening a dialog to add, edit or use them (below).
-- **Add a field** by dragging it onto a shelf or tool, or pressing its **`＋`**. The keyboard path sends measures to Rows and dimensions to Columns.
+- **Add a field** by dragging it onto a shelf or tool, pressing its **`＋`**, or double-clicking it. The `＋` is the keyboard path; both send measures to Rows and dimensions to Columns.
 
 Style: the fields are the focus. Each table is a solid tile (`.ws-table`: `--line-2` stroke, `--elev-2`) on the quiet `--surface-2` pane. Its fields are flat 32px rows (hover wash, the add `+` on hover), with the type icon tinted by role (`--dim-ink` for dimensions, `--meas-ink` for measures), under sentence-case **Dimensions** / **Measures** labels. The groups share one collapsible design (`field-group.js`: `<details class="ws-group">`, chevron + bold name, 4px between rows, 8px between groups); collapsed groups survive a pane rebuild.
 
@@ -110,7 +110,7 @@ The popup also has **Data type**: *Original*, or the casts that make sense for t
 Options are not inline. Right-click a pill (or focus it and press `Enter` / the ContextMenu key / `Shift+F10`) to open its **context popup**; `Esc` closes it and refocuses the pill. `Dashboard/pill-options.js` lists what each pill offers:
 
 - a measure: aggregation radios, **Table calculation…** (opens its editor);
-- also **Use as dimension / measure** and **Field choices…**;
+- a number: **Continuous** (measure) / **Discrete** (dimension) radios; any other flippable pill: **Use as dimension / measure**; and **Field choices…**;
 - a date dimension: the date part radios with **Finer** / **Coarser**, and the **Show all date labels** tick;
 - a filter: its operator radios, **Apply on every dashboard** and the value editor.
 
