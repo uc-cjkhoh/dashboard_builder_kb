@@ -42,7 +42,8 @@ matching whatever you're touching.
 
 | Doc | Topic |
 |---|---|
-| [tabs.md](features/workbook/tabs.md) | Data Source tab + worksheet and dashboard tabs |
+| [tabs.md](features/workbook/tabs.md) | Data Source tab + worksheet, dashboard and story tabs |
+| [stories.md](features/workbook/stories.md) | Story tab: ordered captioned steps, step strip, Previous / Next, print |
 | [dashboards.md](features/workbook/dashboards.md) | The dashboard board: grid, side panel, widgets, lifecycle |
 | [workbook.md](features/workbook/workbook.md) | Auto-save in the browser, restore on connect, Export/Import |
 
@@ -64,7 +65,7 @@ matching whatever you're touching.
 |---|---|
 | [decisions.md](reference/decisions/decisions.md) | D1–D25 (platform, frontend, worksheet, hosting), the D-number → file lookup, open questions |
 | [decisions-calculated-fields.md](reference/decisions/decisions-calculated-fields.md) | D26–D60, D65–D68, D73: calculations, parameters, groups, split / unpivot |
-| [decisions-dashboards.md](reference/decisions/decisions-dashboards.md) | D61–D64, D69, D71–D72: dashboards, hierarchies, option controls |
+| [decisions-dashboards.md](reference/decisions/decisions-dashboards.md) | D61–D64, D69, D71–D72, D81: dashboards, hierarchies, option controls, stories |
 | [decisions-connection.md](reference/decisions/decisions-connection.md) | D70: recent connection sources |
 | [decisions-logic.md](reference/decisions/decisions-logic.md) | D75–D77: `NULL`, `IN` / `BETWEEN`, keyword `IF` |
 
@@ -93,7 +94,7 @@ Overview: [design/overview.md](design/overview.md).
 | Doc | Topic |
 |---|---|
 | [backlog/README.md](backlog/README.md) | the only to-do list: how to read it, recommended order, spikes, guards, known unknowns |
-| [backlog/dashboards.md](backlog/dashboards.md) | P24a–d, layout, actions, navigation, P38, P39 remainder |
+| [backlog/dashboards.md](backlog/dashboards.md) | Stories remainder, layout, actions, navigation, P38, P39 remainder |
 | [backlog/calculations.md](backlog/calculations.md) | functions, LOD, table-calculation polish, P25 |
 | [backlog/data-model.md](backlog/data-model.md) | joins, union, groups, split, cast, hierarchies, P43 |
 | [backlog/charts-and-formatting.md](backlog/charts-and-formatting.md) | chart, authoring, formatting and export gaps |

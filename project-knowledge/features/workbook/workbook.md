@@ -1,6 +1,6 @@
 # Workbook — save, restore, export, import
 
-The whole builder state — the Data Source, every worksheet and every dashboard — survives a page reload and can
+The whole builder state — the Data Source, every worksheet, dashboard and story — survives a page reload and can
 be moved between browsers as a file. Everything stays **in the browser**; there is no server-side
 database ([D21](../../reference/decisions/decisions.md#d21--workbooks-persist-in-the-browser-not-on-the-server)).
 
@@ -26,6 +26,7 @@ database ([D21](../../reference/decisions/decisions.md#d21--workbooks-persist-in
 | each relationship: endpoints + cardinality | loaded Pages members (re-fetched on demand) |
 | each worksheet: name + full `sheet` | the connection, host credentials, **any password** |
 | each dashboard: name + its widgets (worksheet index + grid cell, text, image, spacer, or a button with its target tab as `{ kind, index }`) | |
+| each story: name + its steps (caption + the shown worksheet or dashboard as `{ kind, index }`) | |
 | the tab strip's order, and which tab was open | |
 | the calculated fields (`calculations`) | the parsed formula tree (rebuilt on open) |
 
@@ -35,7 +36,7 @@ The current version is **2**; this build also opens version 1. Shapes are in
 
 ## Format v2 and old files
 
-- **Version 2** holds `worksheets`, `dashboards`, `tabs` (the strip order, `{ kind, index }` per tab) and `active`
+- **Version 2** holds `worksheets`, `dashboards`, an optional `stories` (written only when there are some; older files lack it), `tabs` (the strip order, `{ kind, index }` per tab) and `active`
   (`{ kind, index }`, or null for the Data Source).
 - **A version 1 file is read forever.** `migrateV1` (in `workbook-model.js`):
   - turns every v1 `dashboards[i]` (one worksheet each) into `worksheets[i]`, and makes no dashboards;
@@ -71,7 +72,7 @@ The current version is **2**; this build also opens version 1. Shapes are in
 
 When a connection is established **and the canvas is empty**, the saved workbook for that server + user reopens.
 
-- A toast says `Restored your last workbook (N tables, M worksheets[, K dashboards]).` The dashboards part appears only when there are some.
+- A toast says `Restored your last workbook (N tables, M worksheets[, K dashboards][, L stories]).` The dashboards and stories parts appear only when there are some.
 - Tables re-fetch their columns. Relationships draw as soon as both key rows exist.
 - The previously open tab becomes active (a worksheet re-runs its query).
 - A table that no longer exists shows its card's **failed** state with Retry, and keeps its saved keys.
@@ -91,7 +92,7 @@ Both live in the **Workbook** overflow menu, an icon button near the right end o
 The menu holds:
 
 - **Export workbook** downloads `workbook-YYYY-MM-DD.json` of the current state. When the canvas is empty it says "Nothing to export yet".
-- **Save view as bookmark…** (hidden on a dashboard tab) names and saves the open worksheet's view.
+- **Save view as bookmark…** (hidden on a dashboard or story tab) names and saves the open worksheet's view.
   - A bookmark holds the worksheet's whole sheet (filters, date range, click selection, drill level, page, chart type, format) plus the shared filters.
   - At most **30** per workbook. Bookmarks save with the workbook (`Workbook/bookmarks-dialog.js`).
   - **Bookmarks…** lists them (worksheet and time saved) with **Apply** and **Delete**.
@@ -143,7 +144,8 @@ naming the sheet and field ("Sheet "Sales": unknown chart type "radar" — reset
 | Tables | `id`, `db`, `table` non-empty text; ids and `db.table` unique (first kept); position finite and ≥ 0 else reset to 0; `joinKeys` (written for older builds: the columns the relationships use) is read but not used; at most **100** tables |
 | Relationships | both endpoints reference a kept table; cardinality one of `1:1`, `1:N`, `N:1`, `N:M`; `joinType` one of `inner`, `left`, `right`, `full` (anything else reads as `inner`); optional `pairs` (a compound key's extra `{ from, to }` column names; at most **3**, none reusing a column in any relationship — a bad one is skipped with an issue; absent = one pair); at most **200** |
 | Worksheets / dashboards | each an object (others skipped and reported); name 1–60 characters (else reset to "Worksheet" / "Dashboard"); a non-list means none are opened |
-| Tab order | `tabs` entries `{ kind, index }` pointing at a kept worksheet or dashboard, no repeats — others skipped; tabs it leaves out are added at the end; absent = worksheets then dashboards (no issue); at most **50 tabs of both kinds**, the rest dropped |
+| Stories | an object each (others skipped and reported); a name like any tab; each step `{ caption, target: { kind: worksheet \| dashboard, index } }` with a text caption of at most 300 characters and a target in range — a bad step is **skipped and reported, not cut**; at most 20 steps (the rest dropped and reported); stories count toward the 50 tabs |
+| Tab order | `tabs` entries `{ kind, index }` pointing at a kept worksheet, dashboard or story, no repeats — others skipped; tabs it leaves out are added at the end; absent = worksheets then dashboards (no issue); at most **50 tabs of both kinds**, the rest dropped |
 | Dashboard widgets | see [Dashboard widgets](#dashboard-widgets) below |
 | Sheet | `chartType` one of the 23 types; pills carry `db`, `table`, `column`, `category`; `role` and `agg` valid for the column's category (a bad `agg` resets to sum / count); a `percentile` pill needs a finite `p` 0..1 (else it resets with an issue; `p` on any other aggregation is dropped; a percentile Top-N with a bad `topBy.p` is dropped); at most 20 pills per shelf; at most 8 filters; `collapsed` string keys only (≤ 200 per axis), the rest dropped with an issue |
 | Filters | known `op` (incl. P30 `contains` / `startsWith` / `endsWith` / `relative` / `top`; a `top` must carry its `topBy` measure); single value text (a non-text value resets to empty); `in` / `between` carry a text list; the `category` may be absent (back-filled from the catalog at runtime) |
@@ -213,8 +215,8 @@ The rules are in `Board/board-model.js` (pure).
 1. Clear the model (`canvas.clearModel()`) and close every tab.
 2. Re-add each table through `canvas.addEntity(db, table, x, y, { source })`, and map saved entity ids to the new ones.
 3. Recreate relationships via `relations.restoreRelationship`.
-4. Recreate the tabs in strip order (`createWorksheet` + `updateSheet`, `createDashboard`).
-5. Recreate each dashboard's widgets (`setWidgets`), with fresh `w#N` ids pointing at the new worksheet ids.
+4. Recreate the tabs in strip order (`createWorksheet` + `updateSheet`, `createDashboard`, `createStory`).
+5. Recreate each dashboard's widgets (`setWidgets`), with fresh `w#N` ids pointing at the new worksheet ids, and each story's steps (`setSteps`) pointing at the new tab ids.
 
 - Saved sheets are validated over today's defaults (`sanitizeSheet`; `restoreSheet` is the same without the report),
   so workbooks from older builds gain new fields.

@@ -6,7 +6,7 @@ The only place for work not yet built, grouped by topic. Read it before picking 
 
 | File | Holds |
 |---|---|
-| [dashboards.md](dashboards.md) | P24d, dashboard layout, image and spacer widgets, actions, navigation, P38, P39 remainder |
+| [dashboards.md](dashboards.md) | Stories remainder, dashboard layout, image and spacer widgets, actions, navigation, P38, P39 remainder |
 | [calculations.md](calculations.md) | functions the engine lacks, LOD, table-calculation polish, P25 |
 | [data-model.md](data-model.md) | joins, union, groups, split, cast, hierarchies, P43 |
 | [charts-and-formatting.md](charts-and-formatting.md) | chart, authoring, formatting and export gaps |

@@ -89,6 +89,8 @@ with none is held out of worksheets ([relationships.md](../features/data-source/
 ```
 Tab:     { id: "ws#n", kind: "worksheet", name, sheet }                 one worksheet (the editor)
        | { id: "db#n", kind: "dashboard", name, widgets: [Widget], size }  a board of widgets; size = null (automatic) | { width, height } px
+       | { id: "st#n", kind: "story", name, steps: [Step] }               ordered captioned steps (Story/story-model.js)
+Step:    { caption, target: "ws#n" | "db#n" }                             the worksheet or dashboard the step shows
 Widget:  { id: "w#n", kind: "sheet", sheetId: "ws#n", x, y, w, h }       a worksheet's view
        | { id: "w#n", kind: "text", heading, body, x, y, w, h }          a text block
        | { id: "w#n", kind: "image", alt, src, x, y, w, h }              a picture; src = a base64 PNG / JPEG / GIF / WebP data URL
@@ -105,6 +107,7 @@ The limits are `LIMITS` in `Core/validate.js`. The rules and the first-free-spot
   (text 1–24), `y + h` ≤ 96, at most **12 widgets**.
 - Text: `heading` ≤ 80 and `body` ≤ 2000 characters.
 - Images: at most **4 images** per dashboard and 2 MB of picture data per workbook; each file ≤ 256 KB, `alt` ≤ 120.
+- A story holds at most **20 steps**; a caption is ≤ 300 characters (rejected past it, never cut).
 - A spacer and a nav button are 1–24 rows tall, like text. A button `label` is 1–40 characters and its `tip`
   ≤ 200. Closing the target tab unlinks the button (`target` → null).
 
@@ -112,10 +115,10 @@ The limits are `LIMITS` in `Core/validate.js`. The rules and the first-free-spot
 
 A widget points at a worksheet by tab id; one worksheet may sit on several dashboards, even twice on one.
 
-- `worksheets()` / `dashboards()` — the tabs of a kind.
-- `createWorksheet` / `createDashboard` — null at the tab limit. Also `duplicateWorksheet`.
-- `closeTab` — a closed worksheet's widgets leave every dashboard.
-- `updateSheet` (→ `worksheet:changed`), `setWidgets` + `nextWidgetId` (→ `dashboard:changed`).
+- `worksheets()` / `dashboards()` / `stories()` — the tabs of a kind.
+- `createWorksheet` / `createDashboard` / `createStory` — null at the tab limit. Also `duplicateWorksheet`.
+- `closeTab` — a closed worksheet's widgets leave every dashboard, and a closed worksheet or dashboard's steps leave every story.
+- `updateSheet` (→ `worksheet:changed`), `setWidgets` + `nextWidgetId` (→ `dashboard:changed`), `setSteps` (→ `story:changed`).
 
 Nothing here reaches the server; dashboards add no endpoint
 ([D61](decisions/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2)).
@@ -215,7 +218,8 @@ What [workbook.md](../features/workbook/workbook.md) saves to `localStorage` and
   dashboards:    [ { name, widgets: [ { kind: "sheet", sheet: worksheetIndex, x, y, w, h }
                                     | { kind: "text", heading, body, x, y, w, h } ],
                      size?: { width, height } } ],   // fixed pixels; absent = automatic (older files). Anything outside the limits (not whole pixels, 320–3840 × 240–2400) → automatic with an import issue, never clamped
-  tabs:          [ { kind: "worksheet" | "dashboard", index } ],   // the strip's order, ≤ 50
+  stories?:      [ { name, steps: [ { caption, target: { kind: "worksheet" | "dashboard", index } } ] } ],   // P24d — optional (absent in older files), ≤ 20 steps, caption ≤ 300
+  tabs:          [ { kind: "worksheet" | "dashboard" | "story", index } ],   // the strip's order, ≤ 50
   active:        { kind, index } | null    // null = Data Source
   fields:        { "db.table.column": { alias?, agg?, hidden?, cast?, memberAliases?: { [rawValue]: label } } }   // P28, T02-34, T02-29 — ≤ 2000
   parameters:    [{ id: "prm<n>", name, type: number|text|date, value, allowed: { kind: any|list|range, list?, min?, max?, step? } }]   // P32 — ≤ 20
@@ -227,7 +231,7 @@ What [workbook.md](../features/workbook/workbook.md) saves to `localStorage` and
 ```
 
 - **Ids:** entity ids are only cross-references inside the file. Opening it creates fresh ids, for worksheets
-  and dashboards too; widgets and bookmarks point at worksheets by index.
+  dashboards and stories too; widgets and bookmarks point at worksheets by index, steps at worksheets or dashboards.
 - **Version 1 files** (`dashboards: [{ name, sheet }]`, numeric `active`, bookmarks with `dashboard` /
   `dashName`) are migrated on read ([workbook.md](../features/workbook/workbook.md#format-v2-and-old-files)).
 - **No connection details or passwords** are ever included.

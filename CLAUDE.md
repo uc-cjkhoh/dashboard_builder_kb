@@ -73,7 +73,7 @@ src/DashboardBuilder/
 │                           #   ConnectionRegistry, CsvUtil, *Models.cs
 └── Features/               # one folder per feature: controller + _View.cshtml + .css + .js
     ├── ApiControllerBase.cs  ApiErrors.cs   # RunAsync / SafeError; the one { error, field? } shape
-    ├── Shell/  Core/  Connection/  Schema/  Canvas/  Relations/  Rows/  Tabs/  Board/  Dashboard/  Calc/  Workbook/
+    ├── Shell/  Core/  Connection/  Schema/  Canvas/  Relations/  Rows/  Tabs/  Board/  Story/  Dashboard/  Calc/  Workbook/
 tests/DashboardBuilder.Tests/   # xUnit
 tests/js/                       # node --test, for the pure JS modules
 ```
@@ -117,7 +117,7 @@ dashboard_builder/          (this KB)
 │   ├── features/           # one file per app feature, in three groups:
 │   │   ├── data-source/    #   connection · schema-browser · canvas · query-sources · relationships
 │   │   ├── worksheet/      #   worksheet · worksheet-charts · worksheet-encodings · calculated-fields · field-settings
-│   │   └── workbook/       #   tabs · dashboards · workbook
+│   │   └── workbook/       #   tabs · dashboards · stories · workbook
 │   ├── reference/          # api (+ -calculated-fields) · clickhouse-integration (+ clickhouse-calculations) · data-model · frontend-modules · glossary
 │   │   └── decisions/      #   decisions (D1–D25 + lookup) · -calculated-fields · -dashboards · -connection · -logic
 │   ├── operations/         # development · deployment · source-table-guidance (+ git-ignored credentials.local.md)
@@ -142,6 +142,7 @@ dashboard_builder/          (this KB)
 | Chart types / rendering / export | `Features/Dashboard/chart.js` | [worksheet-charts.md](project-knowledge/features/worksheet/worksheet-charts.md) |
 | Marks, filters, drill, pages | `Features/Dashboard/dashboards.js` | [worksheet-encodings.md](project-knowledge/features/worksheet/worksheet-encodings.md) |
 | Query caching / latest-wins / truncation notice | `Features/Dashboard/query-runner.js` | [worksheet.md § Query lifecycle](project-knowledge/features/worksheet/worksheet.md#query-lifecycle) |
+| Story tab (steps, strip, caption, print) | `Features/Story/story.js`, `story-model.js` | [stories.md](project-knowledge/features/workbook/stories.md) |
 | Save / restore / export / import | `Features/Workbook/` | [workbook.md](project-knowledge/features/workbook/workbook.md) |
 | Colour / spacing / type | `Features/Core/core.css` `:root` | [tokens.md](project-knowledge/design/tokens.md) |
 | Motion / transitions | `Features/Core/motion.js` + `core.css` motion tokens | [motion-accessibility.md](project-knowledge/design/motion-accessibility.md#motion) |

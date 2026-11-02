@@ -1,6 +1,6 @@
-# Tabs — Data Source, worksheets and dashboards
+# Tabs — Data Source, worksheets, dashboards and stories
 
-The tab strip runs across the top of the content area and switches between the Data Source, worksheets and dashboards.
+The tab strip runs across the top of the content area and switches between the Data Source, worksheets, dashboards and stories.
 
 - Why one shared model: [D12](../../reference/decisions/decisions.md#d12--subtabs-are-dashboards-over-one-shared-data-source).
 - Why two tab kinds: [D61](../../reference/decisions/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2).
@@ -10,6 +10,7 @@ The tab strip runs across the top of the content area and switches between the D
 - `Features/Tabs/` — `tabs.js`, `tabs.css`, `duplicate-model.js`
 - `Core/store.js` — the shared state the tabs sit over
 - `Features/Board/` — the dashboard tab's body
+- `Features/Story/` — the story tab's body ([stories.md](stories.md))
 
 ## The strip
 
@@ -17,19 +18,20 @@ The tab strip runs across the top of the content area and switches between the D
   It carries `aria-current`.
 - **Data Source tab.** A pinned **Data Source** tab (`.tab--model`) comes first: the shared entity canvas
   ([canvas.md](../data-source/canvas.md) + [relationships.md](../data-source/relationships.md)). It cannot be closed.
-- **Worksheets and dashboards.** After it comes **one ordered list** of two tab kinds.
+- **Worksheets and dashboards.** After it comes **one ordered list** of three tab kinds.
   Each tab shows its kind's icon (`.tab__kind`, decoration only), and its accessible name includes the kind
-  (`aria-label` "Sales (worksheet)" / "Overview (dashboard)").
+  (`aria-label` "Sales (worksheet)" / "Overview (dashboard)" / "Tour (story)").
   - **Worksheet** (`.tab--worksheet`, icon `chart-bar`) — one Tableau-style worksheet ([worksheet.md](../worksheet/worksheet.md)).
   - **Dashboard** (`.tab--dashboard`, icon `dashboard`) — a board of worksheet, text, image, button and spacer widgets ([dashboards.md](dashboards.md)).
     Its data (widgets, limits, validation, save and open) is in [data-model.md](../../reference/data-model.md#tabs-and-dashboards).
+  - **Story** (`.tab--story`, icon `story`) — ordered, captioned steps over worksheets and dashboards ([stories.md](stories.md)).
 
 ### New tab
 
-- **`[+]`** (`.tab-add`, `aria-haspopup="menu"`) opens a menu: **New worksheet / New dashboard**.
+- **`[+]`** (`.tab-add`, `aria-haspopup="menu"`) opens a menu: **New worksheet / New dashboard / New story**.
   The menu is `Core/menu.js`: arrows move, Esc closes and returns focus to `[+]`, and Enter / Space on a focused item acts.
 - A new tab is active, and its label is focused.
-- Default names are **"Worksheet N" / "Dashboard N"**, where N is the first number not in use by a tab of that kind.
+- Default names are **"Worksheet N" / "Dashboard N" / "Story N"**, where N is the first number not in use by a tab of that kind.
 - **Limit:** a workbook holds at most **50 tabs of either kind** (`LIMITS.tabs`).
   Creating one past it toasts "A workbook holds at most 50 tabs — close one first.", adds nothing and keeps focus on `[+]`.
   Import caps it the same way ([workbook.md](workbook.md#validation-parseworkbook)).
@@ -50,6 +52,8 @@ The close icon (`.tab__close`, `aria-label` "Close <name>") closes a tab.
   from those dashboards." Once closed, its widgets are removed from them, and each dashboard is notified with `dashboard:changed`.
 - **A worksheet on no dashboard** confirms only when it holds content.
 - **A dashboard with widgets** confirms ("The worksheets on it are not affected."). Closing a dashboard never touches a worksheet.
+- **A worksheet or dashboard shown by story steps** leaves those steps (each story is notified with `story:changed`); no extra confirm.
+- **A story with steps** confirms ("The worksheets and dashboards it shows are not affected.").
 
 ### Duplicate
 
@@ -65,20 +69,22 @@ The duplicate icon (`.tab__dup`, `aria-label` "Duplicate <name>") appears on **w
 
 ### Workbook menu
 
-The Workbook menu's **Save view as bookmark…** is hidden while a dashboard tab is active, because bookmarks capture worksheets only.
+The Workbook menu's **Save view as bookmark…** is hidden while a dashboard or story tab is active, because bookmarks capture worksheets only.
 
 ## How views switch
 
-- **Current view.** `store.currentView()` is `{ kind: "model" }`, `{ kind: "worksheet", id }` or `{ kind: "dashboard", id }`.
+- **Current view.** `store.currentView()` is `{ kind: "model" }`, `{ kind: "worksheet", id }`, `{ kind: "dashboard", id }` or `{ kind: "story", id }`.
 - **Who renders what:**
   - `canvas.js` / `relations.js` render `#model-view` when the model is active.
   - `dashboards.js` renders the active worksheet into `#worksheet-view` (`isWorksheetActive()`).
   - `board.js` shows `#board-view` for a dashboard (`isDashboardActive()`). It renders only the active one and destroys its views when you leave it.
+  - `story.js` shows `#story-view` for a story (`isStoryActive()`), likewise.
 - **Events:**
   - Each module shows/hides its own view on `view:changed`.
   - The strip redraws on `tabs:changed`.
   - `worksheet:changed { id }` means a worksheet's sheet was replaced.
   - `dashboard:changed { id }` means a dashboard's widgets changed.
+  - `story:changed { id }` means a story's steps changed.
 - Closing the active tab activates its right-hand neighbour (else the left one, else the Data Source).
 - All tabs build from the **same** entities and relationships: a table added while on a worksheet still lands in the shared model.
 

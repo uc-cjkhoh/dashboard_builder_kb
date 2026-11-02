@@ -142,3 +142,11 @@ Decided 2026-11-02 (autonomous build). A relationship may match on more than one
 - **Not colour alone:** one bar colour; the length is written at each bar's end and in the tooltip with the start and end.
 - **Skipped:** a row with no usable start or a negative length is not drawn and is counted in the notice; a zero length is drawn as a thin bar.
 - **Rejected for now:** a length from an end field, a colour split per bar, and dependencies — see the backlog.
+
+### D81 — A story is a tab of captioned steps that point at worksheets and dashboards
+- **Third tab kind:** `{ id: "st#N", kind: "story", name, steps: [{ caption, target }] }` beside worksheets and dashboards, in the one strip, under the same 50-tab limit. No endpoint and no server limit.
+- **Steps point, they do not copy:** a step holds a tab id, so a story shows the worksheet as it is now and a closed worksheet or dashboard removes its steps. Copying a sheet into each step would freeze it and fork the data; a bookmark step (applying a saved view) would mutate a worksheet just by reading a story, so it is left out for now.
+- **The stage is static:** a worksheet step draws through `createWorksheetView({ interactive: false })` and the shared result cache; a dashboard step links to its tab, since the board is built around one active dashboard.
+- **Saved as an optional `stories` list in format v2**, with steps as `{ kind, index }`. The version stays 2 because every reader that knows only worksheets and dashboards still opens the file; such a build reports the story entries in the tab order as pointing at nothing and drops them.
+- **Bounds reject, not clamp:** at most 20 steps and 300 characters per caption; an import skips and reports a step with a long caption or a missing target, and drops steps past 20 with a message.
+- **The current step is not saved:** it is reading position, like a dashboard's selection.

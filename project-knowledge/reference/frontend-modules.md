@@ -47,11 +47,13 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Relations/key-pairs.js`, `Relations/key-pairs-ui.js` — a compound key: pure `suggestPairs`, `addPair`, `compoundName`, `MAX_EXTRA_PAIRS`; the dialog's "Also match on" section (native controls, `textContent` only)
 - `Relations/relation-rules.js` — pure (`relEnds` lists every column a link uses, extra pairs included): `keysCompatible`, `findDuplicate`, `linkProblem` — what may be linked; `JOIN_TYPES`, `normalizeJoinType`, `joinChoices`, `planJoinType`, `joinBadge` — join types
 
-### Tabs/ and Board/ — tabs and the dashboard board
+### Tabs/, Board/ and Story/ — tabs, the dashboard board and stories
 
-- `Tabs/tabs.js` — Data Source tab + one ordered list of worksheet and dashboard tabs, the `[+]` menu, close confirms — [tabs.md](../features/workbook/tabs.md)
+- `Tabs/tabs.js` — Data Source tab + one ordered list of worksheet, dashboard and story tabs, the `[+]` menu, close confirms — [tabs.md](../features/workbook/tabs.md)
 - `Board/board-model.js` — pure (P24b):
   - widget geometry and limits — `overlaps`, `inBounds`, `firstFreeSpot`, `placeNew`, `placeAt` (a drop), `checkPlacement`, `explainRefusal` (the refusal in words), the import clean-up `cleanWidgets`, `savedWidgets`, `removeSheetWidgets`, `dashboardsUsing`, `defaultTabName` — [data-model.md](data-model.md#tabs-and-dashboards)
+- `Story/story-model.js` — pure (node-tested): `validateCaption`, `addStep`, `removeStep`, `moveStep`, `setCaption`, `goTo` (never wraps), `dropTarget` (used by `closeTab`), `offeredTargets`, `targetKind`, `stepName`, `savedSteps`, `cleanSteps` (import: bad steps skipped and reported) — [stories.md](../features/workbook/stories.md)
+- `Story/story.js` — the story tab's body (`#story-view`): add row, step strip (tablist), caption editor, step tools, Previous / Next, the stage (a static `createWorksheetView` or a dashboard link), print
 - `Board/board-size.js` — pure (node-tested): dashboard size — `SIZE_PRESETS`, `SIZE_LIMITS`, `sizeError`, `cleanSize` (import), `savedSize`, `sizeKey` / `sizeLabel` — [dashboards.md](../features/workbook/dashboards.md#layout)
 - `Board/board-layout.js` — pure (node-tested):
   - cell → pixel geometry — `layoutBoard(widgets, panelWidth, { rowH, gap, stack?, fixed? })` → `{ stacked, height, rects }` (`stack` is for print), `fixedRowH`, `columnWidth`, `widgetOrder` (reading order)
