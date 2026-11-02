@@ -12,7 +12,6 @@ project *is* lives in [../project-knowledge/](../project-knowledge/index.md).
 | KB upkeep | [kb/hooks.md](kb/hooks.md) | The three hooks: KB verify, update logs, Chrome reaper |
 | Safe operation | [operations/safe-operations.md](operations/safe-operations.md) | Never-do list for the build host, live service and credentials |
 | Run logs | [run-logs/blocked.md](run-logs/blocked.md) | Work that could not be built, and why |
-| Run logs | [run-logs/debug-fine-tuning-2026-10-29.md](run-logs/debug-fine-tuning-2026-10-29.md) | Problems hit during the fine-tuning run |
 
 Code-level gates (safety, frontend) that every change must meet are project knowledge:
 [change-checklist.md](../project-knowledge/engineering/change-checklist.md).

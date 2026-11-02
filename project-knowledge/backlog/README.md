@@ -12,7 +12,7 @@ The only place for work not yet built, grouped by topic. Read it before picking 
 | [charts-and-formatting.md](charts-and-formatting.md) | chart, authoring, formatting and export gaps |
 | [analytics-and-maps.md](analytics-and-maps.md) | statistics, forecasting, clustering, P42, maps |
 | [platform.md](platform.md) | persistence, P45, P44, open risks, workbook additions, decisions to settle |
-| [journeys-and-releases.md](journeys-and-releases.md) | journeys and acceptance scenarios, releases R0–R3, quality targets |
+| [journeys-and-releases.md](journeys-and-releases.md) | journeys and acceptance scenarios, releases R1a–R3, quality targets |
 | [out-of-scope.md](out-of-scope.md) | what is deliberately excluded, and why (not backlog) |
 | [blocked.md](../../agent-behavior/run-logs/blocked.md) | work that could not be built, and why |
 
@@ -30,16 +30,15 @@ Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5
 
 ## Recommended order
 
-3. Small P0 gaps (cast, duplicate sheet, tooltip editor, per-member colour, exclude) — each is independent and closes Release 0.
-4. Calculation aggregations, logic, text and date functions — the engine's tree path already exists.
-5. Table-calculation polish — builds on the function set.
-7. Data-model breadth (joins, union, groups, split, hierarchies) — independent of the engine; join types come before P43.
-8. Chart gaps and formatting — client-only, ordered by priority.
-9. Actions, navigation, P38 and P39 remainder — need dashboards and, for sets, P25.
-10. LOD — needs the core engine and written filter-order rules.
-11. Analytics and forecasting — trend models come before intervals and forecast.
-12. P42 AI assist and maps — large, and need decisions on data leaving the server and bundled geography.
-13. Persistence and P45 — blocked on the D2 decision.
+1. Calculation aggregations, logic, text and date functions — the engine's tree path already exists.
+2. Table-calculation polish — builds on the function set.
+3. Data-model breadth (joins, union, groups, split, hierarchies) — independent of the engine; join types come before P43.
+4. Chart gaps and formatting — client-only, ordered by priority.
+5. Actions, navigation, P38 and P39 remainder — need dashboards and, for sets, P25.
+6. LOD — needs the core engine and written filter-order rules.
+7. Analytics and forecasting — trend models come before intervals and forecast.
+8. P42 AI assist and maps — large, and need decisions on data leaving the server and bundled geography.
+9. Persistence and P45 — blocked on the D2 decision.
 
 ## Spikes before committing a big design
 

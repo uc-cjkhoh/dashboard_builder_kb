@@ -109,7 +109,7 @@ dashboard_builder/          (this KB)
 │   ├── workflow/           # definition-of-done · merge-to-main · status-dashboard
 │   ├── kb/                 # kb-maintenance · hooks
 │   ├── operations/         # safe-operations (never-do list)
-│   └── run-logs/           # blocked work · debug logs
+│   └── run-logs/           # blocked work
 ├── project-knowledge/      # what the project is
 │   ├── README.md  ARCHITECTURE.md  index.md
 │   ├── engineering/        # golden-rules · sharp-edges · change-checklist

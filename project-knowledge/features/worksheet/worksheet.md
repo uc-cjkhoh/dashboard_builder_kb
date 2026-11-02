@@ -47,7 +47,7 @@ Data sits on top; view controls sit on the chart ([design/layout.md](../../desig
 Beside the data header and chart card, the **field pane** holds, top to bottom: **Marks** (soft `--surface-3` slots; accent wash when set or open), the search box, then **each model table that is in a relationship** (a table card with none is held out — [relationships.md](../data-source/relationships.md#rendering)).
 
 - **Resize** by dragging its right edge, or `←`/`→` on the handle.
-- **Hide / show** with the first button of the view bar; the worksheet takes the room. It sets `aria-expanded` and is remembered in `localStorage` as `dashboardbuilder.fields.collapsed`, like the sidebar rail. On a phone the pane keeps its own **Fields** overlay.
+- **Hide / show** with the first button of the view bar; the worksheet takes the room. It sets `aria-expanded` and is remembered in `localStorage` as `dashboardbuilder.fields.collapsed`, like the sidebar rail.
 - **Calculated fields** and **Hierarchies** are not in the pane. While a worksheet is open they are two icons in the sidebar body ([layout.md](../../design/layout.md#sidebar)), each opening a dialog to add, edit or use them (below).
 - **Add a field** by dragging it onto a shelf or tool, pressing its **`＋`**, or double-clicking it. The `＋` is the keyboard path; both send measures to Rows and dimensions to Columns.
 

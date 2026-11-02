@@ -34,8 +34,7 @@ anything here.**
   subfolder per concern. The folder tree is kept in one place only: the
   [KB directory map in CLAUDE.md](../../CLAUDE.md#kb-directory-map). Update it when you add, move or
   remove a folder.
-  - `project-knowledge/archive/` is the exception to these rules. It holds the frozen build plan for
-    phases P0–P20 (the original build phases), a historical artifact kept as-is and not maintained.
+  - `project-knowledge/archive/` is the exception to these rules. It holds frozen historical files (the P0–P20 build plan, an old debug log), kept as-is and not maintained; its README lists them.
 
 ## When you make a change
 

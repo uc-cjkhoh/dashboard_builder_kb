@@ -5,7 +5,7 @@ Deep dives for the Dashboard Builder. Start from [README.md](README.md) /
 matching whatever you're touching.
 
 > **Shorthand used across the KB:** `D##` = a decision ([lookup](reference/decisions/decisions.md#where-each-decision-lives)) ·
-> `P##` = a product phase, built or planned ([backlog](backlog/README.md)) · `R0`–`R3` = planned releases
+> `P##` = a product phase, built or planned ([backlog](backlog/README.md)) · `R1a`–`R3` = planned releases
 > ([journeys-and-releases.md](backlog/journeys-and-releases.md#releases)) · `T01`–`T09` = Tableau-inventory requirement areas ([backlog](backlog/README.md#how-to-read-an-entry)).
 
 ## engineering/ — the rules (read before changing behaviour)
@@ -95,7 +95,7 @@ Overview: [design/overview.md](design/overview.md).
 | [backlog/charts-and-formatting.md](backlog/charts-and-formatting.md) | chart, authoring, formatting and export gaps |
 | [backlog/analytics-and-maps.md](backlog/analytics-and-maps.md) | statistics, forecasting, clustering, P42, maps |
 | [backlog/platform.md](backlog/platform.md) | persistence, P45, P44, risks, workbook additions, decisions to settle |
-| [backlog/journeys-and-releases.md](backlog/journeys-and-releases.md) | journeys, acceptance scenarios, releases R0–R3, quality targets |
+| [backlog/journeys-and-releases.md](backlog/journeys-and-releases.md) | journeys, acceptance scenarios, releases R1a–R3, quality targets |
 | [backlog/out-of-scope.md](backlog/out-of-scope.md) | deliberately excluded topics and why |
 
 ## updates/ — what changed, by date

@@ -18,7 +18,6 @@ What "done" means for the undone work. A release exits when its journeys pass wi
 
 | Release | Contents | Exit |
 |---|---|---|
-| R0 | Remaining **P0** items: type cast, duplicate sheet, tooltip editor, per-member colour, exclude | Journey A passes with exact fixture values. |
 | R1a | Text, date and logic functions, remaining P1 chart types, PDF export | Common book examples reproduce without code. |
 | R1b | Joins and unions breadth, table-calculation polish, linked actions, floating layout | Journeys B and C pass. |
 | R2 | LOD, maps, regression, forecast, k-means, stories, chart-in-tooltip | Journeys D and E pass. |
@@ -33,4 +32,4 @@ What "done" means for the undone work. A release exits when its journeys pass wi
 | Marks | Aggregate or cap beyond 10,000 marks | The cap is 5000 groups today; reconcile ([platform.md](platform.md#decisions-to-settle)). |
 
 - **Safety additions:** parse GeoJSON defensively; make no network request except to the app origin; keep workbook files free of credentials.
-- **Tests:** unit tests for operators, nulls, aggregation, date and week logic, AST validation and limits; golden fixtures with exact SQL and results (duplicates, nulls, joins, missing dates, aliases, rejected functions); `node --test` for table calculations, regression, forecast, seeded k-means and workbook upgrade; visual checks for axis scales, continuous vs discrete dates, legends, map overlap, export size and phone layout; a live smoke against a throwaway ClickHouse ([development.md](../operations/development.md)).
+- **Tests:** unit tests for operators, nulls, aggregation, date and week logic, AST validation and limits; golden fixtures with exact SQL and results (duplicates, nulls, joins, missing dates, aliases, rejected functions); `node --test` for table calculations, regression, forecast, seeded k-means and workbook upgrade; visual checks for axis scales, continuous vs discrete dates, legends, map overlap, export size; a live smoke against a throwaway ClickHouse ([development.md](../operations/development.md)).
