@@ -86,6 +86,8 @@ A `calc` tree becomes SQL in four steps; no formula text and no literal is ever 
 - `count(x) < 2` keeps a one-value group NULL (bare `stddevSamp` is NaN, which JSON cannot carry). `min(x)`,
   not `any`, ignores NULL rows in `attr`. `PlainRankSql` (Top-N) uses the same writer.
 
+**As a filter.** A row-level calculation compiles once (prefix `c{n}`) and its SQL is the left side of an ordinary `BuildCondition` in `WHERE` (compared values bound `p{i}`), `AND`ed with the other filters and so inside a Top-N's inner query too: filters run before grouping ([D82](decisions/decisions-filters.md#d82--a-calculated-field-is-a-row-filter-applied-before-grouping)). `CalcSql.CalcFilterSql` refuses an aggregate tree and maps the calculation's type to the value category (number, text, date, boolean); a boolean is `toBool(…)` like a boolean dimension, and `not in` keeps NULL results as for a plain column.
+
 **Top-N rank, exact vs approximate.** A rank by a plain measure is always exact and unscaled
 (`PlainRankSql`; only the order matters). A rank by a calculation compiles through the table above, so in
 approximate mode it uses `uniq` for `COUNTD` and scaled sums on a sampled table. The two ranks are not

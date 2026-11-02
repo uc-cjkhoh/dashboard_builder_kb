@@ -208,7 +208,7 @@ Calculations are not in the field pane itself. On a worksheet tab, the sidebar's
 |---|---|
 | Edit… | opens the dialog (a group field: the Group dialog, [below](#group-fields)) |
 | Duplicate | adds `<name> copy` (`copy 2` … when taken) with the same formula (or groups) and Use-as choice |
-| Delete… | Refused with a toast `Used by calculation 'B'.` while another calculation refers to it. When worksheets or shared Top-N filters use it, a confirm says how many, and Delete clears its pills (and a sort or Top-N ranking aimed at it) from them. Otherwise it deletes at once |
+| Delete… | Refused with a toast `Used by calculation 'B'.` while another calculation refers to it. When worksheets or shared Top-N filters use it, a confirm says how many, and Delete clears its pills and filters (and a sort or Top-N ranking aimed at it) from them. Otherwise it deletes at once |
 
 - **Broken calculation** (its field left the model, an imported cycle): shows an **Error** badge instead of the role chip, with its message as the tooltip. It cannot be dragged or added.
 - **Adding:** the **+** puts a calculation on a shelf (Rows for a measure, Columns for a dimension); calculations are not dragged from this list.
@@ -237,7 +237,7 @@ A pill is `{ calc: id, db: "", table: "", column: <name at last save>, category,
 
 Dropping one on any of these shows the toast **`Calculated fields can't be used here yet.`** and adds no pill:
 
-- a filter, Pages, drill-down, the date range, a shared filter, a click selection;
+- Pages, drill-down, the date range, a shared filter, a click selection (a **filter** takes a row-level calculation — [Filters](worksheet-encodings.md#calculated-fields-as-filters)); an aggregate one is refused there too, with `Calculation 'X' can't be a filter: …`;
 - the Shape and Angle slots;
 - a field-choice list (a calculated pill has no field choices).
 

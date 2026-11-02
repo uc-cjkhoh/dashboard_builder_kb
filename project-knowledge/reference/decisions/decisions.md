@@ -12,6 +12,7 @@ open question, promote it to a decision.
 | D26–D60, D65–D68, D73 (calculated fields, parameters, member labels, groups, split / unpivot) | [decisions-calculated-fields.md](decisions-calculated-fields.md) |
 | D61–D64, D69, D71–D72, D74, D79–D81 (dashboards, hierarchies, option controls, desktop-only, compound join keys, Gantt, stories) | [decisions-dashboards.md](decisions-dashboards.md) |
 | D70 (recent connection sources) | [decisions-connection.md](decisions-connection.md) |
+| D82 (calculated fields as row filters) | [decisions-filters.md](decisions-filters.md) |
 | D75–D77 (`NULL`, `IN` / `BETWEEN`, keyword `IF`), D78 (`MAKEDATE`, `DATENAME`) | [decisions-logic.md](decisions-logic.md) |
 
 ## Platform & safety
@@ -274,9 +275,7 @@ at the field) and authoritatively on the server (`ClickHouse/RequestValidation.c
     default), so a long time range returns months, not millions of timestamps.
   - Past 1,000 categories an axis zooms (slider), and past 1,500 marks the chart draws on canvas.
 - **CSV export** asks for the whole result up to **100,000** rows (`MaxExportRows`), no Top-N.
-- **Rejected:** a no-`LIMIT` "All" (rejected at the user's request — one group-by on a high-cardinality
-  key could return millions of groups); virtualised table rendering (the crosstab's merged row headers
-  don't survive it — the table redraws from the loaded rows instead, fine to tens of thousands of rows).
+- **Rejected:** a no-`LIMIT` "All" (rejected at the user's request — one group-by on a high-cardinality key could return millions of groups); virtualised table rendering (the crosstab's merged row headers don't survive it — the table redraws from the loaded rows instead, fine to tens of thousands of rows).
 - **Known limits:** a date-grouped axis can't be click-filtered (its labels are bucket starts). "Other"
   is skipped (the chart is still drawn) if the server refuses the `transform_null_in` setting.
 

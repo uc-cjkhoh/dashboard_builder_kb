@@ -44,6 +44,7 @@ The current version is **2**; this build also opens version 1. Shapes are in
   - carries `active` and each bookmark's `dashboard` index over as worksheet indexes (v2 bookmarks say `worksheet` / `worksheetName`).
 
   A valid v1 file opens with identical content and **no issues**. A malformed one is reported through the same checks as v2.
+- **Stories and older builds.** An older build opens a file with stories, reports the story tabs as missing from the tab order and drops them; its next autosave then overwrites the stored workbook without them. Opening a workbook with stories in an older build is a one-way loss (Export first).
 - **A file with a version above 2 is refused.**
 - **Writing is v2 only**, so an older build refuses a newer file instead of silently dropping dashboards
   ([D61](../../reference/decisions/decisions-dashboards.md#d61--worksheets-and-dashboards-are-separate-tab-kinds-workbook-format-v2)).
@@ -204,7 +205,7 @@ The rules are in `Board/board-model.js` (pure).
   The same applies to `columns`, `color`, `filters`, `size`, `label`, `shape`, `path`, `angle`, `detail`, `tooltip` and `pages`.
 - A Top-N filter ranked by a missing calculation is removed the same way, whether in a sheet, a shared-filter list or a bookmark.
   Bookmark sheets are cleaned like worksheets.
-- A calculated pill is also removed from `filters`, drill levels, the date range, `pages` and shared filters.
+- A calculated pill is also removed from drill levels, the date range, `pages` and shared filters; a sheet's filter keeps a calculation (never as a Top-N).
 - A saved `datePart` is dropped from a calculated pill, and an `agg` outside sum / avg / min / max / countDistinct / countNonNull resets to sum.
   Each of these is reported.
 

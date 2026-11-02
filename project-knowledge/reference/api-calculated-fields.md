@@ -80,3 +80,5 @@ reaches the server or SQL.
 - **Results:** a number-typed calculation's values are numbers (division by zero → `null`). `min` / `max`
   of a text or date calculation are strings. A calculated dimension's keys are strings like any key:
   numbers in invariant form (`"0.3333333333333333"`, `"20"`), `null` for a NULL key.
+
+**As a filter** ([D82](decisions/decisions-filters.md#d82--a-calculated-field-is-a-row-filter-applied-before-grouping)). `QueryFilter.calc` is the tree, `db` / `table` are `""`, `column` is the label (≤ 60 characters). The same tree checks apply, at `filters[i].calc.<node>`. Extra 400s: an aggregate-containing tree ("A filter can't contain an aggregate — it is applied to each row before the view is grouped.", `filters[i].calc`), `op: "top"` (`filters[i].calc`) and any `cast` (`filters[i].cast`). The compared values keep the plain filter's rules and limits (≤ 20 filters, ≤ 500 `in` values, ≤ 1000 characters), coerced by the calculation's type (number, text, date, boolean).

@@ -106,6 +106,10 @@ Each Filters pill is a column + operator + value. Every value is a **bound typed
 | text | any |
 | compound / other | can't be filtered |
 
+### Calculated fields as filters
+
+A **row-level calculated field** dropped on Filters is a filter on its value ([D82](../../reference/decisions/decisions-filters.md#d82--a-calculated-field-is-a-row-filter-applied-before-grouping)): the same pill, operators (not `top`, and not `in the` for a date) and bound typed values, coerced by the calculation's type. Members for `in` / `not in` come from a one-dimension query of the calculation (≤ 200 shown). It is a `WHERE` condition, so rows are filtered **before** grouping, ranking and table calculations. An **aggregate** calculation is refused (toast and 400). It can't be shared, doesn't apply to a histogram or box plot (counted in their notice) and is left out of "View data".
+
 ### Invalid and empty filters
 
 - **A value that doesn't fit** makes the pill **invalid** (dashed border, warning icon, tooltip). The reason shows inline in the filter's value editor, in its context popup: "'abc' is not a number for column amount."
@@ -144,7 +148,7 @@ Each Filters pill is a column + operator + value. Every value is a **bound typed
 
 ### Histogram and box plot
 
-They are single-table views. They apply the filters that sit on their own table and show a notice counting the rest ("2 filters on other tables don't apply to a box plot").
+They are single-table views. They apply the filters that sit on their own table and show a notice counting the rest ("2 filters on other tables or calculated fields don't apply to a box plot").
 
 ## Click-to-filter
 

@@ -194,8 +194,8 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Calc/calc-resolve.js` — pure: `catalogFromEntities`, `makeResolve`, `compileCalculation(calc, calcs, catalog, params)` (parse → expand → substitute parameters → check), `calcTables`
 - `Calc/calc-workbook.js` — pure: `checkName`, `mapRefs` (rewrite refs outside text literals), `renameInFormulas`, `usedBy`, `cleanCalculation(s)` — the workbook list rules
 - `Calc/calc-pill.js` — pure:
-  - the calc-pill shape (`makeCalcPill`, `isCalcPill`, `pillName`), `refusal` (the places a calculated field is refused, [D33](decisions/decisions-calculated-fields.md#d33--calculated-fields-are-refused-wherever-a-plain-column-is-assumed)), `pillSlots`, `syncCalcPills`, `usesCalc`, `clearCalcPills`
-- `Calc/calc-plan.js` — pure: the worksheet plan seam — `wireDim`, `wireMeasure`, `planTables`, `calcProblem`, `measureLabel`, `aggWord(agg, p)` (`p90`), `topByRef` / `wireTopBy` (both carry `p` for a percentile), `resolveSortTarget`
+  - the calc-pill shape (`makeCalcPill`, `newCalcFilter`, `isCalcPill`, `pillName`), `refusal` (the places a calculated field is refused, [D33](decisions/decisions-calculated-fields.md#d33--calculated-fields-are-refused-wherever-a-plain-column-is-assumed)), `pillSlots`, `syncCalcPills`, `usesCalc`, `clearCalcPills`
+- `Calc/calc-plan.js` — pure: the worksheet plan seam — `wireDim`, `wireMeasure`, `planTables`, `calcProblem`, `filterCalcProblem` / `wireCalcFilter` (a calculated filter), `measureLabel`, `aggWord(agg, p)` (`p90`), `topByRef` / `wireTopBy` (both carry `p` for a percentile), `resolveSortTarget`
 - `Calc/calc-dialog-model.js` — pure: `evaluateDraft` (validation), `chipFor` (role chip), `suggest` (`[` field, `[@` parameter and function-name autocomplete)
 - `Calc/function-help.js` — pure: the function glossary `FUNCTION_HELP` (derived from `calc-types.js` + the logic keywords), `searchHelp`, `groupHelp`, `functionItems` — the dialog's Functions panel and name autocomplete
 - `Calc/calc-pane-model.js` — pure: `paneState` (group items), `deleteCalcPlan`, `showUseAs` / session Use-as choice, `normaliseFormula`

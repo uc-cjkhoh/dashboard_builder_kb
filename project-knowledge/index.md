@@ -68,6 +68,7 @@ matching whatever you're touching.
 | [decisions-dashboards.md](reference/decisions/decisions-dashboards.md) | D61–D64, D69, D71–D72, D81: dashboards, hierarchies, option controls, stories |
 | [decisions-connection.md](reference/decisions/decisions-connection.md) | D70: recent connection sources |
 | [decisions-logic.md](reference/decisions/decisions-logic.md) | D75–D77: `NULL`, `IN` / `BETWEEN`, keyword `IF` |
+| [decisions-filters.md](reference/decisions/decisions-filters.md) | D82: a calculated field as a row filter |
 
 ## operations/ — build, run, deploy
 
