@@ -36,6 +36,7 @@ An invalid field mapping shows a friendly **hint**, never an error (e.g. "A poin
 | Funnel | 1 dimension + 1 measure | Stages widest first, each labelled with value and % of the first. Label ink picked per stage |
 | Gauge | 1 measure, no dimension | Arc from 0 to Format → **Target** (else a round maximum). Value and "% of target" written in the middle |
 | Bullet | 1 measure (+ ≤1 dimension), + an optional 2nd measure, + Format → **Target** | Per member: the value bar over three bands (< 50 %, 50–75 %, 75–100 % of target) with the target tick. Format → **Target field** picks the view's second (or later) measure as the target, so each member has its own target (the tooltip shows it and the %). With no field, the fixed **Target** number applies to every member. With neither, a hint |
+| Gantt | 1 dimension + 2 measures (start, length) | One horizontal bar per member, first on top, from the first measure (start) to start + the second (length). A date start (a date field used as a measure with Minimum / Maximum) draws a time axis and the length counts days; a number start draws a value axis. The length is written at each bar's end and the tooltip shows start → end and the length, so colour carries nothing. Rows without a valid start or with a negative length are skipped and counted in the notice; a zero length is a thin bar. Not a click-to-filter target ([D80](../../reference/decisions/decisions-dashboards.md)) |
 | Sankey (flow) | 2 dimensions + 1 measure | Flows from the first dimension's members to the second's. Non-positive flows are skipped. A member on both sides stays two nodes |
 | Small multiples | 2 dimensions + ≥1 measure | A mini line chart per member of the **first** dimension (at most 24 panels, with a notice), the second along each x axis, one shared y scale |
 | KPI | measures | big number per measure; with a dimension, an inline SVG **sparkline** of the trend |
@@ -48,12 +49,12 @@ An invalid field mapping shows a friendly **hint**, never an error (e.g. "A poin
 - Only **Table, Text and KPI** can show a string value. Any other chart type shows a hint: "Min/Max of a text or date field shows as Table, Text or KPI — switch the chart type, or use Count."
 - Null values render as "—".
 
-### The P36 types (Waterfall, Funnel, Gauge, Bullet, Sankey, Small multiples)
+### The P36 types (Waterfall, Funnel, Gauge, Bullet, Sankey, Small multiples, Gantt)
 
-- All six run on the ordinary `/api/query` result.
-- Sizing: Waterfall scrolls like a bar chart; Bullet grows down the left; Funnel, Gauge, Sankey and Small multiples always fit the pane.
+- All seven run on the ordinary `/api/query` result.
+- Sizing: Waterfall scrolls like a bar chart; Bullet and Gantt grow down the left (one slot per row); Funnel, Gauge, Sankey and Small multiples always fit the pane.
 - They aren't click-to-filter targets.
-- Code: `renderP36` in `render-special.js`; builders in `chart.js`; pure helpers `waterfallSteps`, `niceMax`, `multiplesGrid` (unit-tested).
+- Code: `renderP36` in `render-special.js`; builders in `chart.js`; pure helpers `waterfallSteps`, `niceMax`, `multiplesGrid` and `Dashboard/gantt-model.js` (unit-tested).
 
 ### Measures and dimensions
 

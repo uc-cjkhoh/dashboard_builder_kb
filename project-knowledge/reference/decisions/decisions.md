@@ -10,7 +10,7 @@ open question, promote it to a decision.
 |---|---|
 | D1–D25 | this file |
 | D26–D60, D65–D68, D73 (calculated fields, parameters, member labels, groups, split / unpivot) | [decisions-calculated-fields.md](decisions-calculated-fields.md) |
-| D61–D64, D69, D71–D72, D74, D79 (dashboards, hierarchies, option controls, desktop-only, compound join keys) | [decisions-dashboards.md](decisions-dashboards.md) |
+| D61–D64, D69, D71–D72, D74, D79–D80 (dashboards, hierarchies, option controls, desktop-only, compound join keys, Gantt) | [decisions-dashboards.md](decisions-dashboards.md) |
 | D70 (recent connection sources) | [decisions-connection.md](decisions-connection.md) |
 | D75–D77 (`NULL`, `IN` / `BETWEEN`, keyword `IF`), D78 (`MAKEDATE`, `DATENAME`) | [decisions-logic.md](decisions-logic.md) |
 

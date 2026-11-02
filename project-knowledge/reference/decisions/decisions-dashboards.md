@@ -135,3 +135,10 @@ Decided 2026-11-02 (autonomous build). A relationship may match on more than one
 - **Suggestions:** same name (exact, else ignoring case and `_` `-` spaces) and the same kind; offered in the dialog, never added silently.
 - **Rejected:** a `pairs` list that replaces `from` / `to` (every consumer of a link's ends would change at once); keyboard "add to the existing link" by relating
   two more columns of already-related tables (it would change what that gesture means today).
+
+### D80 — Gantt is a result-shaped mark: one dimension, a start measure, a length measure
+- **Shape:** one dimension (the rows) and exactly two shelf measures — the first is the start, the second the length. No new endpoint, no new server limit; it draws the ordinary `/api/query` result like the other P36 types.
+- **Date start:** a date field used as a measure with Minimum / Maximum comes back as text; Gantt is allowed to read it (`TEXT_VALUE_TYPES`). The length then counts days (fractions allowed) and the axis is a time axis. A number start gives a value axis and a length in the same unit.
+- **Not colour alone:** one bar colour; the length is written at each bar's end and in the tooltip with the start and end.
+- **Skipped:** a row with no usable start or a negative length is not drawn and is counted in the notice; a zero length is drawn as a thin bar.
+- **Rejected for now:** a length from an end field, a colour split per bar, and dependencies — see the backlog.
