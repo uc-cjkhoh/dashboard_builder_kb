@@ -144,7 +144,8 @@ In the table below, `P##` tags (P28, P33 …) name the product phase whose cases
 | `tests/js/workbook-model.test.mjs` (P39 cases) | bookmarks round-trip with dashboard index, selection and shared filters; bad bookmarks / link actions dropped and reported |
 | `tests/js/workbook-model.test.mjs` (P40 cases) | shared filters round-trip / cap 4 / bad ops dropped; field choices kept, shown field included, junk dropped |
 | `tests/js/theme-model.test.mjs` | **every preset and derived custom accent passes contrast in light and dark**, refusals, palettes, saved-theme checks |
-| `tests/js/p36-charts.test.mjs` | waterfall steps (incl. below zero), round maxima, small-multiples grid, fit rules and registration of the six P36 types |
+| `tests/js/p36-charts.test.mjs` | waterfall steps (incl. below zero), round maxima, small-multiples grid, fit rules and registration of the seven P36 types |
+| `tests/js/gantt-model.test.mjs` | Gantt bars (number / date start, skipped rows, calendar-day lengths across a DST change), axis time, label margin, registration |
 | `tests/js/conditional-model.test.mjs` | scale tints (sequential / diverging, midpoint), **every tint ≥ 4.5:1 light and dark**, data bars from zero, first-match rules |
 | `tests/js/scale-model.test.mjs` | table paging plan + progress, Other row, date-grouping plan, zoom past 1,000 categories, canvas mark counts |
 | `tests/js/chart-fit.test.mjs` | per-category slots (grouped, horizontal, heatmap), label rotation by pane width, no minimum for pie/scatter/treemap |
