@@ -38,6 +38,8 @@ and `NULL` to `NULL`, since nothing the user typed reaches the SQL. A boolean st
 
 ### D77 — The keyword `IF` is another spelling of `CASE WHEN`
 `IF c THEN a [ELSEIF d THEN b]… [ELSE e] END` parses to the same `case` node as `IF(c, a, e)`, `IIF` and `CASE WHEN`, so
-the server, the compiler and the workbook see nothing new. `IF (c) THEN …` starts like the function, so the parser tries the
-function first and falls back to the keyword form; the error that got further is the one shown.
+the server, the compiler and the workbook see nothing new. `IF (c) THEN …` starts like the function, so the parser decides the form from the tokens, without backtracking: a comma at
+depth 1 of the parentheses (or an unclosed one) is the function; anything else is the keyword form. **Rejected:** trying the
+function and retrying as the keyword form on failure: it re-parses nested `IF (…) THEN` twice per level, so 22 levels took
+44 s and the 500-character limit allows about 30. The cost now is one token scan per `IF (`.
 - No `ELSE` gives NULL, like `CASE`. `ELSEIF` after `ELSE` is a parse error.
