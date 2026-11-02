@@ -27,7 +27,7 @@ reaches the server or SQL.
 | `ifnull` | `l`, `r` |
 | `case` | `whens`: `[{ "c": cond, "t": result }]` (at least one) and an optional `else`. `IF`/`IIF` are one arm plus `else` |
 | `not` / `isnull` | `arg` |
-| `fn` | `fn` ∈ `text lower upper trim len left right replace concat contains startswith endswith split datediff dateadd year month day quarter week weekday date`, `args`: array |
+| `fn` | `fn` ∈ `text lower upper trim ltrim rtrim len left right mid find replace concat contains startswith endswith icontains istartswith iendswith split datediff dateadd year month day quarter week weekday date`, `args`: array |
 | `agg` | `fn` ∈ `sum avg min max count countd median stddev variance percentile attr`, `arg`, and `p` for `percentile` |
 
 - In `agg`, `count` counts non-NULL values (as `countNonNull`) and `countd` counts distinct values.

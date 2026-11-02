@@ -31,8 +31,8 @@ A `calc` tree becomes SQL in four steps; no formula text and no literal is ever 
    - **Logic nodes:** `(a = b)` (also `!= < <= > >=`), `and(a, b)`, `or(a, b)`, `not(a)`, `if(c, a, b)` (IF/IIF),
      `multiIf(c1, a1, …, else)` (CASE; `NULL` last without an ELSE), `ifNull(a, b)`, `isNull(a)`. A NULL condition is
      not true: IF takes its else, CASE the next WHEN (pinned by the live smoke test).
-   - **Text functions** (`fn` nodes, every argument compiled once in source order): `toString(x)` (`TEXT`; `STR` parses to the same `text` node), `lowerUTF8`, `upperUTF8`, `trimBoth`, `toFloat64(lengthUTF8(…))`, `leftUTF8`/`rightUTF8(t, {UInt32})`, `replaceAll`, `concat`, `(position(t, s) > 0)`, `startsWith`,
-     `endsWith`, `if(isNull(t), NULL, arrayElementOrNull(splitByString({sep:String}, assumeNotNull(t)), {k:UInt32}))`.
+   - **Text functions** (`fn` nodes, every argument compiled once in source order): `toString(x)` (`TEXT`; `STR` parses to the same `text` node), `lowerUTF8`, `upperUTF8`, `trimBoth`/`trimLeft`/`trimRight`, `toFloat64(lengthUTF8(…))`, `leftUTF8`/`rightUTF8(t, {UInt32})`, `substringUTF8(t, {UInt32}, {UInt32})` (`MID`), `toFloat64(positionUTF8(t, s))` (`FIND`), `replaceAll`, `concat`, `(position(t, s) > 0)`, `startsWith`,
+     `endsWith`, the case-insensitive twins `(positionCaseInsensitiveUTF8(t, s) > 0)` and `startsWith`/`endsWith(lowerUTF8(t), lowerUTF8(s))` (new function names `ICONTAINS` etc., not a flag, so the wire shape stays `fn` + `args`), `if(isNull(t), NULL, arrayElementOrNull(splitByString({sep:String}, assumeNotNull(t)), {k:UInt32}))`.
    - **Date functions:**
      - `toFloat64(dateDiff({unit:String}, a, b))`. `dateDiff` on a `Date` with a time unit reads midnight to midnight (24 hours a day).
      - `addYears`/`addQuarters`/`addMonths`/`addWeeks`/`addDays`/`addHours`/`addMinutes`/`addSeconds(d, {n:Int32})` (fixed name per unit, unit never in SQL), applied to `toDateTime64(d, 0)` and

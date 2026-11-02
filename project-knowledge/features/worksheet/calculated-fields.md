@@ -38,7 +38,7 @@ ref       := "[" name "]" | "[@" parameter "]"                   (a workbook par
 
 - **Operators** `+ − * /`, parentheses, numbers, and the aggregates `SUM`, `AVG`, `MIN`, `MAX`, `COUNT`, `COUNTD`, `MEDIAN`, `STDDEV`, `VARIANCE`, `PERCENTILE`, `ATTR`. Function names are case-insensitive. The function table lives in `calc-types.js`.
 - **Logic** ([below](#logic-functions)): comparisons, `AND` / `OR` / `NOT`, `IF` / `IIF` / `CASE`, `IFNULL`, `ISNULL`, `ZN`, text literals.
-- **Text** ([below](#text-functions)): `TEXT` (alias `STR`), `LOWER`, `UPPER`, `TRIM`, `LEN`, `LEFT`, `RIGHT`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `SPLIT`.
+- **Text** ([below](#text-functions)): `TEXT` (alias `STR`), `LOWER`, `UPPER`, `TRIM`, `LTRIM`, `RTRIM`, `LEN`, `LEFT`, `RIGHT`, `MID`, `FIND`, `REPLACE`, `CONCAT`, `CONTAINS`, `STARTSWITH`, `ENDSWITH`, `ICONTAINS`, `ISTARTSWITH`, `IENDSWITH`, `SPLIT`.
 - **Date** ([below](#date-functions)): `DATEDIFF`, `DATEADD`, `YEAR`, `MONTH`, `DAY`, `QUARTER`, `WEEK`, `WEEKDAY`, `DATE`.
 - **References:** `[table.column]` (`[db.table.column]` when two databases hold the same table name), or `[Name]` for another calculation. Calculations can refer to calculations. The browser expands every reference into one tree before sending, so the server never sees a calculation name.
 - **Division by zero** gives NULL, never an error. A formula with **no field references** (`1+2`) is valid but needs a field elsewhere on the sheet to group or total.
@@ -91,12 +91,12 @@ Row-level functions over text. Names are case-insensitive; the table is `ROW_FUN
 |---|---|---|
 | `TEXT(x)` / `STR(x)` | text | A number, date or text as text. `STR` is the same function. Unlike the rows below, the argument is not limited to text: it may be any number, date or text expression. A condition is refused: `TEXT (or STR) needs a number, date or text — that value is boolean.` Numbers print as ClickHouse prints a Float64 (`10`, `2.5`, `0.30000000000000004`, `1e21`; no thousands separator). A date reads `YYYY-MM-DD`; any value with a time (a `DATETIME` column, a `DATEADD` result) reads `YYYY-MM-DD hh:mm:ss`. NULL gives NULL; text is unchanged. `CONCAT('#', TEXT([o.id]))` builds a label |
 | `LOWER(t)` / `UPPER(t)` | text | change case, accents and non-Latin letters included (`UPPER('straße')` is `STRASSE`) |
-| `TRIM(t)` | text | remove leading and trailing spaces (the space character only; tabs and line breaks stay) |
-| `LEN(t)` | number | length in **characters**, not bytes (`LEN('日本語')` is 3) |
-| `LEFT(t, n)` / `RIGHT(t, n)` | text | The first / last `n` characters. `n` is a whole number 0 to 1000. Longer than the text gives the whole text; 0 gives an empty text |
+| `TRIM(t)` / `LTRIM(t)` / `RTRIM(t)` | text | remove spaces at both ends / the start / the end (the space character only; tabs and line breaks stay) |
+| `LEN(t)` / `FIND(t, s)` | number | `LEN`: length in **characters**, not bytes (`LEN('日本語')` is 3). `FIND`: 1-based character position of the first `s` in `t`, 0 when absent, case-sensitive, 1 for an empty `s` |
+| `LEFT(t, n)` / `RIGHT(t, n)` | text | The first / last `n` characters. `n` is a whole number 0 to 1000. Longer than the text gives the whole text; 0 gives an empty text. `MID(t, start, n)` takes `n` characters from `start` (1 to 1000, 1 is the first); `start` and `n` are literals |
 | `REPLACE(t, from, to)` | text | Every occurrence of `from` replaced by `to`. Case-sensitive. An empty `from` changes nothing. `from` and `to` may be fields (pinned live) |
 | `CONCAT(a, b, …)` | text | Two to ten texts joined. Empty if any is empty (wrap a part in `IFNULL(x, '')` to keep the rest) |
-| `CONTAINS(t, s)` / `STARTSWITH(t, s)` / `ENDSWITH(t, s)` | boolean | **case-sensitive** match (`LOWER` both sides for a case-insensitive one); an empty `s` is always true |
+| `CONTAINS(t, s)` / `STARTSWITH(t, s)` / `ENDSWITH(t, s)` | boolean | **case-sensitive** match; `ICONTAINS` / `ISTARTSWITH` / `IENDSWITH` are the case-insensitive twins (separate names, no flag); an empty `s` is always true |
 | `SPLIT(t, sep, k)` | text | The `k`-th piece (1 is the first) of `t` cut at `sep`. `sep` is text of 1 to 20 characters; `k` a whole number 1 to 1000. Empty when there is no `k`-th piece. An empty text has one empty piece; two neighbouring separators leave an empty piece |
 
 - **Split… menu.** A text field's menu **Split…** asks for a separator (1–20 characters) and 2–10 pieces, then adds one calculated field per piece (`tags 1`, `tags 2`, … = `SPLIT([db.table.tags], ',', k)`). It stops at the 20-field limit. A field whose names hold `.`, `[` or `]` can't be split.
