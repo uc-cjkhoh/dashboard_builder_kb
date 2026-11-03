@@ -116,7 +116,7 @@ edge / shadow / ink / weight:
 |---|---|
 | hover | `--glass-ctl-hover`, edge darkens to `--ink-3`, `--elev-8` (ghost: gains fill + edge + `--elev-2`), icon turns accent |
 | pressed | `scale(.96–.98)`, shadow drops to the rim only |
-| selected (active tab, open tool, Format on) | `--accent-soft` fill + `--accent` edge + 2px accent underline + weight 600 |
+| selected (active tab, open tool, Format on) | `--accent-soft` fill + weight 600 (no accent shadow or underline on a button) |
 | focus | the 2px `--focus` ring (inset where the control sits near an edge, e.g. a chip's `＋`) |
 | dragging (table chip) | `--accent` edge + `--elev-16`, grip shown |
 | disabled | `opacity .5`, no shadow, `not-allowed`, no hover change |

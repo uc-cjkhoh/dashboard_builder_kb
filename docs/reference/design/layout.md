@@ -102,7 +102,7 @@ list with one hairline above them.
 
 A glass bar across the top of the content area (`.canvas__bar`). From left to right it holds:
 
-1. Frosted-pill tabs; the active one has an accent fill, edge and underline.
+1. Frosted-pill tabs; the active one has an accent fill and bold text.
 2. The quiet autosave text.
 3. The **Workbook** overflow menu ([tabs.md](../../concepts/workbook/tabs.md),
    [workbook.md](../../concepts/workbook/workbook.md)).

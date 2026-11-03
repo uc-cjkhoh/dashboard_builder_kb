@@ -17,7 +17,7 @@ The tab strip runs across the top of the content area and switches between the D
 
 ## The strip
 
-- **Look.** Tabs are frosted pills (tier-2 glass controls). The active tab has an accent fill, edge and underline, and bold text.
+- **Look.** Tabs are frosted pills (tier-2 glass controls). The active tab has an accent fill and bold text.
   It carries `aria-current`.
 - **Data Source tab.** A pinned **Data Source** tab (`.tab--model`) comes first: the shared entity canvas
   ([canvas.md](../data-source/canvas.md) + [relationships.md](../data-source/relationships.md)). It cannot be closed.
