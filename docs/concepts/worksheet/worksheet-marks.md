@@ -11,7 +11,10 @@ The Marks group sits at the top of the field pane and collapses like the other g
 
 - **Every tool is always reachable** (there is no More menu). Tools the chart type doesn't use are **quiet** (dimmed) unless they hold fields: Size / Shape outside scatter, square, circle; Path outside line, area; Angle outside pie, donut; Detail, Drill and Pages by default.
 - **A slot** is an icon over its name. It shows a **count badge** when it holds fields and is a **drop target** (drag a field straight onto it).
-- **Click a slot** to open **one** editor panel in the data header, with its pills over a drop zone. At most one editor is open at a time.
+- **Click a slot** to open **one** editor, with its pills over a drop zone. It is a **flyout** (`.ws-toolfly`) that opens just right of the field pane, level with the slot but below the Columns and Rows lanes, so a field is one short drag away, the chart never shifts, and the lanes stay uncovered. At most one editor is open at a time.
+  - Keyboard focus moves into the flyout when a slot is pressed; **Esc** or ✕ closes it and returns focus to the slot. Pressing the slot again also closes it.
+  - Pressing the chart puts the flyout away (the press still reaches the chart); the field pane, lanes and the flyout itself are left alone, since fields are dragged from and to them.
+  - The calculation and field-choices editors opened from a pill stay inline under the lanes.
 - Code: `.ws-shelf--marks`; `buildTools` / `toolButton`; `markGrid` in `Dashboard/pill-options.js` chunks the slots into rows of three. `visibleTools(chartType, tools)` (`Dashboard/toolbar-rules.js`, pure) decides which are quiet. The editor panel is `toolPanel` (`.ws-toolpanel`). Icons come from `Core/icons.js`.
 
 ## Marks

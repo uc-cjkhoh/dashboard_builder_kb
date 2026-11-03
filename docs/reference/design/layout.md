@@ -140,7 +140,7 @@ Data controls sit in the glass header; view controls sit on the chart card they 
    - Pills are 24px, so a filled lane stays as tall as an empty one.
    - The Marks slots sit in the field pane
      ([Marks slots](../../concepts/worksheet/worksheet-marks.md#marks-slots)).
-   - One editor panel (`.ws-toolpanel`) opens under the lanes at a time.
+   - One Marks editor (`.ws-toolpanel`, in `.ws-toolfly`) is open at a time, floating beside the field pane — see [worksheet-marks.md](../../concepts/worksheet/worksheet-marks.md).
 2. **Chart card** (`.ws-chart-card`, solid): a head (`.ws-chart-head`) with the **view bar**
    (`.ws-viewbar`), then the Format card when open, the result notice, and the chart pane.
    - View bar, left: the field-pane toggle, the chart-type picker and undo / redo.

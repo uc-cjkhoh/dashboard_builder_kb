@@ -20,7 +20,7 @@ Each worksheet tab is one Tableau-style worksheet: a field pane beside shelves y
 
 Data sits on top; view controls sit on the chart ([design/layout.md](../../reference/design/layout.md#worksheet--data-header-and-chart-card)).
 
-1. **Data header** — the **Columns** and **Rows** shelves (full-width lanes, always visible) and the open Marks editor panel. The Marks slots themselves live in the field pane ([worksheet-marks.md](worksheet-marks.md#marks-slots)).
+1. **Data header** — the **Columns** and **Rows** shelves (full-width lanes, always visible) (a Marks editor opens as a flyout, not in the header). The Marks slots themselves live in the field pane ([worksheet-marks.md](worksheet-marks.md#marks-slots)).
 2. **Chart card** — flush (no margin, no radius). Its head is the **view bar**, left to right:
    - field-pane toggle;
    - the one chart-type control (`chartTypePicker`, [worksheet-charts.md](worksheet-charts.md#chart-type-control));
