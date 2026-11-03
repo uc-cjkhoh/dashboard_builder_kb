@@ -62,5 +62,6 @@ These are golden rules 6–9 in [coding-standards.md](../../development/coding-s
 | Shell, sidebar, entity cards, worksheet header tiers, `hidden`, dialogs | [design/layout.md](layout.md) |
 | CSS class vocabulary, shared and per feature | [design/components.md](components.md) |
 | Motion tokens, reduced motion, accessibility posture | [design/motion-accessibility.md](motion-accessibility.md) |
+| The icon set: rules, notable uses, every name | [design/icons.md](icons.md) |
 
 How each screen uses the design: the [features/](../../concepts/worksheet/worksheet.md) docs.

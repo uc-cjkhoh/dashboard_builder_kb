@@ -92,7 +92,7 @@ Problems while restoring:
 
 ## Export & Import
 
-The tab bar's right end holds the site-wide icons: **Performance**, **Appearance** and the **Settings** menu (Theme…, `Shell/Index.cshtml`, right-most). Workbook actions live in the worksheet view bar.
+The tab bar's right end holds the site-wide icons: **Appearance** and the **Settings** menu (Theme…, `Shell/Index.cshtml`, right-most). The **Performance** timings tile is in the sidebar body (worksheet and dashboard tabs only), and workbook actions live in the worksheet view bar.
 The worksheet view bar's icon row ends with **Export**, **Import workbook…** and the **Sheet actions** (⋯) menu, and the **Export** menu holds **Workbook (JSON)**, and the worksheet sidebar's **Parameters** icon opens the Parameters dialog.
 The actions:
 
@@ -117,7 +117,7 @@ The actions:
 
 Two more parts save with the workbook but are not managed from this menu:
 
-- **Hierarchies** (T03-29) are managed in the Hierarchies dialog, opened from the sidebar's drill icon
+- **Hierarchies** (T03-29) are managed in the Hierarchies dialog, opened from the sidebar's hierarchy (tree) icon
   ([worksheet-encodings.md](../worksheet/worksheet-encodings.md#named-hierarchies)).
   - They save as the optional `hierarchies` field of version 2, omitted when there are none.
   - A file without it (every older file) opens with none and **no issue**. `parseWorkbook` ignores fields it doesn't know, so the field needs no version bump.

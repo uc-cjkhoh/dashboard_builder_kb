@@ -106,7 +106,7 @@ Each widget is an `<article class="board-widget">` with a header (title, then ic
 | **Spacer** | "Spacer"; **Remove** (no Edit) | empty, hatched on screen so it can be found; invisible in print; 2 × 1, 2–12 wide, 1–24 tall |
 | **Text** | the heading (empty reads "Text"); **Edit** (inline, below) and **Remove** | the body text, plain (`textContent`; line breaks kept and wrapped, no Markdown, no markup) |
 
-**Focus and accessibility.** Every widget is a focusable group with a visible focus ring and a corner grip at its bottom-right.
+**Focus and accessibility.** Every widget is a focusable group with a visible neutral focus wash and a corner grip at its bottom-right.
 It has `tabindex="0"`, `role="group"`, `aria-roledescription="dashboard widget"`, `aria-label` set to its name,
 and `aria-describedby` pointing at a one-line key hint.
 
@@ -282,7 +282,7 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
 - `tests/live/board-edit-ui.mjs` — real mouse events: move and resize with the ghost, overlapping / off-grid drops that snap back,
   keyboard and the live status, text edit / limits / Esc, undo and redo of every edit type by button and shortcut, panel drag,
   pointercancel / blur / Esc, reload keeps the layout but not the history;
-  light and dark screenshots with the ghost, a refused ghost and the focus ring.
+  light and dark screenshots with the ghost, a refused ghost and the focus wash.
 
 **Whole board**
 

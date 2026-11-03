@@ -116,7 +116,7 @@ Spec: [design/index.md](../reference/design/index.md), [tokens.md](../reference/
   Nothing is removed, and an encoding that holds fields is never hidden.
 - **Red accent without red-means-error ambiguity** (the reason D7 was retired). Danger is a distinct
   vermilion (`--danger-*`) and always carries an icon and words. Field pills are blue / teal / violet.
-  The focus ring is neutral ink, and a focused input keeps a neutral border with an accent underline, so
+  Keyboard focus is a neutral ink wash (no ring, border change or accent underline), so
   focus never looks like an invalid field.
 - **Glass only where nothing sits beneath it but the wash.** On a blurred panel over content, the text
   underneath reads through the text on top, so anything that floats is solid ([tokens.md](../reference/design/tokens.md)).

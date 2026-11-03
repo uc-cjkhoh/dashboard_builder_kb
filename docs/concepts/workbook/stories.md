@@ -20,7 +20,7 @@ Its view is `#story-view`, shown only while a story is active.
 |---|---|
 | Bar | the story's name, "N of 20 steps", a polite status line, **Print step** |
 | Add row | **Step shows** (a select of every worksheet and dashboard), a caption field (≤ 300), **Add step**. The new step is appended and becomes current. A refusal (caption too long, 20 steps already, no tab chosen) is written under the row and nothing is added. |
-| Step strip | one button per step: number, caption start (else the tab's name), and an icon for the kind. The current step is filled, underlined and bold, and has `aria-selected`; the strip is a `tablist`. |
+| Step strip | one button per step: number, caption start (else the tab's name), and an icon for the kind. The current step is filled and bold, and has `aria-selected`; the strip is a `tablist`. |
 | Current step | "Step N of M · <tab name>", the caption (plain text), and the step's tools |
 | Stage | a **worksheet** step draws that worksheet as a static view (no selection or drill) through the shared result cache; a **dashboard** step shows a card with **Open dashboard** |
 | Previous / Next | one step each; disabled at the ends (no wrap); "N / M" between them |

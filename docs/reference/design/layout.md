@@ -48,7 +48,7 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
     the 14px text) within 0.5px. The first and last rows sit 4px inside the list's top and bottom edges.
     A failed card's status line uses the same 16px gutter.
 - **Nothing touches.**
-  - Menu lists (`.menu__list`, including the two-column chart picker) have a 4px gap between items.
+  - Menu lists (`.menu__list`, including the two-column chart picker) have a 4px gap between items and size to their content (`width: max-content`, capped to the window), so an item never wraps.
   - Stacked `<details>` field rows are spaced 4px apart (`.ws-group > :not(summary) + *`).
   - Single-choice `<select>`s show a chevron on the 16px gutter instead of the UA arrow; pill selects
     keep the native one.
@@ -80,9 +80,9 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
     The brand name, toggle, resizer and the connection / database / tables are `display: none`.
   - On a **worksheet** the rail also carries the tool icons in one column, 1 × N (`#ws-tools`,
     `.sidebar__tool`, 40px, filled by `dashboards.js`). They use the frosted control tier: `--ctl-edge`
-    ≥ 3:1 border, full-ink icon, accent on hover. The tools are **Calculated fields** (`calc` icon) and
-    **Hierarchies** (`drill` icon). Each has its name as `aria-label` / tooltip and opens a dialog.
-  - A dashboard's rail has the mark only.
+    ≥ 3:1 border, full-ink icon, accent on hover. The tools are **Calculated fields** (`calc` icon),
+    **Parameters** (`param`) and **Hierarchies** (`hierarchy`); the **Performance** tile (`chart-gauge`) closes the rail. Each has its name as `aria-label` / tooltip and opens a dialog.
+  - A dashboard's rail has the mark and the Performance tile.
   - The user's own collapse choice is untouched and returns with the Data Source tab.
 - The brand name is one line (ellipsis), so the toggle never makes the brand row taller
   than `--topbar-h`.
