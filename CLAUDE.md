@@ -125,7 +125,7 @@ dashboard_builder/          (this KB)
 │   │   ├── run-logs/       #   blocked work
 │   │   └── updates/        #   generated change logs
 │   └── archive/            # frozen P0–P20 build plan, old debug log — not maintained
-└── .claude/                # hooks (kb-verify, update-log, reap-chrome), settings, skills
+└── .claude/                # hooks (kb-verify, update-log, reap-orphans), settings, skills
 ```
 
 ## Where things live

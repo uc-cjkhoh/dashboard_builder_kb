@@ -23,9 +23,9 @@
           },
           {
             "type": "command",
-            "command": "/unified/user/cj/knowledge/web_development/dashboard_builder/.claude/hooks/reap-chrome.sh",
+            "command": "/unified/user/cj/knowledge/web_development/dashboard_builder/.claude/hooks/reap-orphans.sh",
             "timeout": 10,
-            "statusMessage": "Checking for orphaned Chrome..."
+            "statusMessage": "Checking for orphaned Chrome and dev servers..."
           }
         ]
       }
@@ -35,9 +35,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/unified/user/cj/knowledge/web_development/dashboard_builder/.claude/hooks/reap-chrome.sh",
+            "command": "/unified/user/cj/knowledge/web_development/dashboard_builder/.claude/hooks/reap-orphans.sh",
             "timeout": 10,
-            "statusMessage": "Checking for orphaned Chrome..."
+            "statusMessage": "Checking for orphaned Chrome and dev servers..."
           }
         ]
       }

@@ -3,14 +3,14 @@ components: []
 ---
 # Hooks
 
-What the three KB hooks check or generate, and how to run them by hand. The hooks are wired in
+What the KB hooks check or generate, and how to run them by hand. The hooks are wired in
 `.claude/settings.json`; the scripts live in `.claude/hooks/`.
 
 | Hook | Fires | Does |
 |---|---|---|
 | `kb-verify.py` | after Write/Edit of a KB markdown file | Reports line-limit breaches (under 300 lines per doc, under 200 for indexes), code blocks in `architecture/overview.md`, missing front-matter, folders without an `index.md`, non-kebab-case filenames, changelog phrasing, and broken file/anchor links (inbound too) back to the agent. Rules: [kb-maintenance.md](kb-maintenance.md). |
 | `update-log.py` | after a Bash call that runs `git merge` or `git commit` | Rebuilds [ui_updates.md](updates/ui_updates.md) and [feature_updates.md](updates/feature_updates.md) from the app repo's `main` history. |
-| `reap-chrome.sh` | after Bash, and on Stop | Kills orphaned headless-Chrome processes and removes their `calc-ui-*` profile dirs. |
+| `reap-orphans.sh` | after Bash, and on Stop | Kills orphaned headless-Chrome processes and removes their `calc-ui-*` profile dirs. Also stops orphaned dev servers (`dotnet run`, `bin/Debug` builds) that a Claude shell started (`CLAUDECODE=1`), now parentless and over an hour old, with their process tree. Never the live service under `/var/www`. |
 
 ## By hand
 
