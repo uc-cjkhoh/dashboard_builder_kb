@@ -26,7 +26,7 @@ The editing dialog has:
   - **Field autocomplete:** typing `[` opens a list of fields and other calculations (a calculation never offers itself). Arrow keys move; Enter or Tab (after arrowing) accepts; Esc closes the list and not the dialog.
   - **Function autocomplete:** typing the start of a function name (a letter prefix outside `[ ]` and outside a text literal, e.g. `LO`) offers up to 12 matching functions in the same list, each with its signature (`LOWER(text)`). Not offered when the caret is inside a word. Accepting inserts `LOWER(` with the caret after the bracket; before an existing `(` no second one is added. `AND`, `OR`, `NOT` and `CASE` insert the word and a space.
   - **Robust input:** CRLF is normalised; control characters and over-long text give a message, never an exception.
-- **Functions** — a button under the formula opens a help panel (`aria-expanded`; Esc closes the panel and not the dialog).
+- **Functions** — the dialog has two panels: the editor on the left, the available functions on the right (always shown; there is no toggle button; below 760px it stacks). The right panel is a search box, the grouped list (name, then its arguments), and a detail area.
   - A search box filters the glossary (name, group, plain-words sentence, signature). The list is grouped Aggregate, Logic, Text, Date.
   - Hovering or focusing a row shows its detail: signature, what it does, what it takes, what it gives, one example formula and the empty-value (NULL) rule.
   - Clicking a row inserts its signature at the caret (replacing a selection). **Insert example** inserts the example of the function last focused with the keyboard or clicked (hovering only previews).
@@ -39,7 +39,7 @@ The editing dialog has:
 
 ## Field pane group
 
-Calculations are not in the field pane itself. On a worksheet tab, the sidebar's calculator icon opens the **Calculated fields** dialog (`Dashboard/calc-manager.js`). It lists one row per calculation: its chip (name, role chip such as `Aggregate · number`, the add **+** and a **⋯** menu) and an **Edit** button. **New calculated field** sits in the dialog footer and is disabled at the count limit. The dialog redraws while open whenever calculations change. The **⋯** menu:
+Calculations are not in the field pane itself. On a worksheet tab, the sidebar's calculator icon opens the **Calculated fields** dialog (`Dashboard/calc-manager.js`). It lists one row per calculation: one element, its chip: the type icon, the name, the role chip such as `Aggregate · number`, the add **+**, a **⋯** menu and a pencil **Edit** button built into the chip (pressing the name edits too) — all on one line. **New calculated field** sits in the dialog footer and is disabled at the count limit. The dialog redraws while open whenever calculations change. The **⋯** menu:
 
 | Action | Behaviour |
 |---|---|
