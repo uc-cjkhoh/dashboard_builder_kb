@@ -89,6 +89,15 @@ The fill carries the edge instead:
 
 Where the ≥ 3:1 edge rule below mentions a border, read it as "a fill that stands out from the glass".
 
+### Button states
+
+Every button runs the same ladder (`Core/buttons.css`): **rest → hover** (deeper fill) **→ pressed** (deeper still, and it sinks: `translateY(1px)` for text buttons, `scale(.96)` for icon buttons) **→ focus** (the neutral 2px ring) **→ disabled** (faded, `not-allowed`).
+
+- **Weight is the hierarchy:** the primary action is 600, every other `.btn` is 500.
+- **Side padding:** a text `.btn` has 16px each side; with a leading icon, 8px on that side so the glyph sits level with the text above it.
+- **`.btn--ghost`:** no fill at rest, a 1px edge drawn as an inset shadow (buttons have no border), and the `.btn` fill on hover.
+- **Reduced motion:** transitions and the pressed sink are switched off.
+
 ### Controls on glass — three tiers and a state ladder
 
 Blur does not signal "clickable", so interactivity is carried by solidity, edge and feedback.
