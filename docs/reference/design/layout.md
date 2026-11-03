@@ -98,19 +98,20 @@ then the search box and table list. The connected summary is a flat row: status 
 host, and edit and disconnect ghost buttons. **Union** and **Unpivot** are pinned under the scrolling
 list with one hairline above them.
 
+The **performance** gauge tile (`#perf-btn`) closes the body: the same 40px sidebar tool tile as the worksheet tools, pinned to the bottom, left-aligned under Union / Unpivot on the Data Source and centred in the rail on a worksheet or dashboard (where the body shows only the tools, or only this tile). It is hidden while the sidebar is collapsed.
+
 ## Tab bar
 
 A glass bar across the top of the content area (`.canvas__bar`). From left to right it holds:
 
 1. Frosted-pill tabs; the active one has an accent fill and bold text.
 2. The quiet autosave text.
-3. The **Workbook** overflow menu ([tabs.md](../../concepts/workbook/tabs.md),
-   [workbook.md](../../concepts/workbook/workbook.md)).
-4. The **performance** gauge button (`#perf-btn`, `Shell/perf-panel.js`) opens the timings dialog
-   ([frontend-modules.md](../../architecture/frontend-modules.md)); it sits flush against the next button, no overlap.
-5. Right-most, the **appearance toggle** (`#scheme-btn`, `Shell/scheme-toggle.js`). It is an icon button
+3. The **appearance toggle** (`#scheme-btn`, `Shell/scheme-toggle.js`). It is an icon button
    whose glyph shows the current choice (monitor / sun / moon; label "Appearance: System"). It opens a
    System / Light / Dark radio menu ([tokens.md § Light and dark](tokens.md#light-and-dark)).
+4. Right-most, the **Settings** menu (Theme…; [workbook.md](../../concepts/workbook/workbook.md)).
+
+The **performance** gauge button (`#perf-btn`, `Shell/perf-panel.js`) is not in this bar: it is a sidebar tool tile in the sidebar body (see § Sidebar).
 
 The bar's contents are vertically centred. It shares `--topbar-h` with the sidebar brand block, so the
 two bottom borders line up across the shell. If the tabs wrap, the bar grows taller than the brand.
