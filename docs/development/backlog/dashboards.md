@@ -1,0 +1,18 @@
+---
+components: []
+---
+# Backlog: dashboards, actions and stories
+
+Dashboard tabs are built: widgets render and save, and the board supports drag, resize, keyboard editing and undo ([dashboards.md](../../concepts/workbook/dashboards.md)). The entries below are what remains. Entries are in build order. Format: [index.md](index.md#how-to-read-an-entry).
+
+- **Layout and size** (IDs: T08-07, T08-08, T08-10; priority P2) — Open: range-constrained size (minimum and maximum width and height), floating (free-positioned, overlapping) widgets, custom fixed width and height beyond the five presets, undo/redo of size changes. Partial: a dashboard is automatic or fixed to a preset size, saved in the workbook ([dashboards.md](../../concepts/workbook/dashboards.md#layout)). Needs: none.
+- **Configurable actions** (IDs: T08-20, T08-21, T08-22, T08-23, T08-24; priority P1) — Open: source/target/linking-field setup, hover or menu triggers, multi-mark selection (ctrl-click, rectangle, lasso). Partial: highlight inside one chart only; a click in one dashboard widget filters the other widgets by the clicked value on the clicked widget's primary dimension (one `=`, one selection, fixed behaviour — [dashboards.md](../../concepts/workbook/dashboards.md#cross-widget-filtering)); Clear restores everything with no preserve or filter-to-none option. Needs: none.
+- **Navigation** (IDs: T08-25, T08-26; priority P2) — Open: cross-dashboard interactions (a selection or filter carried to the dashboard a button opens), a button that applies a bookmark. Partial: the navigation button goes to a worksheet or dashboard tab ([dashboards.md](../../concepts/workbook/dashboards.md#widgets)); bookmarks are menu-only and the URL action opens external links only. Needs: none.
+- **P38 Drill-through and report tooltips** (IDs: T08-29, T06-15; priority P2; effort M) — Open: a mark menu "Go to <dashboard>" that opens the target with the mark's values as bound filters plus a Back button; a tooltip that renders a dashboard or chart filtered to the hovered mark (small, cached, latest-wins), with conditions. Tooltips show text fields only. Needs: none.
+- **Stories remainder** (IDs: T08-28; priority P3) — Open: a step that applies a bookmark, a dashboard drawn inside the story stage, step-level filters and selections, a presentation mode (full screen, keys), and an image / PDF export of a whole story. Partial: story tabs hold captioned steps over worksheets and dashboards ([stories.md](../../concepts/workbook/stories.md)). Needs: none.
+- **Parameter and set actions (P39 remainder)** (IDs: T08-27; priority P3; effort S) — Open: a click sets a parameter to the mark's value (parameters exist); a click adds a member to a set (sets are in [calculations.md](calculations.md)). Both sit on the selection chip beside the link action. Needs: sets need P25.
+- **Dashboard guidance and data notes** (IDs: T08-02, T08-30, T09-12; priority P1–P2) — Open: audience/goal planning prompt, design-consistency checks, free-text data notes. Partial: the status bar shows the last-query time and the print header lists calculation definitions and the update time, beside fields, filters and the notice; the dashboard's own print header does not. Needs: none.
+
+## Action design
+
+Actions form an explicit graph: a source-sheet event (select, hover, menu, multi-select) runs an action type (filter, highlight, navigate, go to sheet) on target sheets, matched by chosen fields, with Clear set to all, none or keep. A selected mark filters targets by its group keys, bound as typed values (golden rule 3), never by display labels. Field mappings across sheets are explicit when two sheets use different tables. Set actions stay P3.

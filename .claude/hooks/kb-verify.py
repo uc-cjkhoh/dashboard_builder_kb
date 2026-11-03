@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""PostToolUse hook: verify an edited KB doc against agent-behavior/kb/kb-maintenance.md.
+"""PostToolUse hook: verify an edited KB doc against docs/development/kb-maintenance.md.
 
 Reads the hook JSON on stdin. If the edited file is a markdown doc of this KB (not the exempt
-archive/ or a git-ignored *.local.md), it checks:
-  - CLAUDE.md / README.md < 200 lines; every other doc <= 350 lines
-  - ARCHITECTURE.md has no code blocks (fences with a language tag; untagged plain-text fences are allowed)
-  - kebab-case filename under project-knowledge/ and agent-behavior/
+archive/, updates/, run-logs/ or a git-ignored *.local.md), it checks:
+  - index files (CLAUDE.md, README.md, docs/README.md, index.md) < 200 lines; every other doc < 300 lines
+  - docs/architecture/overview.md has no code blocks (fences with a language tag; untagged plain-text fences are allowed)
+  - kebab-case filename under docs/ (README.md and index.md allowed)
+  - front-matter block with a `components:` list on every doc under docs/
+  - an index.md in every docs/ folder that holds more than one markdown file
   - no changelog / history phrasing ("current state, not history")
   - relative links (file and #anchor) in the file resolve, and links elsewhere to this file still resolve
 Findings go back to the model as additionalContext (non-blocking). Clean edits print nothing.
@@ -14,7 +16,8 @@ Run with --all to check every KB doc from the shell (prints findings, exit 1 if 
 import json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-EXEMPT = ("project-knowledge/archive/", "project-knowledge/updates/", "agent-behavior/run-logs/")  # updates/ is a generated log (update-log.py), run-logs/ are dated agent logs: history by design
+EXEMPT = ("docs/archive/", "docs/development/updates/", "docs/development/run-logs/")  # updates/ is a generated log (update-log.py), run-logs/ are dated agent logs: history by design
+INDEXES = ("CLAUDE.md", "README.md", "AGENTS.md")
 HISTORY = [
     (r"\bCorrection,? same day\b", "changelog-style 'Correction, same day'"),
     (r"\b(shipped|added|fixed|removed|changed|built|deployed|migrated)\s+(on\s+|live\s+)?\d{4}-\d{2}-\d{2}\b", "dated changelog entry"),
@@ -76,20 +79,26 @@ def check(f, inbound=True):
     lines = text.count("\n") + (0 if text.endswith("\n") or not text else 1)
     name, issues = os.path.basename(f), []
 
-    if rel in ("CLAUDE.md", "README.md", "project-knowledge/README.md", "agent-behavior/README.md"):
+    if rel in INDEXES or name in ("README.md", "index.md"):
         if lines >= 200: issues.append(f"{rel} is {lines} lines; indexes must stay under 200 — move detail into a topic file")
-    elif lines > 350:
-        issues.append(f"{rel} is {lines} lines (limit ~350) — extract its most self-contained sub-topic into a new file in the same subfolder and link it")
+    elif lines >= 300:
+        issues.append(f"{rel} is {lines} lines (limit: under 300) — extract its most self-contained sub-topic into a new file in the same folder and link it")
     # a fence with a language tag is code; an untagged fence is plain text (diagrams, trees) and allowed
-    if rel == "project-knowledge/ARCHITECTURE.md" and re.search(r"^[ \t]*```[ \t]*\w", text, re.M):
-        issues.append("ARCHITECTURE.md must be high-level flow only: remove code blocks and point to source / topic files")
-    if rel.startswith(("project-knowledge/", "agent-behavior/")) and name not in ("README.md", "ARCHITECTURE.md") and not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*\.md", name):
-        issues.append(f"filename '{name}' is not kebab-case")
+    if rel == "docs/architecture/overview.md" and re.search(r"^[ \t]*```[ \t]*\w", text, re.M):
+        issues.append("architecture/overview.md must be high-level flow only: remove code blocks and point to source / topic files")
+    if rel.startswith("docs/"):
+        if name not in ("README.md", "index.md") and not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*\.md", name):
+            issues.append(f"filename '{name}' is not kebab-case")
+        if not re.match(r"---\ncomponents: \[.*\]\n---\n", text):
+            issues.append(f"{rel} lacks the front-matter block (`---` / `components: [source paths]` / `---`)")
+        folder = os.path.dirname(f)
+        if len([x for x in os.listdir(folder) if x.endswith(".md")]) > 1 and not any(os.path.exists(os.path.join(folder, i)) for i in ("index.md", "README.md")):
+            issues.append(f"{os.path.relpath(folder, ROOT)}/ holds several docs but has no index.md")
     fence = False
     for n, line in enumerate(text.splitlines(), 1):
         if line.lstrip().startswith("```"): fence = not fence
         if fence: continue
-        for pat, label in ([] if rel == "agent-behavior/kb/kb-maintenance.md" else HISTORY):   # that page quotes the banned phrases
+        for pat, label in ([] if rel == "docs/development/kb-maintenance.md" else HISTORY):   # that page quotes the banned phrases
             if re.search(pat, line, re.I):
                 issues.append(f"{rel}:{n} {label} — KB tracks current state, not history; overwrite the line instead")
     for n, t in links(f):
@@ -120,7 +129,7 @@ def main():
     if exempt(os.path.relpath(f, ROOT)): return
     issues = check(f)
     if issues:
-        msg = ("KB check (agent-behavior/kb/kb-maintenance.md) failed for " + os.path.relpath(f, ROOT) + ":\n- "
+        msg = ("KB check (docs/development/kb-maintenance.md) failed for " + os.path.relpath(f, ROOT) + ":\n- "
                + "\n- ".join(issues[:15]) + "\nFix these in the same change.")
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": msg}}))
 

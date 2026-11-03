@@ -2,11 +2,11 @@
 
 Index for anyone (human or agent) working on the **Dashboard Builder**. This file is the map: where the
 code is, setup commands, directory layout, and the golden rules in one line each. The detail lives in
-[`project-knowledge/`](project-knowledge/index.md) and [`agent-behavior/`](agent-behavior/README.md) — follow the links.
+the [`docs/`](docs/README.md) knowledge base — follow the links.
 
-> **Read first:** [README.md](project-knowledge/README.md) · [ARCHITECTURE.md](project-knowledge/ARCHITECTURE.md) · [design/overview.md](project-knowledge/design/overview.md),
-> then the [`project-knowledge/`](project-knowledge/index.md) file for whatever you're touching. **Update that doc in the same
-> change** — this KB tracks current state, not history ([kb-maintenance.md](agent-behavior/kb/kb-maintenance.md)).
+> **Read first:** [README.md](README.md) · [architecture/overview.md](docs/architecture/overview.md) · [design/index.md](docs/reference/design/index.md),
+> then the [`docs/`](docs/README.md) file for whatever you're touching. **Update that doc in the same
+> change** — this KB tracks current state, not history ([kb-maintenance.md](docs/development/kb-maintenance.md)).
 
 > **This KB is docs only.** The source is at `/unified/user/cj/web_development/prototype/dashboard_builder/`
 > on the build host `10.168.49.20` (same shared filesystem — build it from here). Never scaffold code
@@ -14,7 +14,7 @@ code is, setup commands, directory layout, and the golden rules in one line each
 
 ## Golden rules
 
-One line each; full text in [golden-rules.md](project-knowledge/engineering/golden-rules.md).
+One line each; full text in [coding-standards.md](docs/development/coding-standards.md).
 **Rules 1–3 shape every server change.**
 
 1. **Read-only against ClickHouse** — `SELECT`/`SHOW`/`DESCRIBE` only, no DDL/DML endpoint in v1; ClickHouse's own
@@ -39,7 +39,7 @@ plus a **read-only JSON API**. The **browser holds all builder state** — the s
 **server is a thin, session-scoped proxy to ClickHouse**: `ConnectionRegistry` holds the session's
 connection; `ClickHouseGateway` runs introspection and bounded, identifier-safe aggregate/join queries
 and returns JSON. **There is no application database.** Full picture:
-[ARCHITECTURE.md](project-knowledge/ARCHITECTURE.md).
+[overview.md](docs/architecture/overview.md).
 
 ## Build, run, test, deploy
 
@@ -55,13 +55,13 @@ dotnet publish src/DashboardBuilder/DashboardBuilder.csproj -c Release -o publis
 ```
 
 - **Prereqs:** .NET SDK 10 (on the host's `PATH`); a ClickHouse to point at — details and a throwaway
-  container in [development.md](project-knowledge/operations/development.md).
+  container in [quickstart.md](docs/getting-started/quickstart.md).
 - **Live:** `webapps-dev.dashboardbuilder.service`, Kestrel `:5105`, Apache `:8443`, path
   `/dashboardbuilder`. Stop → copy → start for server changes — never copy a DLL over the running
-  process ([deployment.md](project-knowledge/operations/deployment.md)).
+  process ([live-service.md](docs/operations/live-service.md)).
 - **Never `pkill -f DashboardBuilder.dll`** (matches the live service) — stop dev runs by port.
 - **Credentials** (SSH + ClickHouse): git-ignored
-  [credentials.local.md](project-knowledge/operations/credentials.local.md) — never in shared docs. All never-do rules: [safe-operations.md](agent-behavior/operations/safe-operations.md).
+  [credentials.local.md](docs/operations/credentials.local.md) — never in shared docs. All never-do rules: [safe-operations.md](docs/operations/safe-operations.md).
 
 ## Source layout
 
@@ -79,11 +79,11 @@ tests/js/                       # node --test, for the pure JS modules
 ```
 
 Feature assets are served at `/features/<Feature>/<file>` (`.css`/`.js` only). Map:
-[ARCHITECTURE.md § Code map](project-knowledge/ARCHITECTURE.md#code-map).
+[components.md § Code map](docs/architecture/components.md).
 
 ## Design rules
 
-Full text and how they map to tokens: [golden-rules.md § 11](project-knowledge/engineering/golden-rules.md#11-design-rules).
+Full text and how they map to tokens: [coding-standards.md § 11](docs/development/coding-standards.md#11-design-rules).
 
 1. **Optical alignment** on every element — align to what the eye reads, not the box edge.
 2. **Gaps and spacing** are only 4 / 8 / 16 / 24 px (`--s1` `--s2` `--s4` `--s6`).
@@ -95,7 +95,7 @@ Full text and how they map to tokens: [golden-rules.md § 11](project-knowledge/
 ## Tech stack reference
 
 Preferred stack for new projects — **reference only**: this app stays vanilla JS/CSS
-([golden rule 10](project-knowledge/engineering/golden-rules.md#10-self-hosted-framework-free-frontend)).
+([golden rule 10](docs/development/coding-standards.md#10-self-hosted-framework-free-frontend)).
 UI: shadcn/ui NOVA · Icons: Lucide · Animation: Motion · Drag and drop: dnd-kit · State: Zustand.
 
 ## KB directory map
@@ -104,25 +104,26 @@ The one copy of the folder tree; other docs link here.
 
 ```
 dashboard_builder/          (this KB)
-├── CLAUDE.md  README.md    # entry index (kept at root for Claude Code) · router to the two folders
-├── agent-behavior/         # how to work here
-│   ├── workflow/           # definition-of-done · merge-to-main · status-dashboard
-│   ├── kb/                 # kb-maintenance · hooks
-│   ├── operations/         # safe-operations (never-do list)
-│   └── run-logs/           # blocked work
-├── project-knowledge/      # what the project is
-│   ├── README.md  ARCHITECTURE.md  index.md
-│   ├── engineering/        # golden-rules · sharp-edges · change-checklist
-│   ├── design/             # overview · tokens · layout · components · motion-accessibility
-│   ├── features/           # one file per app feature, in three groups:
+├── README.md               # project introduction and entry point
+├── CLAUDE.md               # instructions for AI coding agents (loaded automatically)
+├── CHANGELOG.md            # pointer to the generated change logs
+├── docs/
+│   ├── README.md           # KB index and navigation
+│   ├── getting-started/    # prerequisites · installation · configuration · quickstart
+│   ├── architecture/       # system-context · overview · data-flow · components · frontend-modules
+│   ├── concepts/           # core-concepts, then one folder per app area:
 │   │   ├── data-source/    #   connection · schema-browser · canvas · query-sources · relationships
-│   │   ├── worksheet/      #   worksheet · worksheet-charts · worksheet-encodings · calculated-fields · field-settings
+│   │   ├── worksheet/      #   worksheet (+ -query, -table-view) · worksheet-charts · worksheet-encodings (+ -marks, -filters) · calculated-fields (+ -formulas, -groups) · field-settings
 │   │   └── workbook/       #   tabs · dashboards · stories · workbook
-│   ├── reference/          # api (+ -calculated-fields) · clickhouse-integration (+ clickhouse-calculations) · data-model · frontend-modules · glossary
-│   │   └── decisions/      #   decisions (D1–D25 + lookup) · -calculated-fields · -dashboards · -connection · -logic · -filters
-│   ├── operations/         # development · deployment · source-table-guidance (+ git-ignored credentials.local.md)
-│   ├── backlog/            # undone work by topic · recommended order · design specs
-│   ├── updates/            # generated change logs
+│   ├── how-to/             # local-development · testing · deployment · troubleshooting
+│   ├── reference/          # api (+ -calculated-fields) · clickhouse-integration (+ clickhouse-calculations) · data-model · source-table-guidance · glossary
+│   │   └── design/         #   index (concept + rules) · tokens · layout · components · motion-accessibility
+│   ├── decisions/          # README (D1–D82 lookup, open questions) · decisions-* by topic
+│   ├── operations/         # live-service · safe-operations (+ git-ignored credentials.local.md)
+│   ├── development/        # coding-standards · sharp-edges · review-guidelines · git-workflow · status-dashboard · kb-maintenance · hooks
+│   │   ├── backlog/        #   undone work by topic · recommended order · design specs
+│   │   ├── run-logs/       #   blocked work
+│   │   └── updates/        #   generated change logs
 │   └── archive/            # frozen P0–P20 build plan, old debug log — not maintained
 └── .claude/                # hooks (kb-verify, update-log, reap-chrome), settings, skills
 ```
@@ -131,20 +132,20 @@ dashboard_builder/          (this KB)
 
 | Task | Code | Doc |
 |---|---|---|
-| Add/adjust a ClickHouse query | `ClickHouse/ClickHouseGateway.cs` | [clickhouse-integration.md](project-knowledge/reference/clickhouse-integration.md) |
-| Add an API endpoint | `Features/*/…Controller.cs` (subclass `ApiControllerBase`) | [api.md](project-knowledge/reference/api.md) (calculation trees: [api-calculated-fields.md](project-knowledge/reference/api-calculated-fields.md)) |
-| Validate an input / add a limit | `ClickHouse/RequestValidation.cs` + `Features/Core/validate.js` (keep in step) | [api.md § Limits](project-knowledge/reference/api.md#limits) |
-| Connection flow | `ClickHouse/ConnectionRegistry.cs`, `Features/Connection/` | [connection.md](project-knowledge/features/data-source/connection.md) |
-| Drag/drop, entity cards | `Features/Canvas/canvas.js` | [canvas.md](project-knowledge/features/data-source/canvas.md) |
-| Relationships / cardinality | `Features/Relations/relations.js` | [relationships.md](project-knowledge/features/data-source/relationships.md) |
-| Tabs / dashboard data | `Features/Tabs/tabs.js`, `Core/store.js`, `Features/Board/board-model.js` | [tabs.md](project-knowledge/features/workbook/tabs.md) |
-| Worksheet shelves / plan / crosstab | `Features/Dashboard/dashboards.js` | [worksheet.md](project-knowledge/features/worksheet/worksheet.md) |
-| Chart types / rendering / export | `Features/Dashboard/chart.js` | [worksheet-charts.md](project-knowledge/features/worksheet/worksheet-charts.md) |
-| Marks, filters, drill, pages | `Features/Dashboard/dashboards.js` | [worksheet-encodings.md](project-knowledge/features/worksheet/worksheet-encodings.md) |
-| Query caching / latest-wins / truncation notice | `Features/Dashboard/query-runner.js` | [worksheet.md § Query lifecycle](project-knowledge/features/worksheet/worksheet.md#query-lifecycle) |
-| Story tab (steps, strip, caption, print) | `Features/Story/story.js`, `story-model.js` | [stories.md](project-knowledge/features/workbook/stories.md) |
-| Save / restore / export / import | `Features/Workbook/` | [workbook.md](project-knowledge/features/workbook/workbook.md) |
-| Colour / spacing / type | `Features/Core/core.css` `:root` | [tokens.md](project-knowledge/design/tokens.md) |
-| Motion / transitions | `Features/Core/motion.js` + `core.css` motion tokens | [motion-accessibility.md](project-knowledge/design/motion-accessibility.md#motion) |
-| Gotchas before editing | — | [sharp-edges.md](project-knowledge/engineering/sharp-edges.md) |
-| Definition of done | — | [definition-of-done.md](agent-behavior/workflow/definition-of-done.md) |
+| Add/adjust a ClickHouse query | `ClickHouse/ClickHouseGateway.cs` | [clickhouse-integration.md](docs/reference/clickhouse-integration.md) |
+| Add an API endpoint | `Features/*/…Controller.cs` (subclass `ApiControllerBase`) | [api.md](docs/reference/api.md) (calculation trees: [api-calculated-fields.md](docs/reference/api-calculated-fields.md)) |
+| Validate an input / add a limit | `ClickHouse/RequestValidation.cs` + `Features/Core/validate.js` (keep in step) | [api.md § Limits](docs/reference/api.md#limits) |
+| Connection flow | `ClickHouse/ConnectionRegistry.cs`, `Features/Connection/` | [connection.md](docs/concepts/data-source/connection.md) |
+| Drag/drop, entity cards | `Features/Canvas/canvas.js` | [canvas.md](docs/concepts/data-source/canvas.md) |
+| Relationships / cardinality | `Features/Relations/relations.js` | [relationships.md](docs/concepts/data-source/relationships.md) |
+| Tabs / dashboard data | `Features/Tabs/tabs.js`, `Core/store.js`, `Features/Board/board-model.js` | [tabs.md](docs/concepts/workbook/tabs.md) |
+| Worksheet shelves / plan / crosstab | `Features/Dashboard/dashboards.js` | [worksheet.md](docs/concepts/worksheet/worksheet.md) |
+| Chart types / rendering / export | `Features/Dashboard/chart.js` | [worksheet-charts.md](docs/concepts/worksheet/worksheet-charts.md) |
+| Marks, filters, drill, pages | `Features/Dashboard/dashboards.js` | [worksheet-encodings.md](docs/concepts/worksheet/worksheet-encodings.md) |
+| Query caching / latest-wins / truncation notice | `Features/Dashboard/query-runner.js` | [worksheet-query.md § Query lifecycle](docs/concepts/worksheet/worksheet-query.md#query-lifecycle) |
+| Story tab (steps, strip, caption, print) | `Features/Story/story.js`, `story-model.js` | [stories.md](docs/concepts/workbook/stories.md) |
+| Save / restore / export / import | `Features/Workbook/` | [workbook.md](docs/concepts/workbook/workbook.md) |
+| Colour / spacing / type | `Features/Core/core.css` `:root` | [tokens.md](docs/reference/design/tokens.md) |
+| Motion / transitions | `Features/Core/motion.js` + `core.css` motion tokens | [motion-accessibility.md](docs/reference/design/motion-accessibility.md#motion) |
+| Gotchas before editing | — | [sharp-edges.md](docs/development/sharp-edges.md) |
+| Definition of done | — | [review-guidelines.md](docs/development/review-guidelines.md) |
