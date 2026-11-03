@@ -14,8 +14,10 @@ The Marks group sits at the top of the field pane and collapses like the other g
 - **Click a slot** to open **one** editor, with its pills over a drop zone. It is a **flyout** (`.ws-toolfly`) that opens just right of the field pane, level with the slot but below the Columns and Rows lanes, so a field is one short drag away, the chart never shifts, and the lanes stay uncovered. At most one editor is open at a time.
   - Keyboard focus moves into the flyout when a slot is pressed; **Esc** or ✕ closes it and returns focus to the slot. Pressing the slot again also closes it.
   - Pressing the chart puts the flyout away (the press still reaches the chart); the field pane, lanes and the flyout itself are left alone, since fields are dragged from and to them.
+  - Each editor has an **Add field** button (**Replace field** on a one-field slot that is full): a searchable list of the pane's fields, grouped by table, filtered to what the slot takes (Size numeric, Date range temporal). Choosing one goes through the slot's own drop handler, so rules and messages match a drag. It is the click and keyboard path.
+  - A hairline separates what the slot holds from its own editor: **Date range** (full-width range and compare selects), **Tooltip** (the text, an **Edit tooltip…** link beside its label, a preview), and **Filters**, whose filter cards (values, bounds, checklists) move into the flyout while it is open so they are never hidden behind it.
   - The calculation and field-choices editors opened from a pill stay inline under the lanes.
-- Code: `.ws-shelf--marks`; `buildTools` / `toolButton`; `markGrid` in `Dashboard/pill-options.js` chunks the slots into rows of three. `visibleTools(chartType, tools)` (`Dashboard/toolbar-rules.js`, pure) decides which are quiet. The editor panel is `toolPanel` (`.ws-toolpanel`). Icons come from `Core/icons.js`.
+- Code: `.ws-shelf--marks`; `buildTools` / `toolButton`; `markGrid` in `Dashboard/pill-options.js` chunks the slots into rows of three. `visibleTools(chartType, tools)` (`Dashboard/toolbar-rules.js`, pure) decides which are quiet. The editor panel is `toolPanel` (`.ws-toolpanel`); `fieldPicker` builds the Add field list from the field pane's chips (`data-field`). Icons come from `Core/icons.js`.
 
 ## Marks
 
