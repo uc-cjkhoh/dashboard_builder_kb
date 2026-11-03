@@ -20,7 +20,7 @@ which is the source of truth. The sibling MNP Web Portal KB uses the same rules
   contradiction, reconcile to the single current truth — when docs and code disagree, the code wins.
 - **Explicit, actionable logic.** Dense bulleted specifications and numbered steps, natural wording over
   internal jargon, no filler or preamble.
-- **Same-change rule.** Update the doc for what you touched in the same commit. When moving a heading or
+- **Same-change rule** ([golden rule 11](coding-standards.md#11-update-the-kb-after-every-prompt)). Update the doc for what you touched in the same turn and the same commit, before reporting the work done. When moving a heading or
   file, fix inbound links (file and `#anchor`).
 
 ## Layout

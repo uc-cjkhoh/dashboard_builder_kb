@@ -45,7 +45,7 @@ groups. Nothing is removed: an encoding that holds fields is always shown.
   ([tokens.md](tokens.md#controls-on-glass--three-tiers-and-a-state-ladder)).
 - **Design rules** — optical alignment; space only 4 / 8 / 16 / 24 px; one radius for inner and outer
   shapes; saturation ≈ 70 %; font sizes 14 / 16 (content) and 24 / 32 (titles); the layout explains, not
-  extra labels ([coding-standards.md § 11](../../development/coding-standards.md#11-design-rules)).
+  extra labels ([coding-standards.md § 12](../../development/coding-standards.md#12-design-rules)).
 - **`hidden` attribute** for show/hide — never `style.display`.
 - **Fixed shell** — the page never scrolls.
 - **Never colour alone** — status is icon + text + colour.

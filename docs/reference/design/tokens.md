@@ -228,7 +228,7 @@ sizes, and no ad-hoc sizes.
 
 ## Spacing, radius, sizing
 
-- Spacing: `--s1` 4 · `--s2` 8 · `--s4` 16 · `--s6` 24 — nothing between ([golden rule 11](../../development/coding-standards.md#11-design-rules)).
+- Spacing: `--s1` 4 · `--s2` 8 · `--s4` 16 · `--s6` 24 — nothing between ([design rule 2](../../development/coding-standards.md#12-design-rules)).
 - Radius: one `--r` 8px for every shape, inner or outer · `--r-pill` 999px.
 - `--sidebar-w`: 264px default (resizable — [layout.md](layout.md#sidebar)).
 - `--topbar-h`: 60px — the shared `min-height` of the sidebar brand (`.sidebar__brand`) and the tab bar

@@ -5,7 +5,7 @@ components: [src/DashboardBuilder/ClickHouse/ClickHouseGateway.cs, src/Dashboard
 
 The invariants every change must keep. Read the rule for the area you are changing before you start.
 [CLAUDE.md](../../CLAUDE.md#golden-rules) carries the one-line summary; this is the full text. Rules 1–4
-shape every server change; 5–11 every frontend one. "Why" links point to decision records (D1, D2 …) in
+shape every server change; 5–10 every frontend one; 11 applies to every change. "Why" links point to decision records (D1, D2 …) in
 [decisions-platform.md](../decisions/decisions-platform.md).
 
 ## 1. The server is read-only against ClickHouse
@@ -109,7 +109,18 @@ library, ECharts, is vendored at `Features/Core/vendor/echarts.min.js`. Why:
 The preferred stack for *new* projects (shadcn/ui NOVA, Lucide, Motion, dnd-kit, Zustand) is a
 reference only. This app does not adopt it, because it is React-based.
 
-## 11. Design rules
+## 11. Update the KB after every prompt
+
+Whatever a prompt changes — behaviour, layout, design, an icon, a test, a limit — update the doc for that area **in the same turn,
+before you report the work as done**. The KB tracks current state ([kb-maintenance.md](kb-maintenance.md)), so a change with no doc edit leaves it wrong.
+
+- Find the file that owns the topic ([KB directory map](../../CLAUDE.md#kb-directory-map)) and overwrite the stale lines. Do not append history.
+- No suitable file? Create one in the right folder, with front-matter and under 300 lines, and link it from that folder's `index.md`.
+- Search the docs for the old wording (a renamed control, a moved button, a removed feature) and fix every hit, not just the first.
+- Run `python3 .claude/hooks/kb-verify.py --all`; it must report `KB clean`.
+- A prompt that changes nothing a doc describes (a question, a read-only check) needs no edit.
+
+## 12. Design rules
 
 Enforced by `tests/js/tokens.test.mjs`.
 

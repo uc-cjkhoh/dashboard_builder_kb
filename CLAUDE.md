@@ -30,6 +30,7 @@ One line each; full text in [coding-standards.md](docs/development/coding-standa
 8. **Fixed shell** — the page never scrolls; panels scroll inside.
 9. **Never colour alone** — icon + text + colour; legends; shape-coded cardinality.
 10. **Self-hosted, framework-free frontend** — vanilla JS/CSS, no build step, no CDN.
+11. **Update the KB after every prompt** — whatever the prompt changed, update its doc in the same turn, before you report done.
 
 ## What this is in one screen
 
@@ -83,7 +84,7 @@ Feature assets are served at `/features/<Feature>/<file>` (`.css`/`.js` only). M
 
 ## Design rules
 
-Full text and how they map to tokens: [coding-standards.md § 11](docs/development/coding-standards.md#11-design-rules).
+Full text and how they map to tokens: [coding-standards.md § 12](docs/development/coding-standards.md#12-design-rules).
 
 1. **Optical alignment** on every element — align to what the eye reads, not the box edge.
 2. **Gaps and spacing** are only 4 / 8 / 16 / 24 px (`--s1` `--s2` `--s4` `--s6`).
