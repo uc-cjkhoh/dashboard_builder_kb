@@ -49,7 +49,7 @@ groups. Nothing is removed: an encoding that holds fields is always shown.
 - **`hidden` attribute** for show/hide — never `style.display`.
 - **Fixed shell** — the page never scrolls.
 - **Never colour alone** — status is icon + text + colour.
-- **One control height** — every toolbar control is `--ctl-h`.
+- **One control height** — every toolbar control is `--ctl-h`. The sidebar's 40px tools, database select, table search and Union/Unpivot buttons are the one documented exception ([layout.md](layout.md)). Click targets are ≥ 24px: small glyphs get a padded hit area.
 - **Icons are inline SVG** from `Core/icons.js` — no icon font, no Unicode glyph icons.
 
 These are golden rules 6–9 in [coding-standards.md](../../development/coding-standards.md).
