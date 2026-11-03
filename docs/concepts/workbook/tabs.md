@@ -70,10 +70,6 @@ The duplicate icon (`.tab__dup`, `aria-label` "Duplicate <name>") appears on **w
 - At the tab limit it toasts "A workbook holds at most 50 tabs." and adds nothing.
 - The naming, limit check and sheet copy are pure (`Tabs/duplicate-model.js`).
 
-### Workbook menu
-
-**Save view as bookmark…** is an icon in the worksheet view bar, so it is absent on dashboard and story tabs: bookmarks capture worksheets only.
-
 ## How views switch
 
 - **Current view.** `store.currentView()` is `{ kind: "model" }`, `{ kind: "worksheet", id }`, `{ kind: "dashboard", id }` or `{ kind: "story", id }`.

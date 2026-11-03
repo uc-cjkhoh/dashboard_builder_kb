@@ -19,7 +19,7 @@ worksheets (and text) on a 12-column snap grid; one worksheet may sit on several
   - **Import repairs and reports** instead of refusing the file: it clamps into the grid, moves an overlapping widget to the
     first free spot, and drops one that has no worksheet or no room (`Board/board-model.js`, pure and node-tested).
 - **Format v2** saves `worksheets`, `dashboards` (widgets point at worksheets by index), `tabs` (the strip order) and `active`
-  (`{ kind, index }`). Bookmarks carry `worksheet` / `worksheetName`, since a bookmark captures a worksheet.
+  (`{ kind, index }`).
   - **Why the version bump:** the shape changed, so **an older build refuses a v2 file** rather than opening it and silently
     losing the dashboards.
 - **The v1 reader stays for good** (`migrateV1`). Every v1 `dashboards[i]` becomes `worksheets[i]`, the tab order and `active`
@@ -81,8 +81,8 @@ otherwise a note).
 ### D69 — A named hierarchy is a workbook list a sheet copies from, not a reference
 A hierarchy is `{ id, name, levels }` on the workbook. Applying it writes a fresh `sheet.drill` (the same shape the Drill tool
 builds).
-- **Why a copy:** the drill state machine, bookmarks, undo and the query path are untouched, and a sheet keeps working when the
-  hierarchy is renamed, edited or deleted. A live reference would need a missing-hierarchy state on every sheet and bookmark.
+- **Why a copy:** the drill state machine, undo and the query path are untouched, and a sheet keeps working when the
+  hierarchy is renamed, edited or deleted. A live reference would need a missing-hierarchy state on every sheet.
 - **Cost:** editing a hierarchy doesn't update sheets that already used it (re-apply it).
 - **Levels** are plain columns of one table. A calculated or cast field is refused, because a cast or formula could change
   under a stored level.

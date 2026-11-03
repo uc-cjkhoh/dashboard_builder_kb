@@ -38,7 +38,7 @@ Code: `Dashboard/query-runner.js`, unit-tested in `tests/js/`. Each fetch and dr
 2. **Cache before query.** The request (endpoint + full plan) is the cache key. The last **16** results per worksheet are kept. Presentation-only changes (legend, decimals, axis titles, data labels, colour-by-category) and paging back through the Pages shelf therefore re-render instantly with **no** ClickHouse query. Anything that changes the plan (fields, filters, sort, Top-N, chart family) queries.
 3. **Refresh and Cancel.**
    - **Refresh** (icon button on the view bar) drops the worksheet's cache and re-queries with `fresh`, so the server's 60-second result cache is bypassed too ([D25](../../decisions/decisions-platform.md#d25--a-short-lived-server-result-cache-and-approximate-mode)). Use it when the data in ClickHouse has changed.
-   - A result from the server cache says so on the info line.
+   - A result from the server cache says so under the list in the "How this is computed" popover (not on the info line).
    - While a query runs, **Loading…** carries a **Cancel** button. It aborts the request (the server stops the ClickHouse query) and leaves "Query cancelled — Refresh runs it again."
 4. **Truncation notice.** Top-N **All** (the default) asks for up to **5000** groups ([D24](../../decisions/decisions-platform.md#d24--showing-all-data-bounded-requests-paging-other-date-grouping)), so below that, sorting only reorders.
    - If the server reports `truncated` (more groups than the limit) and no **Other** mark shows it, an info line at the top of the chart card says: "Showing the first 50 in sort order — more exist. Raise Top-N in Format, or add a filter."

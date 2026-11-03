@@ -57,7 +57,7 @@ A pill is `{ calc: id, db: "", table: "", column: <name at last save>, category,
 - `category` follows the type (`numeric`, `text`, `temporal`, `boolean`).
 - The empty `db` / `table` keep every reader of `f.db` / `f.table` / `f.column` safe. The **live name** always comes from the workbook's list by `calc` id.
 - A row-level number used as a measure carries `agg: "sum"`.
-- After any calculation change, every sheet's pills refresh their category, role and name (`syncCalcPills`). After undo, redo, applying a bookmark or opening a workbook, the sheet's calculated pills re-read the live calculation's type and role.
+- After any calculation change, every sheet's pills refresh their category, role and name (`syncCalcPills`). After undo, redo or opening a workbook, the sheet's calculated pills re-read the live calculation's type and role.
 
 **Where it goes.** Calculated pills go on Rows, Columns, Color, and the Size, Label, Path and Detail / Tooltip slots. They may be a Top-N ranking measure and a sort target.
 

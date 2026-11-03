@@ -44,7 +44,7 @@ The current version is **2**; this build also opens version 1. Shapes are in
 - **A version 1 file is read forever.** `migrateV1` (in `workbook-model.js`):
   - turns every v1 `dashboards[i]` (one worksheet each) into `worksheets[i]`, and makes no dashboards;
   - orders the tabs as the worksheets were;
-  - carries `active` and each bookmark's `dashboard` index over as worksheet indexes (v2 bookmarks say `worksheet` / `worksheetName`).
+  - carries `active` over as a worksheet index; a v1 file's `bookmarks` (the feature was removed) are ignored.
 
   A valid v1 file opens with identical content and **no issues**. A malformed one is reported through the same checks as v2.
 - **Stories and older builds.** An older build opens a file with stories, reports the story tabs as missing from the tab order and drops them; its next autosave then overwrites the stored workbook without them. Opening a workbook with stories in an older build is a one-way loss (Export first).
@@ -92,16 +92,11 @@ Problems while restoring:
 
 ## Export & Import
 
-The tab bar's right end holds two icon menus (`_Workbook.cshtml`): **Workbook** (Bookmarks…) and **Settings** (Theme…).
-The worksheet view bar's icon row holds **Save view as bookmark…** and **Import workbook…**, and its **Export** menu holds **Workbook (JSON)**, and the worksheet sidebar's **Parameters** icon opens the Parameters dialog.
+The tab bar's right end holds the site-wide icons: **Performance**, **Appearance** and the **Settings** menu (Theme…, `Shell/Index.cshtml`, right-most). Workbook actions live in the worksheet view bar.
+The worksheet view bar's icon row ends with **Export**, **Import workbook…** and the **Sheet actions** (⋯) menu, and the **Export** menu holds **Workbook (JSON)**, and the worksheet sidebar's **Parameters** icon opens the Parameters dialog.
 The actions:
 
 - **Workbook (JSON)** (worksheet view bar → Export) downloads `workbook-YYYY-MM-DD.json` of the current state. When the canvas is empty it says "Nothing to export yet".
-- **Save view as bookmark…** (a worksheet view-bar icon, so absent on a dashboard or story tab) names and saves the open worksheet's view.
-  - A bookmark holds the worksheet's whole sheet (filters, date range, click selection, drill level, page, chart type, format) plus the shared filters.
-  - At most **30** per workbook. Bookmarks save with the workbook (`Workbook/bookmarks-dialog.js`).
-  - **Bookmarks…** lists them (worksheet and time saved) with **Apply** and **Delete**.
-  - Applying restores the shared filters and that worksheet's sheet, and switches to it.
     If the worksheet was closed, it is recreated under its saved name; a toast says why when the tab limit blocks that.
 - **Parameters…** (P32; the sidebar's Parameters icon on a worksheet tab) lists the workbook's parameters (at most 20) with **New**, **Edit** and **Delete**.
   - Each has a name (unique, 1–60 characters), a type (number / text / date), the allowed values (any, a list of ≤ 50, or a number range) and the current value.
@@ -129,7 +124,7 @@ Two more parts save with the workbook but are not managed from this menu:
   - Disconnecting clears them from the screen.
 - **Calculated fields** save as `calculations: [{ id, name, formula }]`: the formula text only. The tree is rebuilt on open
   ([calculated-fields.md](../worksheet/calculated-fields.md)).
-  - `nextCalcId` (the next calculation number) is saved beside them, so deleting the highest id never lets a bookmark's old id bind to a new calculation.
+  - `nextCalcId` (the next calculation number) is saved beside them, so deleting the highest id never lets a sheet's old id bind to a new calculation.
     A file without it derives the number from the highest id.
   - A file without `calculations` opens with none, and the field needs no `version` bump.
   - A Top-N filter ranked by a calculation (`topBy.calc`) round-trips.
@@ -170,7 +165,6 @@ naming the sheet and field ("Sheet "Sales": unknown chart type "radar" — reset
 | Hierarchies | ≤ 20; id `hier<n>` unique, a unique name of 1–60 characters, ≥ 2 levels of `{ db, table, column }` strings from one table; a calculated, repeated or other-table level is removed and reported, levels past 6 cut; fewer than 2 left, a bad entry, a duplicate id / name, or a table that isn't among the file's tables skips that hierarchy and reports it; a non-list means none are opened (`cleanHierarchies`) |
 | Calculations | see [Calculations](#calculations) below |
 | Field settings | keys `db.table.column`; `alias` 1–60 characters, `agg` a known aggregation, `hidden` true, `cast` a known cast, `memberAliases` an object of member value (≤ 100 characters) → label (1–80 characters), ≤ 200 entries (a bad entry is dropped and reported per field; a non-object clears it); ≤ 2000; bad ones dropped and counted |
-| Bookmarks | at most 30; a name 1–60 characters and a sheet (validated like any sheet; a well-formed click selection is kept, unlike a dashboard's); shared filters as above; a worksheet index in range, else "closed" (recreated when applied) |
 | Link action | `https://` with a host and `{value}`, ≤ 500 characters; else removed and reported |
 | Theme | `accent` a preset id or a valid custom `#rrggbb`, `palette` a known id; absent = default; else reset and reported |
 | `active` | `{ kind, index }` pointing at a kept tab, else the Data Source opens |
@@ -208,8 +202,7 @@ The rules are in `Board/board-model.js` (pure).
 - A pill pointing at a calculation the file lacks is removed from its shelf or mark slot and reported as
   `Sheet "X" rows: a calculated field that no longer exists was removed.`
   The same applies to `columns`, `color`, `filters`, `size`, `label`, `shape`, `path`, `angle`, `detail`, `tooltip` and `pages`.
-- A Top-N filter ranked by a missing calculation is removed the same way, whether in a sheet, a shared-filter list or a bookmark.
-  Bookmark sheets are cleaned like worksheets.
+- A Top-N filter ranked by a missing calculation is removed the same way, whether in a sheet or a shared-filter list.
 - A calculated pill is also removed from drill levels, the date range, `pages` and shared filters; a sheet's filter keeps a calculation (never as a Top-N).
 - A saved `datePart` is dropped from a calculated pill, and an `agg` outside sum / avg / min / max / countDistinct / countNonNull resets to sum.
   Each of these is reported.

@@ -14,7 +14,7 @@ It is a third tab kind beside worksheets and dashboards ([tabs.md](tabs.md)); it
 ## The tab
 
 `[+]` → **New story** makes "Story N" (icon `story`, accessible name "Story 1 (story)"). It counts toward the 50-tab limit.
-Its view is `#story-view`, shown only while a story is active; a story has no bookmark action (the menu item is hidden).
+Its view is `#story-view`, shown only while a story is active.
 
 | Part | What it does |
 |---|---|
@@ -63,5 +63,5 @@ Save and open: [data-model.md](../../reference/data-model.md#workbook-file) and 
 
 ## Not built
 
-Bookmarks as steps (a step that applies a saved worksheet view), a dashboard drawn inside the stage, step-level filters and
+A dashboard drawn inside the stage, step-level filters and
 selections, and a presentation mode — see the [backlog](../../development/backlog/dashboards.md).

@@ -215,7 +215,6 @@ Grouped by feature folder; each entry is the module, then what it owns.
 
 - `Workbook/parameters-dialog.js` — P32: the Parameters dialog (sidebar Parameters icon)
 - `Workbook/theme-dialog.js` — the Theme dialog (Settings menu)
-- `Workbook/bookmarks-dialog.js` — P39: Save view as bookmark…, the Bookmarks list, `applyBookmark`
 - `Workbook/workbook.js` — auto-save, restore on connect, Export/Import — [workbook.md](../concepts/workbook/workbook.md)
 - `Workbook/workbook-model.js` — pure:
   - workbook serialize (v2) / `parseWorkbook` (full validation + issue list; v1 files via `migrateV1`) / `sanitizeSheet` / storage keys (`storageKey`, `legacyStorageKey`) — [workbook.md](../concepts/workbook/workbook.md#validation-parseworkbook)

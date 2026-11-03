@@ -252,7 +252,7 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
     This overrides the worksheet print rule that fixes every chart canvas at 1000 × 560. `afterprint` restores the screen layout and chart sizes.
   - **Fixed size:** a **fixed-size** dashboard instead prints its box with the on-screen arrangement kept, absolutely positioned and
     scaled down proportionally to the 1000px page width (never up).
-- Image and CSV export, and bookmarks, stay per worksheet (reach them with **Edit**). The bookmark action is hidden on a dashboard.
+- Image and CSV export stay per worksheet (reach them with **Edit**).
 
 ## Tests
 

@@ -228,16 +228,14 @@ What [workbook.md](../concepts/workbook/workbook.md) saves to `localStorage` and
   fields:        { "db.table.column": { alias?, agg?, hidden?, cast?, memberAliases?: { [rawValue]: label } } }   // P28, T02-34, T02-29 — ≤ 2000
   parameters:    [{ id: "prm<n>", name, type: number|text|date, value, allowed: { kind: any|list|range, list?, min?, max?, step? } }]   // P32 — ≤ 20
   hierarchies?:  [{ id: "hier<n>", name, levels: [{ db, table, column }] }]   // T03-29 — optional, ≤ 20, 2–6 same-table levels; a sheet's drill copies them
-  bookmarks:     [{ name, worksheet: index | null, worksheetName, sheet, sharedFilters, savedAt }]   // P39 — ≤ 30
   sharedFilters: Filter[]                  // P40 — ≤ 4, applied by every worksheet where their table is in the view
   theme:         { accent: "crimson" | "blue" | "teal" | "violet" | "graphite" | "#rrggbb", palette: "default" | "okabe" | "muted" }
 }
 ```
 
 - **Ids:** entity ids are only cross-references inside the file. Opening it creates fresh ids, for worksheets
-  dashboards and stories too; widgets and bookmarks point at worksheets by index, steps at worksheets or dashboards.
-- **Version 1 files** (`dashboards: [{ name, sheet }]`, numeric `active`, bookmarks with `dashboard` /
-  `dashName`) are migrated on read ([workbook.md](../concepts/workbook/workbook.md#format-v2-and-old-files)).
+  dashboards and stories too; widgets point at worksheets by index, steps at worksheets or dashboards.
+- **Version 1 files** (`dashboards: [{ name, sheet }]`, numeric `active`) are migrated on read ([workbook.md](../concepts/workbook/workbook.md#format-v2-and-old-files)).
 - **No connection details or passwords** are ever included.
 - **Validation:** on open, every field is validated against `Core/sheet-schema.js` and the `LIMITS` above.
   Invalid parts are reset to defaults and reported ([workbook.md § Validation](../concepts/workbook/workbook.md#validation-parseworkbook)).

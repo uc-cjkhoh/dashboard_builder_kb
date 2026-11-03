@@ -27,7 +27,7 @@ explorer, not an admin template.
 | Empty state | `.empty` |
 | Toast | `.toast` (`.toast--ok` / `--info` / `--danger`, a coloured left rule), `.toast__text`, `.toast__close`; announced through `#toast-live` |
 | Issue list | `.dialog__list` (`ui.listDialog`) |
-| Bookmarks dialog | `.bookmark-list`, `.bookmark` (`__info`, `__name`, `__meta`), `.bookmark-note` |
+| List-row dialogs (Parameters, Hierarchies) | `.bookmark-list`, `.bookmark` (`__info`, `__name`, `__meta`), `.bookmark-note` |
 | Theme dialog | `.theme-dialog` (`__body`), `.theme-group` (`__title`), `.theme-options`, `.theme-option` (`--custom`, `__label`), `.theme-swatches`, `.theme-swatch`, `.theme-picker`, `.theme-hex`, `.theme-error` |
 
 ## Per feature

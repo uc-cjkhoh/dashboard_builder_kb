@@ -53,7 +53,6 @@ In the table below, `P##` tags (P28, P33 …) name the product phase whose cases
 | `DatePartTests` (.NET) | each part → one function; auto / exact untouched; hostile / unknown parts rejected (400) |
 | `tests/js/action-model.test.mjs` | link templates: https-only, host required, `{value}` encoded and unable to escape its slot or change the host |
 | `tests/js/workbook-model.test.mjs` (P28 case) | field settings round-trip; bad keys / aliases / aggregations dropped and counted |
-| `tests/js/workbook-model.test.mjs` (P39 cases) | bookmarks round-trip with dashboard index, selection and shared filters; bad bookmarks / link actions dropped and reported |
 | `tests/js/workbook-model.test.mjs` (P40 cases) | shared filters round-trip / cap 4 / bad ops dropped; field choices kept, shown field included, junk dropped |
 | `tests/js/theme-model.test.mjs` | **every preset and derived custom accent passes contrast in light and dark**, refusals, palettes, saved-theme checks |
 | `tests/js/p36-charts.test.mjs` | waterfall steps (incl. below zero), round maxima, small-multiples grid, fit rules and registration of the seven P36 types |
