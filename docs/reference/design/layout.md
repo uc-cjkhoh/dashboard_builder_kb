@@ -175,7 +175,7 @@ positioned from the pure `board-layout.js`.
 
 **Widget:** a surface card (`--r`, `--elev-2`) with:
 
-- a `--surface-2` header (grab cursor; the page's `:focus-visible` ring on a focused widget);
+- a `--surface-2` header (grab cursor; the neutral focus wash on a focused widget);
 - a 16px corner grip;
 - while dragging, a dashed ghost with an `--ink-2` border. When the drop is refused, the ghost shows a
   `--danger-solid` border and a `--danger-bg` label with an icon and text.

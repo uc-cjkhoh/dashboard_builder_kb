@@ -119,7 +119,7 @@ edge / shadow / ink / weight:
 | hover | `--glass-ctl-hover`, edge darkens to `--ink-3` (ghost: gains fill), icon turns accent |
 | pressed | deeper fill, `scale(.96–.98)` or a 1px sink |
 | selected (active tab, open tool, Format on) | `--accent-soft` fill + weight 600 (no accent shadow or underline on a button) |
-| focus | the 2px `--focus` ring (inset where the control sits near an edge, e.g. a chip's `＋`) |
+| focus | a neutral wash (12 % `--ink`, 6 % on a text field) laid over the element's own fill — no ring, outline or border change |
 | dragging (table chip) | `--accent` edge + `--elev-16`, grip shown |
 | disabled | `opacity .5`, no shadow, `not-allowed`, no hover change |
 
@@ -135,9 +135,9 @@ wash tint, in both themes.
 | `--accent` / `-hover` / `-pressed` | `#b82035` / `#9c1c32` / `#821729` | `#d42a3c` / `#b72031` / `#991b2a` | primary fill (white `--on-accent` ≥ 4.5:1 in every state); active tab underline, selected relationship, single chart series |
 | `--accent-ink` | `#a51d31` | `#eea0a7` | accent **text** |
 | `--accent-soft` / `--accent-line` | `#fcf0f2` / `#f3c3ca` | `#3a1a20` / `#6b2a33` | tint / stroke |
-| `--focus` | `--ink` | `--ink` | focus ring — neutral, so focus never looks like an error |
+| `--focus` | `--ink` | `--ink` | neutral focus colour (kept for outlines a feature may still draw by hand; `:focus-visible` outlines are forced off) |
 
-Inputs on focus get a neutral `--ink-2` border plus the 2px `--focus` ring (an outline, never a shadow). An invalid input uses
+Inputs on focus get the neutral wash and their caret; the border does not change. An invalid input uses
 `--danger-solid` and always has its icon + message below.
 
 ### Workbook themes (P41)
@@ -247,6 +247,6 @@ sizes, and no ad-hoc sizes.
   - `--elev-16`: menus, popovers, toast and the card being dragged.
   - `--elev-28`: dialogs.
 - **Glass:** see [Glass](#glass) — chrome only.
-- **Focus:** a 2px `--focus` (ink) outline with a 2px offset on `:focus-visible`, everywhere (inset on menu
-  items).
+- **Focus:** no outline or border highlight on `:focus-visible` anywhere (`Core/buttons.css` forces it off). Keyboard focus is a
+  neutral ink wash over the element's own fill, so a focused control is still visible in every theme.
 - **Motion tokens** live with the motion rules: [motion-accessibility.md](motion-accessibility.md).
