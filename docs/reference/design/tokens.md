@@ -91,11 +91,13 @@ Where the ≥ 3:1 edge rule below mentions a border, read it as "a fill that sta
 
 ### Button states
 
+**No button or field has a `box-shadow`**, of any colour or in any state (`Core/buttons.css` forces it off). Panels, menus, dialogs and cards keep their elevation (see below).
+
 Every button runs the same ladder (`Core/buttons.css`): **rest → hover** (deeper fill) **→ pressed** (deeper still, and it sinks: `translateY(1px)` for text buttons, `scale(.96)` for icon buttons) **→ focus** (the neutral 2px ring) **→ disabled** (faded, `not-allowed`).
 
 - **Weight is the hierarchy:** the primary action is 600, every other `.btn` is 500.
 - **Side padding:** a text `.btn` has 16px each side; with a leading icon, 8px on that side so the glyph sits level with the text above it.
-- **`.btn--ghost`:** no fill at rest, a 1px edge drawn as an inset shadow (buttons have no border), and the `.btn` fill on hover.
+- **`.btn--ghost`:** no fill at rest, a 1px outline for the edge (buttons have no border and no shadow), and the `.btn` fill on hover.
 - **Reduced motion:** transitions and the pressed sink are switched off.
 
 ### Controls on glass — three tiers and a state ladder
@@ -105,7 +107,7 @@ Blur does not signal "clickable", so interactivity is carried by solidity, edge 
 | Tier | What | Look |
 |---|---|---|
 | 1 · panel | sidebar, tab bar, worksheet header | `--glass` + `--glass-line` |
-| 2 · control on glass | tabs, table chips, inputs / selects on glass | `--glass-ctl` + `--ctl-edge` border + `--glass-rim` + `--elev-2` |
+| 2 · control on glass | tabs, table chips, inputs / selects on glass | `--glass-ctl` + `--ctl-edge` border (no shadow on a button or field) |
 | 3 · primary action | Connect, Apply | solid `--accent`, never glass |
 
 Ghost controls on glass (`.ws-tool` encoding tools, `.iconbtn`) have no fill at rest; the icon + label
@@ -114,14 +116,14 @@ edge / shadow / ink / weight:
 
 | State | Treatment |
 |---|---|
-| hover | `--glass-ctl-hover`, edge darkens to `--ink-3`, `--elev-8` (ghost: gains fill + edge + `--elev-2`), icon turns accent |
-| pressed | `scale(.96–.98)`, shadow drops to the rim only |
+| hover | `--glass-ctl-hover`, edge darkens to `--ink-3` (ghost: gains fill), icon turns accent |
+| pressed | deeper fill, `scale(.96–.98)` or a 1px sink |
 | selected (active tab, open tool, Format on) | `--accent-soft` fill + weight 600 (no accent shadow or underline on a button) |
 | focus | the 2px `--focus` ring (inset where the control sits near an edge, e.g. a chip's `＋`) |
 | dragging (table chip) | `--accent` edge + `--elev-16`, grip shown |
 | disabled | `opacity .5`, no shadow, `not-allowed`, no hover change |
 
-Only `background`, `border-color`, `box-shadow`, `color` and `transform` transition (`--dur-fast`). The
+Only `background`, `border-color`, `color` and `transform` transition (`--dur-fast`). The
 blur is never animated.
 `tests/js/contrast.test.mjs` pins `--ctl-edge` at ≥ 3:1 against the glass over the base and the strongest
 wash tint, in both themes.
@@ -135,7 +137,7 @@ wash tint, in both themes.
 | `--accent-soft` / `--accent-line` | `#fcf0f2` / `#f3c3ca` | `#3a1a20` / `#6b2a33` | tint / stroke |
 | `--focus` | `--ink` | `--ink` | focus ring — neutral, so focus never looks like an error |
 
-Inputs on focus get a neutral `--ink-2` border plus a 2px `--ink-2` underline (never the accent). An invalid input uses
+Inputs on focus get a neutral `--ink-2` border plus the 2px `--focus` ring (an outline, never a shadow). An invalid input uses
 `--danger-solid` and always has its icon + message below.
 
 ### Workbook themes (P41)
