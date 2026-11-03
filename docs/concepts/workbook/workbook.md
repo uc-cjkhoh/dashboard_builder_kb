@@ -93,7 +93,7 @@ Problems while restoring:
 ## Export & Import
 
 The tab bar's right end holds two icon menus (`_Workbook.cshtml`): **Workbook** (Bookmarks…) and **Settings** (Theme…).
-The worksheet view bar's icon row holds **Save view as bookmark…** and **Import workbook…**, and its **Export** menu holds **Workbook (JSON)**, and the sidebar's **Calculated fields** dialog holds **Parameters…**.
+The worksheet view bar's icon row holds **Save view as bookmark…** and **Import workbook…**, and its **Export** menu holds **Workbook (JSON)**, and the worksheet sidebar's **Parameters** icon opens the Parameters dialog.
 The actions:
 
 - **Workbook (JSON)** (worksheet view bar → Export) downloads `workbook-YYYY-MM-DD.json` of the current state. When the canvas is empty it says "Nothing to export yet".
@@ -103,7 +103,7 @@ The actions:
   - **Bookmarks…** lists them (worksheet and time saved) with **Apply** and **Delete**.
   - Applying restores the shared filters and that worksheet's sheet, and switches to it.
     If the worksheet was closed, it is recreated under its saved name; a toast says why when the tab limit blocks that.
-- **Parameters…** (P32; a button in the sidebar's Calculated fields dialog) lists the workbook's parameters (at most 20) with **New**, **Edit** and **Delete**.
+- **Parameters…** (P32; the sidebar's Parameters icon on a worksheet tab) lists the workbook's parameters (at most 20) with **New**, **Edit** and **Delete**.
   - Each has a name (unique, 1–60 characters), a type (number / text / date), the allowed values (any, a list of ≤ 50, or a number range) and the current value.
   - Each is checked before it is kept (`Core/parameters-model.js`).
   - Parameters save with the workbook; disconnecting clears them from the screen.

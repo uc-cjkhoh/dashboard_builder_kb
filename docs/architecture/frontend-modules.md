@@ -213,7 +213,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 
 ### Workbook/ — saving, import/export and workbook dialogs
 
-- `Workbook/parameters-dialog.js` — P32: the Parameters dialog (button in the Calculated fields dialog)
+- `Workbook/parameters-dialog.js` — P32: the Parameters dialog (sidebar Parameters icon)
 - `Workbook/theme-dialog.js` — the Theme dialog (Settings menu)
 - `Workbook/bookmarks-dialog.js` — P39: Save view as bookmark…, the Bookmarks list, `applyBookmark`
 - `Workbook/workbook.js` — auto-save, restore on connect, Export/Import — [workbook.md](../concepts/workbook/workbook.md)
