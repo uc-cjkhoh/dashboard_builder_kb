@@ -98,7 +98,7 @@ then the search box and table list. The connected summary is a flat row: status 
 host, and edit and disconnect ghost buttons. **Union** and **Unpivot** are pinned under the scrolling
 list with one hairline above them.
 
-The **performance** gauge tile (`#perf-btn`) closes the body: the same 40px sidebar tool tile as the worksheet tools, pinned to the bottom, left-aligned under Union / Unpivot on the Data Source and centred in the rail on a worksheet or dashboard (where the body shows only the tools, or only this tile). It is hidden while the sidebar is collapsed.
+The **performance** gauge tile (`#perf-btn`) closes the body: the same 40px sidebar tool tile as the worksheet tools, pinned to the bottom and centred in the rail on a worksheet or dashboard (where the body shows only the tools, or only this tile). It is **not shown on the Data Source tab**, which has no queries to time, nor while the sidebar is collapsed.
 
 ## Tab bar
 
