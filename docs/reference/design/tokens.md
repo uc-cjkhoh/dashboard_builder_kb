@@ -135,7 +135,7 @@ wash tint, in both themes.
 | `--accent-soft` / `--accent-line` | `#fcf0f2` / `#f3c3ca` | `#3a1a20` / `#6b2a33` | tint / stroke |
 | `--focus` | `--ink` | `--ink` | focus ring — neutral, so focus never looks like an error |
 
-Inputs on focus keep a neutral `--ink-3` border plus a 2px `--accent` underline. An invalid input uses
+Inputs on focus get a neutral `--ink-2` border plus a 2px `--ink-2` underline (never the accent). An invalid input uses
 `--danger-solid` and always has its icon + message below.
 
 ### Workbook themes (P41)
