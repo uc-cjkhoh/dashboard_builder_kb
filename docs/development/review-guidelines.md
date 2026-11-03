@@ -49,7 +49,3 @@ What every change must satisfy before it counts as done and merges: verification
 ## Integration
 
 - [ ] Suites green → merge per [git-workflow.md](git-workflow.md).
-
-## Status dashboard
-
-- [ ] Backlog or built-state changed → refresh the dashboard per [status-dashboard.md](status-dashboard.md).

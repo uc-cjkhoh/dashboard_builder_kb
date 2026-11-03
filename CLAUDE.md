@@ -120,7 +120,7 @@ dashboard_builder/          (this KB)
 │   │   └── design/         #   index (concept + rules) · tokens · layout · components · motion-accessibility
 │   ├── decisions/          # README (D1–D82 lookup, open questions) · decisions-* by topic
 │   ├── operations/         # live-service · safe-operations (+ git-ignored credentials.local.md)
-│   ├── development/        # coding-standards · sharp-edges · review-guidelines · git-workflow · status-dashboard · kb-maintenance · hooks
+│   ├── development/        # coding-standards · sharp-edges · review-guidelines · git-workflow · kb-maintenance · hooks
 │   │   ├── backlog/        #   undone work by topic · recommended order · design specs
 │   │   ├── run-logs/       #   blocked work
 │   │   └── updates/        #   generated change logs

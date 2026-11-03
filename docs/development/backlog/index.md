@@ -19,8 +19,6 @@ The only place for work not yet built, grouped by topic. Read it before picking 
 | [out-of-scope.md](out-of-scope.md) | what is deliberately excluded, and why (not backlog) |
 | [blocked.md](../run-logs/blocked.md) | work that could not be built, and why |
 
-Status at a glance: the [backlog status dashboard](https://claude.ai/artifact/C5S1oYsan7vXMbfpaS5USA). Update it after every backlog update ([review-guidelines.md](../review-guidelines.md#status-dashboard)).
-
 ## How to read an entry
 
 `- **name** (IDs: Txx-nn; priority P0–P3; effort S/M/L if stated) — open: nothing implements it, or partial: what exists and what is missing. Needs: dependency or none. Spec: file.`
