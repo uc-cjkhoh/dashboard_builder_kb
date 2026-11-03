@@ -72,7 +72,7 @@ The duplicate icon (`.tab__dup`, `aria-label` "Duplicate <name>") appears on **w
 
 ### Workbook menu
 
-The Workbook menu's **Save view as bookmark…** is hidden while a dashboard or story tab is active, because bookmarks capture worksheets only.
+**Save view as bookmark…** is an icon in the worksheet view bar, so it is absent on dashboard and story tabs: bookmarks capture worksheets only.
 
 ## How views switch
 

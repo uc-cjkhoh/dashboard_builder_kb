@@ -92,27 +92,29 @@ Problems while restoring:
 
 ## Export & Import
 
-Both live in the **Workbook** overflow menu, an icon button near the right end of the tab bar (`_Workbook.cshtml`).
-The menu holds:
+The tab bar's right end holds two icon menus (`_Workbook.cshtml`): **Workbook** (Bookmarks…) and **Settings** (Theme…).
+The worksheet view bar's icon row holds **Save view as bookmark…** and **Import workbook…**, and its **Export** menu holds **Workbook (JSON)**, and the sidebar's **Calculated fields** dialog holds **Parameters…**.
+The actions:
 
-- **Export workbook** downloads `workbook-YYYY-MM-DD.json` of the current state. When the canvas is empty it says "Nothing to export yet".
-- **Save view as bookmark…** (hidden on a dashboard or story tab) names and saves the open worksheet's view.
+- **Workbook (JSON)** (worksheet view bar → Export) downloads `workbook-YYYY-MM-DD.json` of the current state. When the canvas is empty it says "Nothing to export yet".
+- **Save view as bookmark…** (a worksheet view-bar icon, so absent on a dashboard or story tab) names and saves the open worksheet's view.
   - A bookmark holds the worksheet's whole sheet (filters, date range, click selection, drill level, page, chart type, format) plus the shared filters.
   - At most **30** per workbook. Bookmarks save with the workbook (`Workbook/bookmarks-dialog.js`).
   - **Bookmarks…** lists them (worksheet and time saved) with **Apply** and **Delete**.
   - Applying restores the shared filters and that worksheet's sheet, and switches to it.
     If the worksheet was closed, it is recreated under its saved name; a toast says why when the tab limit blocks that.
-- **Parameters…** (P32) lists the workbook's parameters (at most 20) with **New**, **Edit** and **Delete**.
+- **Parameters…** (P32; a button in the sidebar's Calculated fields dialog) lists the workbook's parameters (at most 20) with **New**, **Edit** and **Delete**.
   - Each has a name (unique, 1–60 characters), a type (number / text / date), the allowed values (any, a list of ≤ 50, or a number range) and the current value.
   - Each is checked before it is kept (`Core/parameters-model.js`).
   - Parameters save with the workbook; disconnecting clears them from the screen.
-- **Theme…** opens the theme dialog, with choices as labelled swatches:
+- **Theme…** (Settings menu) opens the theme dialog, with choices as labelled swatches:
+  - a look: Default or One Dark Pro (dark-mode surfaces; it also picks the One Dark accent and chart colours);
   - an accent: Crimson, Blue, Teal, Violet, Graphite or a custom colour (refused with the reason if it can't carry white text);
   - chart colours: Default, Colour-blind safe, Muted.
 
   Choices apply live and save with the workbook. Disconnecting returns the screen to the default theme until the workbook reopens
   ([tokens.md](../../reference/design/tokens.md#workbook-themes-p41)).
-- **Import workbook…** opens a `.json` file.
+- **Import workbook…** (a worksheet view-bar icon) opens a `.json` file.
   - It needs a connection, because a workbook opens against the connected server.
   - If the canvas isn't empty, a confirm dialog asks before **replacing** it.
   - The file is validated in full (below). Anything repaired is listed in an issues dialog ("Opened <file> with N issue(s)");

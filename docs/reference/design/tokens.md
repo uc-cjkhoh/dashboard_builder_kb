@@ -132,8 +132,8 @@ Inputs on focus keep a neutral `--ink-3` border plus a 2px `--accent` underline.
 ### Workbook themes (P41)
 
 P41 in the heading is the product phase ID for workbook themes. A workbook may carry a **theme**
-(`{ accent, palette }`, Workbook → **Theme…**) that overrides the accent set above and
-`--chart-cat-1…8`.
+(`{ accent, palette, surface? }`, Settings → **Theme…**) that overrides the accent set above and
+`--chart-cat-1…8`, and may select a **look** (dark-mode surfaces).
 
 - `Core/theme.js` sets the overrides inline on `:root` and re-applies them on `scheme:changed`. The
   default theme sets nothing.
@@ -150,7 +150,14 @@ What a theme can change:
   This is unit-tested for every preset and for derived custom colours. A custom colour too light for
   white text is refused with the reason. In dark mode it is lifted until it stands 3:1 off the surface.
 - **Palettes:** Default, **Colour-blind safe** (Okabe–Ito), Muted — eight distinct colours per scheme.
-- Surfaces, ink, status colours and glass never change with the theme.
+- **Look:** Default, or **One Dark Pro**. It is the one thing that changes surfaces, ink, status colours and glass,
+  and only in dark mode: `Core/theme.js` sets `<html data-look="onedark">`, and `core.css`
+  `:root[data-scheme="dark"][data-look="onedark"]` overrides the dark tokens. Picking it also picks the One Dark accent
+  (`#456fc8`, text `#6aa8e0`) and chart colours (`#6aa8e0` `#98c379` `#c678dd` `#e5c07b` `#56b6c2` `#d19a66` `#abb2bf` `#e06c75`);
+  both stay changeable. Surfaces are `--bg #181a1f`, `--surface #21252b`, `--surface-2 #282c34`, `--surface-3 #2c313a`;
+  ink `#d7dae0` / `#abb2bf` / `#9aa2af`; lines `#3e4451` / `#4b5263`. Blue is desaturated to `#6aa8e0` (rule: HSL S ≤ 70 %),
+  and the same AA / 3:1 checks run on this block (`tests/js/contrast.test.mjs`). The default look stays crimson-on-warm-neutral.
+- A saved theme with no `surface` is the default look (older workbooks open unchanged).
 
 `--print-paper` / `--print-ink` (`#ffffff` / `#000000`) are the print stylesheet's colours in every scheme.
 
