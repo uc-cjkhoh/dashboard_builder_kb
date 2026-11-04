@@ -21,7 +21,7 @@ Gotchas that have bitten (or will bite) this app. Read before touching the area 
   network-enabled account ([detail](../reference/clickhouse-integration.md#a-wrong-password-can-be-a-network-restriction)).
 - **The target cert is self-signed.** Validation is on by default, so connecting needs the
   "Trust invalid / self-signed certificate" box ticked
-  ([D11](../decisions/decisions-platform.md#d11--tls-certificate-validation-safe-by-default-explicit-per-connection-opt-in)).
+  ([D11](../decisions/decisions-platform.md#d11--tls-certificate-trust-self-signed-is-accepted-by-default-untick-to-verify)).
 - **A hand-built `HttpClient` must set `AutomaticDecompression`**, or ClickHouse.Client throws
   "server returned compressed result but HttpClient did not decompress it".
 - **A union or unpivot source multiplies the scan.** A union reads every source table in full; an

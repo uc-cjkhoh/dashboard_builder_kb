@@ -24,7 +24,7 @@ or T02-34 are build-plan (Pnn) and backlog (Tnn-nn) item ids; D-numbers are [dec
 - **Validate on connect:** open and run `SELECT 1` before reporting "connected".
 - **The `HttpClient`** handed to the driver:
   - accepts an untrusted cert **only** when `allowInvalidCert && secure`
-    (`BypassesCertificateValidation`) — [D11](../decisions/decisions-platform.md#d11--tls-certificate-validation-safe-by-default-explicit-per-connection-opt-in);
+    (`BypassesCertificateValidation`) — [D11](../decisions/decisions-platform.md#d11--tls-certificate-trust-self-signed-is-accepted-by-default-untick-to-verify);
   - **must** set `AutomaticDecompression` — ClickHouse.Client asks for compressed responses and throws
     otherwise;
   - has a **15s `Timeout`** so an unresponsive host fails cleanly.

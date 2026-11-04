@@ -39,6 +39,8 @@ on every edit.
 | Entity cards | rise in on drop; collapse by animating `max-height`; no hover lift |
 | Toasts / dialogs | toasts slide up from the bottom centre; dialogs scale in over a dimming scrim |
 | Status | the loading pill glyph spins |
+| Activity chip | any in-flight API request: appears after 300ms (rises 8px, `--dur`), its refresh glyph spins, the elapsed time ticks each second; gone when the last request ends |
+| Column profile | "Profiling…" fades in after 150ms with a spinning refresh glyph; the result's bento cells rise 8px in turn (40ms apart, capped at the 8th), then each band's tint grows from the left (`scaleX`, 20ms apart, 250ms); hovering a band dims the others to 55% (`--dur-fast`) |
 | Controls | colour / border transitions on hover (`--dur-fast`); a picker's caret flips while its menu is open |
 | Pages shelf | autoplay steps every 1.5s |
 

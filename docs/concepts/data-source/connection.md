@@ -24,9 +24,9 @@ The connection panel sits at the top of the sidebar. It adds the session's Click
 | Field | Default | Notes |
 |---|---|---|
 | Secure (TLS) | on | |
-| Trust invalid / self-signed certificate | off | shown only while Secure is on; a warning (`.form-warn`) shows while ticked ([D11](../../decisions/decisions-platform.md#d11--tls-certificate-validation-safe-by-default-explicit-per-connection-opt-in)) |
+| Trust invalid / self-signed certificate | **on** | shown only while Secure is on; a warning (`.form-warn`) shows while ticked; untick it to verify the certificate ([D11](../../decisions/decisions-platform.md#d11--tls-certificate-trust-self-signed-is-accepted-by-default-untick-to-verify)) |
 
-- The Advanced section opens by itself when TLS is off or the certificate opt-in is on
+- The Advanced section opens by itself when TLS is off or the certificate trust is on, so on a new form it is open and shows the warning
   (`advancedShouldOpen` in `connection-rules.js`).
 - Inputs are read by element id (`conn-host`, `conn-port`, `conn-user`, `conn-password`, `conn-secure`,
   `conn-allowcert`), not by `form.host` named access.
@@ -39,12 +39,13 @@ After each successful connect, the source is remembered in this browser so it ca
   The list is most recent first, at most 5, one per host/port/user.
 - **The password is never stored** (golden rule 4). `recent-sources.js` copies only the fields above, and `sanitize` drops anything else on load
   ([D70](../../decisions/decisions-connection.md#d70--recent-connection-sources-are-non-secret-and-kept-in-the-browser)).
-- **Where it shows:** the list (`#conn-recent`) sits above the form while the form is open.
+- **Where it shows:** the list (`#conn-recent`) sits above the form while the form is open, set off from it by one hairline.
+  Each row is flat — no box: a server glyph, the host (bold, ellipsised), and `user · port` beneath. Hover or focus washes the row and reveals the × (`.conn-recent__remove`).
   It is hidden when there are none or while the summary shows.
 - **Picking one** refills the fields, opens Advanced if needed, clears the password and focuses it.
   The host is refilled exactly as it was entered (`formValues`), because a recent source is stored from the entered value, never a derived one.
 - **Certificate opt-in:** it is remembered too. Picking such a source reopens Advanced with the certificate warning showing; the password is still typed.
-- The × on a row forgets that source.
+- The × on a row forgets that source (shown on hover and on keyboard focus).
 - If browser storage is blocked, nothing is remembered.
 
 ## Validation

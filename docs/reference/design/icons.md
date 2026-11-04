@@ -42,6 +42,6 @@ Removed: `bookmark` and `bookmarks` (the Bookmarks feature was removed).
 
 - **Data source:** `connection`, `database`, `table`, `key`, `link`, `swap`, `story`, `dashboard`.
 - **Marks slots:** `color`, `size`, `label`, `tooltip`, `detail`, `shape`, `path`, `angle`, `pages`, `filter`, `calendar`.
-- **Analytics:** `insights`, `analytics`, `ref-line`, `band`, `trend`, `forecast`, `show-me`.
+- **Analytics:** `insights`, `analytics`, `profile` (a histogram: the Data Source field row's Profile button), `ref-line`, `band`, `trend`, `forecast`, `show-me`.
 - **Actions:** `undo`, `redo`, `expand`, `collapse`, `print`, `sort`, `sort-asc`, `sort-desc`, `format`, `eye`, `refresh`, `power`, `duplicate`, `grip`, `search`, `stroke-width`, `arrow-left`, `arrow-right`.
 - **Chart types:** `chart-bar`, `chart-stacked`, `chart-line`, `chart-area`, `chart-pie`, `chart-donut`, `chart-scatter`, `chart-combo`, `chart-square`, `chart-circle`, `chart-heatmap`, `chart-treemap`, `chart-histogram`, `chart-boxplot`, `chart-waterfall`, `chart-funnel`, `chart-gauge`, `chart-gantt`, `chart-bullet`, `chart-sankey`, `chart-multiples`, `chart-kpi`, `chart-text` (Table reuses `table`).

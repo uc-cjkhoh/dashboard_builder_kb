@@ -18,8 +18,8 @@ each feature owns its controller, view partial, CSS and JS in one folder. Source
 | `ClickHouse/ClickHouseType.cs`, `CsvUtil.cs` | type → display category; safe CSV |
 | `ClickHouse/ConnectionRegistry.cs`, `*Models.cs` | session connection store; request/response records |
 | `Features/ApiControllerBase.cs`, `ApiErrors.cs` | shared `[ApiController]` base — `RunAsync` maps 409 / 400 / 502 / 504 / 500; the one `{ error, field? }` body, body-size limit, exception handler |
-| `Features/Shell/` | `ShellController` (`GET /`), `Index.cshtml` composing the partials, `app.js` bootstrap, `sidebar.js`, `scheme-toggle.js` |
-| `Features/Core/` | `core.css` (tokens + shared components), `api.js`, `ui.js`, `validate.js`, `icons.js`, `menu.js`, `store.js`, `format.js`, `sheet-schema.js`, vendored ECharts |
+| `Features/Shell/` | `ShellController` (`GET /`), `Index.cshtml` composing the partials, `app.js` bootstrap, `sidebar.js`, `scheme-toggle.js`, `activity-bar.js` |
+| `Features/Core/` | `core.css` (tokens + shared components), `api.js`, `activity-model.js`, `ui.js`, `validate.js`, `icons.js`, `menu.js`, `store.js`, `format.js`, `sheet-schema.js`, vendored ECharts |
 | `Features/Connection/`, `Schema/` | sidebar features, each with its API controller |
 | `Features/Canvas/`, `Relations/`, `Tabs/`, `Board/` | client-only features (no controller); `Board/` holds the dashboard tab's body (`board.js`, `board-widget.js`, `board-panel.js`) with the pure `board-model.js` (widget rules) and `board-layout.js` (geometry); pure rule modules `empty-state.js`, `relation-rules.js` |
 | `Features/Rows/`, `Calc/` | row previews, union / unpivot and source columns (controllers + dialogs); calculated fields (parser, type check, dialog, groups) |

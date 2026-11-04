@@ -4,6 +4,7 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-11-03
 
+- feat: Calculated fields manager rows are one element; calculation dialog has an editor and a functions panel (`9905cb1`)
 - fix: no Performance timings tile on the Data Source tab (`d23e26c`)
 - feat: Performance timings moves to the sidebar body as a tool tile (`22654b5`)
 - fix: Filters flyout keeps the header's height so the chart never shifts (`75f2d52`)

@@ -27,7 +27,7 @@ client; `GET /api/connection` returns a password-free view.
 | `user` | ClickHouse user |
 | `password` | **server-only** — never returned, never logged |
 | `secure` | TLS; on by default |
-| `allowInvalidCert` | trust a self-signed cert; off by default, effective only when `secure` |
+| `allowInvalidCert` | trust a self-signed cert; ticked by default in the form, off when a request omits it; effective only when `secure` |
 | `guards` | `QueryGuards` — `Full` / `NoTimeLimit` / `None`: which database-level settings this server accepted at connect ([step-down](clickhouse-integration.md#step-down-when-the-server-refuses-a-setting)) |
 | `serverEnforcesReadOnly` | set at connect when the account already rejects setting changes — queries then run without the gateway's guard settings |
 

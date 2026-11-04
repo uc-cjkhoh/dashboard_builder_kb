@@ -11,6 +11,7 @@ The settings the app reads at startup. Set them as environment variables (system
 | `ASPNETCORE_ENVIRONMENT` | `Development` (launch profile) · `Production` (live) | .NET environment |
 | `PathBase` | unset | URL prefix the app is served under, e.g. `/dashboardbuilder` behind Apache. With it set, `/` itself is not served |
 | `DataProtection:KeyRingPath` | `keys/` under the content root | Where Data Protection keys persist so session cookies survive a restart. Keep it writable and out of git |
+| `Display:TimeZone` | the host machine's zone; Malaysia time (`Asia/Kuala_Lumpur`, UTC+8) when that is UTC or unknown | The zone clock times and "today" use ([time-zone.md](../reference/time-zone.md)) |
 | `Logging:LogLevel` | `Default: Information`, `Microsoft.AspNetCore: Warning` | `appsettings.json` |
 | `AllowedHosts` | `*` | `appsettings.json` |
 

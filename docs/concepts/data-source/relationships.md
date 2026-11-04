@@ -120,6 +120,8 @@ for the same reasons.
 
 - A column in a relationship moves out of the scrolling list into the card's key strip above it (`.entity__keys`, accent wash).
   It goes back to its place when the link goes. So a link's end is always on a visible row, however far the list is scrolled.
+  Pinning runs at the start of every redraw, before the link ends are measured: pinning changes card heights, so measuring first left
+  links on first load or restore pointing at the old row positions until a card was moved.
 - Pinned rows are ordered by their **partner**, not by column order (`pinOrder`, `orderStrip` in `relations.js`):
   by the partner card's top edge, then by the order the relationships were made.
 - Both cards of a pair see the same order, so their links run parallel: straight when the cards' tops line up, never crossing.

@@ -77,17 +77,18 @@ previews rows, and profiles columns.
 
 ## Column profile / field details
 
-- **Opening it.** Each field row on a canvas entity card has a **Profile button** (`.col-row__profile`, analytics icon,
+- **Opening it.** Each field row on a canvas entity card has a **Profile button** (`.col-row__profile`, histogram `profile` icon,
   `aria-label` "Profile <column>"; shown on hover / focus).
   It opens the **profile dialog** (`Schema/column-profile-dialog.js`, rules in `column-profile-model.js`).
   The request is `POST /api/databases/{db}/tables/{table}/profile` ([api.md](../../reference/api.md)), read-only.
 - **Field details:** Name, Type (raw ClickHouse type), Kind (the display category) and Role
   (*measure* for numeric, else *dimension* — the worksheet's rule).
 - **Tiles:** Rows, Distinct (approx.), Null share (percent and "n of N rows"), and Min / Max for numeric and date columns.
-- **Most frequent values:** up to 10. Each has a text label, an in-cell bar, the count and its share of the rows read.
+- **Most frequent values:** up to 10. Each is a 32px band: the label, the count and its share of the rows read sit on a tint that fills the band from the left in proportion to the share.
   - NULL reads *(NULL)* and an empty string reads *(empty)*, in italic, so neither is mistaken for the text "NULL".
   - A value over 100 characters is cut with an ellipsis.
-  - Bars are neutral (red means danger); the text carries every figure.
+  - The tint is neutral (red means danger); the text carries every figure.
+  - The NULL and empty tints are lighter than value tints, so they read as absences, not values.
 - **Honesty about what was read:**
   - Only the **first 1,000,000 rows ClickHouse returns, in no particular order** are read. This is not a statistical sample.
     When the table has at least that many, a warning band says the figures describe those rows, not the table.
@@ -96,6 +97,15 @@ previews rows, and profiles columns.
   - A share never rounds a partial share up to 100%, and tiny ones read "<0.1%".
 - **Copy name** copies the column name. **Copy values** copies the plain top values, one per line (NULL, empty and cut values left out).
   Both use `navigator.clipboard` and say so in a toast, or report that the browser blocked it.
+- **Layout (bento, flat 2.0 + glass):** 720px wide. The dialog, header and footer are solid; the body carries the app's `--wash` over `--bg`, and the
+  cells are glass on it (`--glass` tint, 1px `--glass-line`, `--glass-rim` top highlight, `--glass-blur`) — no drop shadows. The blur only ever sees the
+  body's own wash, never text, so the "solid when floating over content" rule holds; under reduced transparency the glass tokens fall back to solid surfaces.
+  **Two depth tiers:** Size and Most frequent values (the answer) are solid `--surface` lifted by `--elev-card`; Field and Range (support) stay flat glass.
+  Each frequent-value band is a flat `--surface-2` strip; the leader (the most frequent real value, not NULL or empty) has a bold label and a stronger tint. Body padding 16px, 8px between cells; warning cells are solid with a 1px warn border. Related figures share a cell (4-column grid), in this order:
+  one **notes** cell holding every warning line, first, so the caveat comes before the figures it qualifies; **Field** (name / type / kind / role, 2 columns) beside **Size**
+  (Rows, Distinct, Null share as ruled rows: label and note left, value right, 2 columns); **Range** (Min and Max side by side, full width, only when present); then
+  **Most frequent values** (full width).
+  Below 640px it is 2 columns and Field and Size go full width. Cut text carries a `title` with the full text.
 - **States:** "Profiling…" while loading (closing cancels the request).
   A failure (404 / 502 / 504) shows icon + message in the dialog and a toast. **Esc**, X or Close close it.
 - Not yet: sort order and semantic-role editing (see the backlog).

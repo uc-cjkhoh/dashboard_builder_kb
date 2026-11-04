@@ -37,7 +37,7 @@ Data sits on top; view controls sit on the chart ([design/layout.md](../../refer
   - **Fit** — Standard (a slot per category, the pane scrolls), Fit width, Fit height, Entire view (the fitted axis shares the pane and its labels thin out).
   - **Show title and caption** / **Show filter cards**.
   - Fit and the two toggles carry only a tick at the end of the row (radio-style for Fit); no icon, no extra text.
-- **Title and caption** under the view bar — click to edit, `Enter` saves, `Esc` cancels. Empty means the automatic one (the tab name; "sum amount by customers.name · 2 filters"). Printed too.
+- **Title and caption** under the view bar — click to edit, `Enter` saves, `Esc` cancels. Empty means the automatic one (the tab name, which follows a tab rename at once; "sum amount by customers.name · 2 filters"). Printed too.
 - **Status bar** at the foot of the chart card: marks · rows × columns (Table / Text) · measures · the selection · `Updated hh:mm:ss`. The time is when the data was last read from ClickHouse; a cached result keeps the time it was fetched (`fetchCached` stamps `queriedAt`).
 - **Print header** (`beginPrint`): title, caption, date range, filters, the notice, the update time and the print time. It also lists each calculated field the view uses, and those it refers to, as `Calculation: Name = formula` (cut at 200 characters; `data-notes.js`).
 

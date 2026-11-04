@@ -100,7 +100,7 @@ The **Pages** tool takes one dimension (`sheet.pages`).
 
 The **Date range** tool (calendar icon, P35) takes one date / date-time field (`sheet.period`); anything else is refused with a toast. Its panel (`periodEditor`) picks:
 
-- **Range** — Last 7 / 28 / 30 / 90 days (ending today), This / Last month, quarter, year, or **Custom** (two day pickers). Whole days, inclusive, in the browser's calendar.
+- **Range** — Last 7 / 28 / 30 / 90 days (ending today), This / Last month, quarter, year, or **Custom** (two day pickers). Whole days, inclusive, in the [app time zone](../../reference/time-zone.md)'s calendar.
 - **Compare to** — No comparison, **Previous period** (the same number of days just before), **Same period last year** (29 Feb → 28 Feb) or **Custom**.
 
 - **Default:** a new range is **Last 30 days vs previous period**.

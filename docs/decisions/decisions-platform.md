@@ -45,17 +45,16 @@ in one helper (`ClickHouse/Identifier.cs`).
 `secure` is on by default and `8443` is the default port.
 - **Why:** the target ClickHouse exposes only its secure ports ([ports](../reference/clickhouse-integration.md#driver--connection)).
 
-### D11 — TLS certificate validation: safe-by-default, explicit per-connection opt-in
-A secure connection **validates the server certificate** against the host trust store. The user may opt
-in per connection to skip it with "Trust invalid / self-signed certificate" (`allowInvalidCert`).
-- **How it shows:** the checkbox appears only under Secure and shows a warning while ticked. The
-  connection summary flags it (`TLS ⚠ cert unverified`).
+### D11 — TLS certificate trust: self-signed is accepted by default, untick to verify
+The connection form ships with "Trust invalid / self-signed certificate" **ticked**, because the servers this tool targets use self-signed
+certificates. A secure connection validates the certificate against the host trust store only when the user unticks it (`allowInvalidCert`).
+The API itself still defaults to validating: a request that omits `allowInvalidCert` is verified.
+- **How it shows:** the checkbox appears only under Secure and a warning shows while it is ticked. Advanced is therefore open on a new form.
+  The connection summary flags an unverified connection (`TLS ⚠ cert unverified`).
 - **Enforced in:** the bypass is gated on TLS (`allowInvalidCert && secure`). It is applied via
   `DangerousAcceptAnyServerCertificateValidator` only when `BypassesCertificateValidation(info)` is true.
-- **Consequence:** the known target is self-signed, so connecting to it requires the opt-in — or,
-  better, trusting its CA.
-- **Trade-off:** with the opt-in there is no man-in-the-middle protection on the ClickHouse leg. The
-  stronger fix is trusting the server's CA or pinning its cert. Traffic is always encrypted (D10).
+- **Trade-off:** there is no man-in-the-middle protection on the ClickHouse leg unless the user unticks it. The stronger fix is trusting the
+  server's CA or pinning its cert. Traffic is always encrypted (D10).
 
 ## Frontend & design
 
