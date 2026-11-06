@@ -219,6 +219,7 @@ Fields from both tables still pair up as in any join (a field of the other table
 **exactly two tables**; the server refuses (400) a view of more tables with a flagged link, a calculated field, a top-N filter and an aggregation that
 can't be recombined (distinct count, median, percentile, standard deviation, variance, Attr). Sum, Count, Count (non-null), Min, Max and Average work;
 an average is the sum of sums over the sum of counts, so it is the average over rows. Approximate mode reads such a view exactly.
+With no measure, the implicit count is the base table's row count (not the joined rows). A NULL key never matches, also in the "either table" filter.
 
 The Relationships card swaps its "totals repeat" line for the two sentences above. Pure: `applyAggregate()`, `aggregateChoice()`,
 `normalizeFilterDirection()` in `relation-rules.js`; the dialog control is `buildAggregateChoice()` in `relations.js`; browser check `tests/live/agg-ui.mjs`.
