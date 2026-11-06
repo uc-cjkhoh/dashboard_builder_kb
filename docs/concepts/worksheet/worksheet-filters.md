@@ -55,6 +55,16 @@ A **row-level calculated field** dropped on Filters is a filter on its value ([D
 - **Reference line:** Analytics → Reference line **Constant** can follow a number parameter instead of a typed value (`analytics.ref.param`). A deleted parameter falls back to the line's own value.
 - **Band ends:** a typed Band's **from** and **to** can each follow a number parameter (`analytics.band.fromParam` / `toParam`; the ends swap if they cross, equal ends draw nothing). Deleting a parameter (Parameters dialog) first asks, listing every reader it will unlink; it then clears every reference a worksheet or shared filter holds to it (filters, Top N, reference line, band ends, parameter action) — each keeps its own typed value, so results may change, and the delete is not an undo step. Unbinding a band end keeps the parameter's current value as the typed number, and opening a workbook drops a saved link whose parameter is missing — ids are reused after a reopen, so a stale one would otherwise bind to an unrelated new parameter.
 
+### Filter on a measure (T03-27, [D84](../../decisions/decisions-filters.md#d84--a-filter-on-an-aggregated-measure-having-keeps-groups-after-grouping))
+
+A row filter cuts rows before grouping; a **measure filter** cuts whole groups after their value is worked out — "only regions whose total sales are at least 1000".
+
+- **Add it:** right-click (or the keyboard context-menu key on) a measure pill on Rows / Columns → **Keep groups where *sum amount*** → pick the condition (`equals`, `is not`, `is greater than`, `is at least`, `is less than`, `is at most`, `is between`) and type the number (two for between). **Clear** removes it. Tab reaches the condition and the number; each has an accessible name.
+- **See it:** the pill gets a badge with a funnel icon and the condition (`≥ 1000`, `10 – 30`); the info line under the view says it in words with its grain — "Showing only groups where sum amount is at least 1000, per region." (no dimensions: "Showing only the total when …"). A number that isn't one is marked in the popup, the badge reads "not applied" with a warning icon, and nothing is sent for it.
+- **How it composes:** `WHERE` → Top-N → group → measure filter → sort → cap or page. The cap and the table's "of N rows" count only passing groups; a Top-N ranks first, so it may show fewer than N; several measure filters are `AND`ed (at most 10); a measure filter drops the Other bucket (the request would be rejected with it). The popover *How this is computed* names it at the Aggregates stage.
+- **Which measures:** the Rows / Columns shelf measures (plain or calculated, any aggregation). Not Size / Colour / Label measures; not applied to a histogram or box plot (the line says so). Saved with the workbook on the pill (`having`).
+- **Not yet:** a range slider, a filter on a measure that isn't on the view, a filter shared across dashboards, and one on a Top-N ranking measure.
+
 ### Filter cards (P30)
 
 - Under the title, each of the sheet's filters — and the shared ones — shows as a card.

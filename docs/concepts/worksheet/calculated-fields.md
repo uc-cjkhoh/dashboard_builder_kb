@@ -100,7 +100,7 @@ A view-bar button opens a popover listing, for the current sheet, the six stages
 1. **Filters** — own, shared, drill, page, selection, date range and Top-N filter that ClickHouse applies.
 2. **Row-level calculations** — worked out for each remaining row.
 3. **Group by** — the dimensions, or a single group when there are none.
-4. **Aggregates** — including aggregate calculations.
+4. **Aggregates** — including aggregate calculations, then any measure filter drops the groups that fail it.
 5. **Cap and Other** — the display cap (Top-N "All" = 5000 groups) and the Other bucket when the chart folds one.
 6. **Table calculations** — run in the browser on the returned groups.
 

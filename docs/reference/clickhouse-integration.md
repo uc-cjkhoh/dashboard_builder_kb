@@ -174,6 +174,7 @@ builder runs ([api.md § Limits](api.md#limits)).
   `lowerUTF8`, with the text bound as a `String`. **Top-N** is built after the other conditions as
   `col IN (SELECT col FROM <same joins> WHERE <other filters> GROUP BY col ORDER BY <agg> DESC|ASC LIMIT n)`.
   Tests: `RicherFilterTests`.
+- **Measure filter** (`having`, [D84](../decisions/decisions-filters.md#d84--a-filter-on-an-aggregated-measure-having-keeps-groups-after-grouping)): `BuildHaving` appends ` HAVING (v0 >= {h0:Float64}) AND (…)` after `GROUP BY` (before `ORDER BY` / `LIMIT`, and inside the group-count statement). The operand is the generated `v{n}` alias of a validated measure index — never client text — the operator comes from `BuildCondition`'s whitelist narrowed to `RequestRules.HavingOps`, and every number is a bound `Float64`. Top-N's rank subquery doesn't carry it; the Other statement isn't built with it (400). Tests: `HavingTests`; live: `tests/live/having-smoke.mjs`.
 - **Result cache** (P33): `QueryAsync` answers a repeat of the same request on the same server + user from
   `IMemoryCache` for 60 s (logged; `cached: true`). `fresh` skips and replaces it (`CacheKey`; tested: no
   password, `fresh` ignored).
