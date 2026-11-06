@@ -4,6 +4,12 @@ Functional changes (server, models, validation, calculations, charts, workbook).
 
 ## 2026-11-06
 
+- Trend models review fixes: short end label sized to its text, one minus sign, finite-only series, forecast notice, more fixtures (`320e517`)
+- Trend models: exponential and power fits, formula / R² / n in the trend label, plain message when values are not above zero (`86fb16c`)
+- Collapse all: clearer refusal wording (`329573a`)
+- Percentile band: refused value restored in its box, shorter option label with title, single measure chooser, restore tests (`021eb37`)
+- Analytics: custom percentile band (typed lo/hi, 0 < lo < hi < 100, rejected not clamped) (`c6796e1`)
+- Compare columns: guard the in-flight load, retry hint, settled dark shot (`5ec68aa`)
 - Having: merge duplicate import, correct MaxHaving comment (`ff31a48`)
 - How this is computed: say the measure filter at the Aggregates stage (`611f2d6`)
 - Measure filter: keep an operator with no number yet; badge for an unapplied filter; browser check and live smoke script (`72ed2d1`)

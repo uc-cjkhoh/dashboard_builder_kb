@@ -4,6 +4,10 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-11-06
 
+- Stepped colour: flat-range steps, visible neutral step, 3-9 only, scatter browser check (`f7d4703`)
+- Crosstab: Expand all / Collapse all (corner buttons, counted status line, one undo step) (`c1364b0`)
+- Stepped colour: Format Steps (3-9) for heatmap and scatter colour, boundaries named in the legend (`c613b6b`)
+- Union card: Compare columns lists what the union leaves out (T02-16) (`dcfc80f`)
 - Data notes: count the trimmed length; cap the editor height (`cc4a2bb`)
 - Dashboard data notes: free-text note (<=1000, rejected not cut), saved in the workbook; dashboard print header (`609222a`)
 - Relating: flag each other table's best-matching column while a drag or keyboard pick is active (`db5187f`)
