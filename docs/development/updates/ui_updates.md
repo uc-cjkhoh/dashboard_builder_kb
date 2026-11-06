@@ -4,6 +4,11 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-11-06
 
+- Size range: scroll-aware pointer, stable gutter, labelled inputs, per-input invalid, fixed-wins on import (`7044634`)
+- Worksheet font: Format -> Font (default / serif / mono system stacks) for chart and table text (`a0182d7`)
+- Dashboard size range: optional min/max width and height for an Automatic board (`6c1caa6`)
+- Diverging colour: theme-stable orange/blue tokens shared with the table scale; no pins while diverging; centre bound (`f4378cc`)
+- Diverging continuous colour: Colour scale (Low-high / Diverging) and centre for scatter and heatmap (`1d15b83`)
 - Tooltip formats: keep an explicit Auto number format; prune stale formats on a text edit (`10c743f`)
 
 ## 2026-11-03

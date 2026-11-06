@@ -4,6 +4,11 @@ Functional changes (server, models, validation, calculations, charts, workbook).
 
 ## 2026-11-06
 
+- Parameters dialog: one confirm for calculation readers and unlinked references (`7ba8fe3`)
+- Parameters: confirm a delete that unlinks readers (paramRefs); also clear shared filters; unbinding a band end keeps its value (`59b4fc7`)
+- Parameters: analytics band ends follow number parameters; deleting a parameter (or opening a workbook without it) clears every reference to it (`30e94ee`)
+- Table calculation: compound growth rate (`0019923`)
+- Parameter action: a click on a mark sets a parameter to its value (`6edeef9`)
 - wip: connection health, relation describe and related UI changes (`c1f9eb1`)
 
 ## 2026-11-04
