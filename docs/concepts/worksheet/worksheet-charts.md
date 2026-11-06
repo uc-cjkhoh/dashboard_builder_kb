@@ -101,7 +101,7 @@ On Bar / Line / Area the card opens with a row of **items**: Reference line, Ban
 ### Bar / Line / Area
 
 - **Reference line** — Average, Median, Minimum, Maximum or a Constant. Drawn dashed and labelled "Average: 16".
-- **Band** — shaded and labelled with its rule. Its ends are typed **from / to** numbers, **Mean ± 1σ** / **± 2σ** (sample standard deviation, ≥ 2 values), or a percentile range **P25–P75** / **P10–P90** (linear interpolation), or **Custom percentiles** with typed low and high percentiles (start P5–P95; `0 < low < high < 100`, an invalid pair is refused with a message and the band is left as it was, never clamped; a saved workbook is checked the same way and an invalid band is reset).
+- **Band** — shaded and labelled with its rule. Its ends are typed **from / to** numbers, **Mean ± 1σ** / **± 2σ** (sample standard deviation, ≥ 2 values), or a percentile range **P25–P75** / **P10–P90** (linear interpolation), or **Percentiles** with typed low and high percentiles (start P5–P95; `0 < low < high < 100`, an invalid pair is refused with a message, the box returns to the stored value and the band is left as it was, never clamped; with one row the band has zero width, like the presets; a saved workbook is checked the same way and an invalid band is reset).
   - Choosing Typed range draws nothing until two different numbers are typed.
   - With too few values (or typed ends that are equal) there is no band, and an info line says why.
   - A σ / percentile band's label says "(shown rows)".
