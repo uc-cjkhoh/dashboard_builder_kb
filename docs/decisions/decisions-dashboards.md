@@ -153,3 +153,8 @@ Decided 2026-11-02 (autonomous build). A relationship may match on more than one
 - **Saved as an optional `stories` list in format v2**, with steps as `{ kind, index }`. The version stays 2 because every reader that knows only worksheets and dashboards still opens the file; such a build reports the story entries in the tab order as pointing at nothing and drops them. **Downgrade loses stories for good:** that older build's next autosave overwrites the stored workbook without them.
 - **Bounds reject, not clamp:** at most 20 steps and 300 characters per caption; an import skips and reports a step with a long caption or a missing target, and drops steps past 20 with a message.
 - **The current step is not saved:** it is reading position, like a dashboard's selection.
+
+## D85 — The diverging scale picks its hues from tokens, not a free-hex picker
+
+- **Decision:** `format.colorPair` chooses the diverging scale's two hues from a short list (Orange / Blue, Amber / Violet, Green / Violet). Each end reads a design token at draw time, so a pair follows the light, dark and One Dark Pro themes and keeps the app's saturation ceiling (design rule 4). Red is never an end (it means danger).
+- **Not built:** a free-hex colour picker and custom palette editing. A typed hex would be a user colour held as workbook data with no theme variant and no saturation or contrast check; that needs its own contrast rule first (see the backlog entry).

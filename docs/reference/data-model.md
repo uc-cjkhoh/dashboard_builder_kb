@@ -141,7 +141,7 @@ Nothing here reaches the server; dashboards add no endpoint
   collapsed: { rows: [key], cols: [key] },   // T03-29 collapsed crosstab headers; the key exists only once one is collapsed
   tooltipText: null | string,   // T01-19 tooltip template with <Field> placeholders (≤ 300; null = automatic)
   tooltipFormats?: { [field]: { number?, decimals?, date? } },   // T01-19 per-field tooltip formats (≤ 24 fields); absent = the view's formats
-  memberColors: {},              // T01-20 { "table.column": { member: "#rrggbb" } } (format.paletteReverse: bool, T03-33; format.colorRamp brand|blue|green|amber|violet, colorMin / colorMax number|null, T03-19; colorScale sequential|diverging, colorCentre number|null; colorSteps 0|3–9, 0 = continuous)
+  memberColors: {},              // T01-20 { "table.column": { member: "#rrggbb" } } (format.paletteReverse: bool, T03-33; format.colorRamp brand|blue|green|amber|violet, colorMin / colorMax number|null, T03-19; colorScale sequential|diverging, colorPair default|amber-violet|green-violet, colorCentre number|null; colorSteps 0|3–9, 0 = continuous)
   title: null | string, caption: null | string, showTitle: boolean,   // P23 (null = automatic)
   showFilterCards: boolean,                                          // P30
   analytics: null | { ref: { kind, value?, param?, measure? }, band: { from, to, fromParam?, toParam? } | { kind: "stddev", k: 1|2|3 } | { kind: "percentile", lo, hi } | null, trend, forecast, totals: { grand, sub } },   // P21
