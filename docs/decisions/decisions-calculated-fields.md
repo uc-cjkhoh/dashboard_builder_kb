@@ -116,3 +116,7 @@ formula is the same aggregate.
 A calculation whose formula points at a field no longer in the model is kept, with an error state in the field pane and the
 dialog. A worksheet using it shows "Calculation 'X' can't be computed: …" and sends no query; import reports it as an issue.
 - **Why:** dropping it would silently change a user's charts.
+
+### D83 — Groups on whole-number and true/false fields, by listed value
+A group field can sit on a whole-number or true/false column (`group.kind` `"number"` / `"boolean"`; absent = text). The member list is exact values; the tree still compares text, so a number is read as `TEXT(field)` and a true/false column is tested as the condition itself (`TEXT()` refuses booleans). Decimal and floating-point columns, and dates, stay refused.
+- **Why:** it needs no server node and no `IN`; the member list writes `Decimal(10,2)` as `1.50` while ClickHouse's `toString` gives `1.5` (pinned live), so a listed decimal would never match. Ranges and date bins need range nodes and are left open.

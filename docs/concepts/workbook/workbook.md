@@ -188,7 +188,7 @@ The rules are in `Board/board-model.js` (pure).
 ### Calculations
 
 - At most `LIMITS.calculations`. Each is `{ id: calc<n>, name, formula }`.
-- **Group fields** (T02-30) have `formula: ""` plus `group: { field: { db, table, column }, groups: [{ name, members }] }`, checked by `checkGroupSpec`.
+- **Group fields** (T02-30) have `formula: ""` plus `group: { field: { db, table, column }, kind?: "number" | "boolean", groups: [{ name, members }] }`, checked by `checkGroupSpec`.
   An invalid group skips that calculation and reports it.
 - **Name:** 1–`LIMITS.calcName` characters, without `.`, `[`, `]`. **Formula:** a string ≤ `LIMITS.calcFormula`.
 - A bad entry, a duplicate id or a duplicate name (case-insensitive, first kept) is skipped and reported.

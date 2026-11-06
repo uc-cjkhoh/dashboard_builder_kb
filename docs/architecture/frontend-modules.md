@@ -209,8 +209,8 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Calc/function-help.js` — pure: the function glossary `FUNCTION_HELP` (derived from `calc-types.js` + the logic keywords), `searchHelp`, `groupHelp`, `functionItems` — the dialog's Functions panel and name autocomplete
 - `Calc/calc-pane-model.js` — pure: `paneState` (group items), `deleteCalcPlan`, `showUseAs` / session Use-as choice, `normaliseFormula`
 - `Calc/group-model.js` — pure (T02-30):
-  - `groupTree` (CASE / OR-of-equals tree), `groupCost`, `MAX_GROUP_MEMBERS`, `maxMembersFor`, `otherLabel` (remainder label), `checkGroupSpec`, `cleanGroupSpec`, `groupCalcName`, member ↔ group assignments — [calculated-fields-groups.md](../concepts/worksheet/calculated-fields-groups.md)
-- `Calc/group-dialog.js` — DOM: `openGroupDialog({ field, fieldName, calcId?, load })` — the Group… dialog
+  - `groupTree` (CASE / OR-of-equals tree), `groupKind` (text / number / boolean / null for a column), `groupCost`, `MAX_GROUP_MEMBERS`, `maxMembersFor`, `otherLabel` (remainder label), `checkGroupSpec`, `cleanGroupSpec`, `groupCalcName`, member ↔ group assignments — [calculated-fields-groups.md](../concepts/worksheet/calculated-fields-groups.md)
+- `Calc/group-dialog.js` — DOM: `openGroupDialog({ field, fieldName, calcId?, kind?, load })` — the Group… dialog
 - `Calc/calc-dialog.js` — DOM: `openCalcDialog(id?)` — the New / Edit calculated-field dialog
 - `Calc/eval-order.js` — pure: `describeEvaluation` (the six stages), `evaluationInput(sheet, …)` — [calculated-fields.md](../concepts/worksheet/calculated-fields.md#how-this-is-computed)
 - `Calc/explain-popover.js` — DOM: `explainControl(getInput, { signal })` — the view bar's "How this is computed" button and popover
