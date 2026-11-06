@@ -144,7 +144,7 @@ Nothing here reaches the server; dashboards add no endpoint
   memberColors: {},              // T01-20 { "table.column": { member: "#rrggbb" } } (format.paletteReverse: bool, T03-33; format.colorRamp brand|blue|green|amber|violet, colorMin / colorMax number|null, T03-19; colorScale sequential|diverging, colorCentre number|null)
   title: null | string, caption: null | string, showTitle: boolean,   // P23 (null = automatic)
   showFilterCards: boolean,                                          // P30
-  analytics: null | { ref: { kind, value?, param?, measure? }, band: { from, to } | { kind: "stddev", k: 1|2|3 } | { kind: "percentile", lo, hi } | null, trend, forecast, totals: { grand, sub } },   // P21
+  analytics: null | { ref: { kind, value?, param?, measure? }, band: { from, to, fromParam?, toParam? } | { kind: "stddev", k: 1|2|3 } | { kind: "percentile", lo, hi } | null, trend, forecast, totals: { grand, sub } },   // P21
   urlAction: null | { label, template },   // P39 link action — https:// with {value}
   paramAction: null | { param },           // P39 parameter action — a click can set this parameter (id) to the mark's value
   period: null | { db, table, column, category: "temporal", preset, from, to, compare, compareFrom, compareTo },

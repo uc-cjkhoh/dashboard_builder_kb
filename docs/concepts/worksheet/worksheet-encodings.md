@@ -32,7 +32,7 @@ A **selection chip** (`.ws-select`) offers:
 - **Parameter action** (P39) — when the sheet has one (Format → **Parameter action** → a parameter, or None):
   - A **"Set <parameter>"** button on the chip writes the selected value into that parameter. Nothing changes without the click.
   - The value is checked like any parameter edit (its type and allowed values). A refused value changes nothing and a toast says why.
-  - A parameter deleted since leaves no button. One per sheet (`sheet.paramAction = { param }`); the parameter's usual consumers (filters, Top N, calculated fields) re-run as for any edit.
+  - A parameter deleted leaves no button and clears the action (also on opening a workbook without it). One per sheet (`sheet.paramAction = { param }`); the parameter's usual consumers (filters, Top N, calculated fields) re-run as for any edit.
   - Sets (a click adding a member) need P25 and stay in the backlog.
 
 How the action applies:
