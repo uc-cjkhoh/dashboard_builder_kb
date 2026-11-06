@@ -53,7 +53,7 @@ A **row-level calculated field** dropped on Filters is a filter on its value ([D
 - **The Parameters dialog's number range** has min, max and an optional **step size** (a positive number; empty is none; saved and shown again on edit).
 - **Deleting** a parameter that a calculation reads asks first.
 - **Reference line:** Analytics → Reference line **Constant** can follow a number parameter instead of a typed value (`analytics.ref.param`). A deleted parameter falls back to the line's own value.
-- **Band ends:** a typed Band's **from** and **to** can each follow a number parameter (`analytics.band.fromParam` / `toParam`; the ends swap if they cross, equal ends draw nothing). Deleting a parameter clears every reference a worksheet holds to it (filters, Top N, reference line, band ends, parameter action), and opening a workbook drops a saved link whose parameter is missing — ids are reused after a reopen, so a stale one would otherwise bind to an unrelated new parameter.
+- **Band ends:** a typed Band's **from** and **to** can each follow a number parameter (`analytics.band.fromParam` / `toParam`; the ends swap if they cross, equal ends draw nothing). Deleting a parameter (Parameters dialog) first asks, listing every reader it will unlink; it then clears every reference a worksheet or shared filter holds to it (filters, Top N, reference line, band ends, parameter action) — each keeps its own typed value, so results may change, and the delete is not an undo step. Unbinding a band end keeps the parameter's current value as the typed number, and opening a workbook drops a saved link whose parameter is missing — ids are reused after a reopen, so a stale one would otherwise bind to an unrelated new parameter.
 
 ### Filter cards (P30)
 
