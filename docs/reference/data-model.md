@@ -152,10 +152,11 @@ Nothing here reaches the server; dashboards add no endpoint
   format: { numberFormat, decimals, currencySymbol, dateFormat, topN, dateBucket, target, downIsGood, conditional, legend,
             dataLabels, colorByDimension, xTitle, yTitle,
             lineStyle, heatmapShape, targetMeasure,
-            syncAxes, dualAxis, secondaryType, markerSize, markBorder, markerShape, tableAlign, tableDensity, tableShade }
+            syncAxes, dualAxis, secondaryType, markerSize, markBorder, markerShape, font, tableAlign, tableDensity, tableShade }
 }
 ```
 
+- **Format font:** `font` `default` | `serif` | `mono` (default `default`) — the family of chart and table text.
 - **Format table settings:** `tableAlign` `auto` | `left` | `center` | `right` (default `auto`), `tableDensity` `standard` | `compact` | `roomy` (default `standard`), `tableShade` `none` | `banded` | `header` | `both` (default `none`); they apply to Table and Text views.
 - **Format chart settings:**
 

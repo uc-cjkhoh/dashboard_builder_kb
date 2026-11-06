@@ -1,5 +1,5 @@
 ---
-components: [src/DashboardBuilder/Features/Core/format.js, src/DashboardBuilder/Features/Core/icons.js, src/DashboardBuilder/Features/Dashboard/chart.js, src/DashboardBuilder/Features/Dashboard/colour-model.js, src/DashboardBuilder/Features/Dashboard/colour-scale-model.js, src/DashboardBuilder/Features/Dashboard/contrast.js, src/DashboardBuilder/Features/Dashboard/pill-options.js, src/DashboardBuilder/Features/Dashboard/table-style-model.js, src/DashboardBuilder/Features/Dashboard/toolbar-rules.js, src/DashboardBuilder/Features/Dashboard/tooltip-dialog.js, src/DashboardBuilder/Features/Dashboard/tooltip-model.js, src/DashboardBuilder/Features/Dashboard/tooltip-style.js]
+components: [src/DashboardBuilder/Features/Core/format.js, src/DashboardBuilder/Features/Core/icons.js, src/DashboardBuilder/Features/Dashboard/chart.js, src/DashboardBuilder/Features/Dashboard/colour-model.js, src/DashboardBuilder/Features/Dashboard/colour-scale-model.js, src/DashboardBuilder/Features/Dashboard/contrast.js, src/DashboardBuilder/Features/Dashboard/font-model.js, src/DashboardBuilder/Features/Dashboard/pill-options.js, src/DashboardBuilder/Features/Dashboard/table-style-model.js, src/DashboardBuilder/Features/Dashboard/toolbar-rules.js, src/DashboardBuilder/Features/Dashboard/tooltip-dialog.js, src/DashboardBuilder/Features/Dashboard/tooltip-model.js, src/DashboardBuilder/Features/Dashboard/tooltip-style.js]
 ---
 # Worksheet marks — Marks card, member colours, table look
 
@@ -118,3 +118,13 @@ Format → Align · Row height · Shading, in the Table and Text views only. Sto
   - Banding skips cells carrying a rule or scale (`.xt-cf`), so their tone wins. Header shading keeps each header's own ink.
 - All three are classes on the table (`xt-a-*`, `xt-d-*`, `xt-s-*`; defaults add none). There is no free font, size or colour.
 - Code: `Dashboard/table-style-model.js` (`tableStyleClasses`, `TABLE_*_CHOICES`).
+
+### Worksheet font (T01-23)
+
+Format → Font on every chart type and on Table / Text. Stored as `format.font` `default` | `serif` | `mono` (default `default`).
+
+- A fixed list of system stacks, nothing downloaded and no font file vendored (golden-rule 10): Default is the app's `--font`; Serif is `--font-serif` (Charter, Sitka, Cambria, Georgia); Monospace is `--font-mono`. Both tokens are in `core.css`.
+- It changes the family only; sizes stay on the 14 / 16 px scale.
+- A chart reads the token into its text styles (axes, legend, labels, tooltip); a table takes the class `xt-f-serif` / `xt-f-mono` (the default adds none).
+- KPI cards, the worksheet title and the toolbars keep the app font.
+- Code: `Dashboard/font-model.js` (`FONT_CHOICES`, `fontToken`, `fontClass`); `FONTS` in `Core/sheet-schema.js`.

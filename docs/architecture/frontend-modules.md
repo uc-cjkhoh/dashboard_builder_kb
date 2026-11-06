@@ -154,6 +154,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Dashboard/analytics-model.js` — pure (P21):
   - `refValue`, `refConstant` (a constant line's bound parameter), `trendFit` (linear / log / poly2 least squares, R²), `trendSeries` (+ forecast), `combine` (totals by aggregation), `bandBounds` / `bandLabel` / `bandChoice` (typed, mean ± kσ and percentile bands), `pickMeasure`, `ANALYTICS_ITEMS` / `itemsFor` / `itemActive` / `addItem` / `removeItem` (the pane's draggable items)
 - `Dashboard/table-calc.js` — pure (P27): `computeCalc` (running / % of total / difference / % difference / compound growth / rank / percentile rank / moving average, partitioned by the other shelf or by the unticked dimensions), `applyTableCalcs`
+- `Dashboard/font-model.js` — pure: `FONT_CHOICES`, `fontToken`, `fontClass` — [worksheet-marks.md](../concepts/worksheet/worksheet-marks.md)
 - `Dashboard/table-style-model.js` — pure: `tableStyleClasses`, `TABLE_ALIGN_CHOICES`, `TABLE_DENSITY_CHOICES`, `TABLE_SHADE_CHOICES` — [worksheet-encodings.md](../concepts/worksheet/worksheet-encodings.md)
 - `Dashboard/line-style-model.js` / `heatmap-model.js` / `bullet-model.js` — pure: `LINE_STYLE_CHOICES`, `lineStep`, `linesTakeStyle`
   - `HEATMAP_SHAPE_CHOICES`, `circleSize`
