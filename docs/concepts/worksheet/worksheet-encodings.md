@@ -29,6 +29,11 @@ A **selection chip** (`.ws-select`) offers:
   - An **"<label> ↗"** button opens that address with the selected value URL-encoded into `{value}`, in a new tab with `noopener`. Nothing opens without that click.
   - Only `https:` links with a host are accepted. `http:`, `javascript:`, `data:` and the like are refused with the reason. A value can't change the host or break out of its slot.
   - One link action per sheet (`sheet.urlAction`). Rules: `Dashboard/action-model.js` (unit-tested).
+- **Parameter action** (P39) — when the sheet has one (Format → **Parameter action** → a parameter, or None):
+  - A **"Set <parameter>"** button on the chip writes the selected value into that parameter. Nothing changes without the click.
+  - The value is checked like any parameter edit (its type and allowed values). A refused value changes nothing and a toast says why.
+  - A parameter deleted since leaves no button. One per sheet (`sheet.paramAction = { param }`); the parameter's usual consumers (filters, Top N, calculated fields) re-run as for any edit.
+  - Sets (a click adding a member) need P25 and stay in the backlog.
 
 How the action applies:
 

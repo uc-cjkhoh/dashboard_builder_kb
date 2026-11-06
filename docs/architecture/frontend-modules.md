@@ -150,7 +150,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Dashboard/dashboard-select.js` · `selection-dim.js` — pure (P24c):
   - the dashboard selection — `nextSelection`, `selectionRefusal`, `crossFilterOf`, `appliesTo`, `selectedIndexOf`, `crossFor`, `crossSignature`, `stillValid`, the chip and note texts
   - `applySelectionDim` (fade unselected bar / stacked / pie / donut marks) — [dashboards.md](../concepts/workbook/dashboards.md#cross-widget-filtering)
-- `Dashboard/action-model.js` — pure (P39): `templateError`, `buildActionUrl` (https-only, encoded `{value}`), `cleanAction`
+- `Dashboard/action-model.js` — pure (P39): `templateError`, `buildActionUrl` (https-only, encoded `{value}`), `cleanAction`; the parameter action: `cleanParamAction`, `applyParamAction`
 - `Dashboard/analytics-model.js` — pure (P21):
   - `refValue`, `refConstant` (a constant line's bound parameter), `trendFit` (linear / log / poly2 least squares, R²), `trendSeries` (+ forecast), `combine` (totals by aggregation), `bandBounds` / `bandLabel` / `bandChoice` (typed, mean ± kσ and percentile bands), `pickMeasure`, `ANALYTICS_ITEMS` / `itemsFor` / `itemActive` / `addItem` / `removeItem` (the pane's draggable items)
 - `Dashboard/table-calc.js` — pure (P27): `computeCalc` (running / % of total / difference / % difference / rank / percentile rank / moving average, partitioned by the other shelf or by the unticked dimensions), `applyTableCalcs`

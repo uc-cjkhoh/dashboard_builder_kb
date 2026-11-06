@@ -146,6 +146,7 @@ Nothing here reaches the server; dashboards add no endpoint
   showFilterCards: boolean,                                          // P30
   analytics: null | { ref: { kind, value?, param?, measure? }, band: { from, to } | { kind: "stddev", k: 1|2|3 } | { kind: "percentile", lo, hi } | null, trend, forecast, totals: { grand, sub } },   // P21
   urlAction: null | { label, template },   // P39 link action — https:// with {value}
+  paramAction: null | { param },           // P39 parameter action — a click can set this parameter (id) to the mark's value
   period: null | { db, table, column, category: "temporal", preset, from, to, compare, compareFrom, compareTo },
   marks:  { size, label, detail: [], tooltip: [], shape, path, angle },
   format: { numberFormat, decimals, currencySymbol, dateFormat, topN, dateBucket, target, downIsGood, conditional, legend,

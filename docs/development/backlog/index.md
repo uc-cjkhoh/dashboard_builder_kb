@@ -9,7 +9,7 @@ The only place for work not yet built, grouped by topic. Read it before picking 
 
 | File | Holds |
 |---|---|
-| [dashboards.md](dashboards.md) | Stories remainder, dashboard layout, image and spacer widgets, actions, navigation, P38, P39 remainder |
+| [dashboards.md](dashboards.md) | Stories remainder, dashboard layout, image and spacer widgets, actions, navigation, P38, set action |
 | [calculations.md](calculations.md) | functions the engine lacks, LOD, table-calculation polish, P25 |
 | [data-model.md](data-model.md) | joins, union, groups, split, cast, hierarchies, P43 |
 | [charts-and-formatting.md](charts-and-formatting.md) | chart, authoring, formatting and export gaps |
@@ -35,7 +35,7 @@ The only place for work not yet built, grouped by topic. Read it before picking 
 2. Table-calculation polish — builds on the function set.
 3. Data-model breadth (compound joins, union and split remainders, groups, hierarchies) — independent of the engine; compound joins come before P43.
 4. Chart gaps and formatting — client-only, ordered by priority.
-5. Actions, navigation, P38 and P39 remainder — need dashboards and, for sets, P25.
+5. Actions, navigation, P38 and the set action (P39 remainder) — need dashboards and, for sets, P25.
 6. LOD — needs the core engine and written filter-order rules.
 7. Analytics and forecasting — trend models come before intervals and forecast.
 8. P42 AI assist and maps — large, and need decisions on data leaving the server and bundled geography.
