@@ -213,7 +213,7 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
   - This happens only when the selected column's **table is already in the widget's query**; it never forces a join.
   - A widget it can't reach sends no new query, keeps its data and says so in its notice
     ("orders.region: selected on another sheet, not applied here — its table isn't in this view.").
-  - A histogram or box plot (single-table endpoints) says it doesn't take it.
+  - A histogram (a single-table endpoint) says it doesn't take it; a box plot takes it like any chart.
   - Casts follow the plan as in the editor.
   - **Filter budget:** 8 own + 4 shared + 5 drill + 1 page + 1 period + 1 selection = the server's 20.
 - **The source widget** is never filtered.

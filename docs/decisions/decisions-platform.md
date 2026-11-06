@@ -278,3 +278,9 @@ Worksheet results are kept **in the server's memory for 60 seconds** per server 
 
 **Approximate mode** (Format) trades exactness for speed and is always labelled; what it changes in SQL is in
 [clickhouse-integration.md](../reference/clickhouse-integration.md#the-queries-all-read-only).
+
+### D88 — The box plot is the worksheet query with the value as a row dimension
+The box plot reads the worksheet's own plan (joins, filters, calculations, casts, a union / unpivot source) instead of a single-table request.
+- **How:** the client sends a `QueryRequest` to `POST /api/boxplot` whose one row dimension is the numeric value (a column or a row-level numeric calculation) and whose optional column dimension is the group. The server compiles it with the worksheet query's own code up to FROM / joins / WHERE, then runs the three quantile statements over that FROM.
+- **Why:** one validated compilation path for identifiers, calculations and bound values, rather than a second copy in a single-table method. A value is never aggregated, so an aggregate calculation is a 400.
+- **Kept:** the single-table `…/boxplot` route stays for existing callers; the browser no longer uses it. The histogram stays single-table.

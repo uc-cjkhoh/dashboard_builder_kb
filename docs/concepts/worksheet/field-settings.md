@@ -12,7 +12,7 @@ The popup also has **Data type**: *Original*, or the casts that make sense for t
 - **The server converts in the query**, so the field groups, aggregates, filters and ranks (Top-N) as its new type.
 - **A value that doesn't fit becomes empty (NULL)**, never an error. Filters on it therefore drop it (`notin` keeps it).
 - **The field takes the new category everywhere.** It moves to Dimensions / Measures, offers that type's aggregations, operators and date parts, and shows an **as Number** tag (icon + text) on its chip and pills. Changing a cast re-categorises the pills, filters, drill levels and shared filters that read the field (`syncCastCategories`).
-- **Not supported:** calculated fields have their own type and take no cast. Histogram and box plot don't support a cast field yet (a hint, no request).
+- **Not supported:** calculated fields have their own type and take no cast. The histogram doesn't support a cast field yet (a hint, no request); a box plot casts like any chart.
 - **Stored values still show in places:** the filter value picker lists the stored text. View data leaves out filters and a selected mark on a cast field (it reads stored values) and says so.
 - Code: `Dashboard/cast-model.js`, `ClickHouse/TypeCast.cs`.
 

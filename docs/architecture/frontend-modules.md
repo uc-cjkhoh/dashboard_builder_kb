@@ -89,7 +89,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
     - `cross()`: the dashboard selection, `{ filter }` or `{ selected }`. `sync()` re-runs only when it changed what the view shows.
     - Hooks: `onSelect(dimField, raw)`, `onDrill(raw)`, `onLegend({ sheet, field, name, raw, bucketed })`, `legendFocus()`, `onTooltipFields`, `onMemberColors`.
     - Other: `statusBar`, `notices(sheet)`, `draw` (test seam).
-  - Also the single-table histogram / box plot path, and re-exports the `notices.js` helpers — [worksheet-query.md](../concepts/worksheet/worksheet-query.md#query-lifecycle)
+  - Also the single-table histogram path and the box-plot path (`runBox`, via `box-plan.js`), and re-exports the `notices.js` helpers — [worksheet-query.md](../concepts/worksheet/worksheet-query.md#query-lifecycle)
 - `Dashboard/worksheet-render.js` — `renderWorksheet(container, sheet, result, cmp, { plan, interactive, hooks })` → `{ extraNotice }`:
   - the one entry point that draws a result — Other mark, date-part labels, display names, P27 table calculations, then dispatches to a family module.
   - Reads only its arguments (a render context `rc` carries `bucketedKey`, `calcPercent`, `extraNotice`, `interactive`, `hooks`), never the editor, so any view can draw a worksheet

@@ -19,7 +19,7 @@ The row **preview** of each is in [schema-browser.md](schema-browser.md#union).
 
 - **Add** a union or unpivot from its sidebar dialog with **Add to model**; it becomes a card with an automatic, non-editable name.
 - **Union columns** are the ones every table shares by name and kind, after `Source table`; types widen to an exact type where one exists, else `Float64` with a warning.
-- **Reads alone:** a source can't be joined or related to another table, and View data, profile, histogram and box plot are unavailable over it.
+- **Reads alone:** a source can't be joined or related to another table, and View data, profile and histogram are unavailable over it; a box plot can read it.
 - **Cost:** sources are read in full; the 12 s time limit and the table / column caps are the only bounds.
 
 ## Adding one
@@ -79,7 +79,7 @@ The row **preview** of each is in [schema-browser.md](schema-browser.md#union).
 - **Not available over a source** (each says so, and nothing is sent):
   - **View data** (raw rows of one table);
   - column **profile** (no button on the card);
-  - **histogram** and **box plot** (single-table endpoints);
+  - **histogram** (a single-table endpoint);
   - the approximate-mode 10 % sample (the source is read in full).
 
 ## Cost limit
@@ -128,5 +128,5 @@ Listed in [data-model.md](../../development/backlog/data-model.md):
 - joining a source to another table, or a relationship from a source;
 - manual column alignment and rename for a union;
 - editing a source in place;
-- Show rows / profile / histogram / box plot over a source;
+- Show rows / profile / histogram over a source;
 - unions across databases.

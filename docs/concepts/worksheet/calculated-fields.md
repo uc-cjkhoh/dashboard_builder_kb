@@ -80,7 +80,7 @@ Dropping one on any of these shows the toast **`Calculated fields can't be used 
 
 Click-to-filter is **off** when the primary dimension (the drill level, else the first Rows / Columns dimension) is a calculation; the legend still highlights.
 
-**Histogram and box plot** run single-table endpoints that know nothing of calculations. With a calculated pill on Columns or Rows they show **`Histogram and box plot don't use calculated fields yet.`** in the chart slot and send no query.
+**Histogram** runs a single-table endpoint that knows nothing of calculations. With a calculated pill on Columns or Rows it shows **`A histogram doesn't use calculated fields yet.`** in the chart slot and sends no query. A **box plot** takes a row-level numeric calculation as its value (or as its group): it is sent as a row dimension, so a calculation with an aggregate or a non-number is a 400 with a message.
 
 ## Error state
 

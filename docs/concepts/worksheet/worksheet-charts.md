@@ -8,7 +8,7 @@ What the worksheet can draw and how. Shelves and the base query are in [workshee
 ## At a glance
 
 - **23 chart types**, picked from one chart-type control in the view bar. A field mapping a type can't draw shows a **hint**, never an error.
-- **One query path for most types:** the bounded `POST /api/query`. Histogram and box plot have their own endpoints.
+- **One query path for most types:** the bounded `POST /api/query`. The histogram has its own endpoint; the box plot sends the same plan to `POST /api/boxplot`.
 - **ECharts is vendored and only `chart.js` touches it.** Table, Text and KPI are native DOM. Colours come from `--chart-*` tokens.
 - **Every category is labelled;** the pane scrolls instead of squeezing. Big charts zoom and switch to canvas.
 - **Analytics** (reference lines, bands, trend, forecast, totals) are computed in the browser over the returned rows.
@@ -34,7 +34,7 @@ An invalid field mapping shows a friendly **hint**, never an error (e.g. "A poin
 | Heatmap | 2 dimensions + 1 measure | Single-hue token colour scale. Format → **Shape**: **Squares** (cells) or **Circles**. Circles are scatter marks on the same category grid: 80 % of the smaller cell side, 6–48 px, re-sized with the pane. Cells without a value draw no circle. Circles are coloured by the same value legend; labels, tooltip and Reverse palette behave as for squares; the cell banding is dropped |
 | Treemap | 1–2 dimensions + 1 measure | nested rectangles sized by the measure |
 | Histogram | 1 numeric field | equal-width bins; own endpoint |
-| Box plot | 1 numeric field (+ optional group dimension) | Q1 / median / Q3, whiskers at the 1.5 IQR (interquartile range) fences, outlier points beyond them (hollow rings, ≤ 500); own endpoint |
+| Box plot | 1 numeric field, a column or a row-level calculation (+ optional group dimension, from any related table) | Q1 / median / Q3, whiskers at the 1.5 IQR (interquartile range) fences, outlier points beyond them (hollow rings, ≤ 500); `POST /api/boxplot` |
 | Waterfall | ≥1 dimension + 1 measure | Each value is a change from the running total, then a **Total** bar. Increases `--chart-cat-1`, decreases `--chart-cat-6`, total muted — legend-named, and each step labelled with its sign. May run below zero (drawn as a custom series) |
 | Funnel | 1 dimension + 1 measure | Stages widest first, each labelled with value and % of the first. Label ink picked per stage |
 | Gauge | 1 measure, no dimension | Arc from 0 to Format → **Target** (else a round maximum). Value and "% of target" written in the middle |
@@ -160,7 +160,8 @@ On Bar / Line / Area the card opens with a row of **items**: Reference line, Ban
 ## Query paths
 
 - **Standard types** (bar … treemap, KPI, table) all use the one bounded `POST /api/query`. Heatmap and treemap pivot its 2-dimension result in the browser (`renderHeatmap` / `renderTreemap` in `render-special.js`; pivots in `result-model.js`).
-- **Histogram and box plot** are single-table shapes with their own endpoints (`POST …/histogram`, `…/boxplot`). They bypass `buildPlan` (`runStatChart`) and read the first numeric field. Bins default to 20; the server rejects a count outside 1..100.
+- **Histogram** is a single-table shape with its own endpoint (`POST …/histogram`). It bypasses `buildPlan` (`runStat`) and reads the first numeric field. Bins default to 20; the server rejects a count outside 1..100.
+- **Box plot** is `buildPlan` with the first numeric field as the one row dimension (never aggregated) and the first other field as the one column dimension (`Dashboard/box-plan.js`, `runBox`), sent to `POST /api/boxplot`. Joins, filters (Top-N, calculated, dashboard selection), calculated fields, data type casts, and a union / unpivot source all work as in other charts. A calculation with an aggregate, or a non-numeric one, is refused with a message. Measure filters don't apply (the line says so). The group count is Top-N, else 5000.
 - SQL for each: [clickhouse-integration.md](../../reference/clickhouse-integration.md#the-queries-all-read-only).
 
 ## Rendering — the ECharts adapter
@@ -220,4 +221,4 @@ The view bar's **Export** menu (`exportControl`, icon button) also holds **Print
 - **CSV** — posts the same bounded worksheet plan to `POST /api/query/export.csv`.
   - It asks for the **whole result**: up to 100,000 rows, no Top-N, no paging, no Other row (same date grouping as the view).
   - Serialised by `CsvUtil`: RFC-4180 quoting plus a **formula-injection guard** (a leading `= + - @` is prefixed with `'`).
-- Histogram and box-plot data have no CSV export (their shape is not a `QueryRequest`).
+- Histogram and box-plot data have no CSV export (their result is bins / five-number summaries, not rows).

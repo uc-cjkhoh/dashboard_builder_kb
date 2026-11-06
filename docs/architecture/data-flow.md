@@ -26,7 +26,7 @@ How one request moves from connect to render and persistence, step by step. Read
    5. builds the `JOIN`s and runs one bounded `GROUP BY` under ClickHouse's `readonly=2` and a 12 s
       time limit.
 
-   Histogram and box plot use their own single-table endpoints.
+   The histogram uses its own single-table endpoint; the box plot is the same plan (joins, filters, calculations) sent to `POST /api/boxplot`.
    → [worksheet-query.md § Query lifecycle](../concepts/worksheet/worksheet-query.md#query-lifecycle),
    [clickhouse-integration.md](../reference/clickhouse-integration.md)
 6. **Render.** The client pivots the flat result into a crosstab or hands it to the ECharts adapter.

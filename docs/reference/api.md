@@ -69,7 +69,7 @@ so a valid UI never hits these.
 | `offset` (query) | 0–10,000,000 |
 | `having` (query) | filters on aggregated measures (`HavingFilter`: `measure` index into `measures`, `op` `= != > >= < <= between`, `value` or `values [from, to]` plain numbers): ≤ 10 (`MaxHaving`, `LIMITS.having`); bad `op` → 400 `having[i].op`, non-number or From > To → `having[i].value` / `.values`, index outside the view → `having[i].measure`, with `otherBucket` → `otherBucket` ([D84](../decisions/decisions-filters.md#d84--a-filter-on-an-aggregated-measure-having-keeps-groups-after-grouping)) |
 | Filter `calc` | a calculated filter: `db` / `table` empty, `column` the label, `calc` a row-level tree (an aggregate, `op: "top"` or a `cast` is 400 at `filters[i].calc` / `.cast`); values bound as for a plain field, coerced by the calculation's type ([D82](../decisions/decisions-filters.md#d82--a-calculated-field-is-a-row-filter-applied-before-grouping)) |
-| Filter `op` | also `contains`, `startsWith`, `endsWith` (text columns, value required) and `top` (value 1–1000 + `topBy` measure, optional `bottom`; worksheet query only — histogram / box plot reject it) |
+| Filter `op` | also `contains`, `startsWith`, `endsWith` (text columns, value required) and `top` (value 1–1000 + `topBy` measure, optional `bottom`; worksheet query and box plot; the histogram rejects it) |
 | `joins[].pairs` | optional extra key pairs (kinds and repeated pairs are not checked here — the real join leaves a mismatch to ClickHouse, which coerces or refuses it; only the dialog and the preview check kinds) `[{ left, right }]` (column names on the join's two tables; ≤ 3, so a join matches on ≤ 4 pairs, `ApiLimits.MaxJoinPairs`) — more → 400 `joins[i].pairs`; a blank name → 400 `joins[i].pairs[k].left` / `.right`; an unknown column → 400 |
 | `joins[].aggregate`, `joins[].filterDirection` | `aggregate: true` groups each table to the key before joining ([D86](../decisions/decisions-dashboards.md#d86--aggregate-before-joining-is-a-per-relationship-option-on-a-two-table-view)); `filterDirection` `both` (default) or `single` (else 400 `joins[i].filterDirection`). With `aggregate`: the view must have exactly one join (400 `joins`), no calculated measure / dimension / filter and no `top` filter (400 at that field), and only `count`, `sum`, `min`, `max`, `countnonnull`, `avg` measures (400 `measures[i]`) |
 | `joins[].type` | `inner` (default), `left`, `right` or `full` (anything else 400, `joins[i].type`; `top` filters with right/full 400); a join key can't carry `calc` (400, `joins[i].left.calc` / `.right.calc`) |
@@ -243,8 +243,9 @@ Controller: `Features/Dashboard/QueryController.cs`. All `POST` with a JSON body
 |---|---|---|
 | `POST /api/query` | worksheet query across joined tables, or over one union / unpivot `source` (below); optional `offset` (paging), `withTotal`, `otherBucket`, `dateBucket` | `QueryRequest` → `QueryResult` (incl. `truncated`, `total?`, `other?`, `bucket?`) — `values` entries are a **number, a string or `null`** (see below) |
 | `POST /api/query/export.csv` | CSV of the same plan, up to 100,000 rows (never an Other row) | `QueryRequest` → `text/csv` |
+| `POST /api/databases/{db}/tables/{table}/boxplot` | the older single-table box plot (no joins, calculations or casts); the browser no longer calls it | `BoxPlotRequest` → the same result |
 | `POST /api/databases/{db}/tables/{table}/histogram` | equal-width bins over one numeric column | `HistogramRequest` |
-| `POST /api/databases/{db}/tables/{table}/boxplot` | five-number summary, optionally grouped | `BoxPlotRequest` → `{ groups, truncated, outliers, outliersTruncated }`; a group is `{ label, min, q1, median, q3, max, lowerWhisker, upperWhisker }` (whiskers = extreme values inside Q1 − 1.5 IQR / Q3 + 1.5 IQR; IQR = interquartile range, Q3 − Q1), an outlier `{ label, value }`, at most 500 (`ApiLimits.MaxBoxOutliers`; `outliersTruncated` when more exist) |
+| `POST /api/boxplot` | five-number summary of a worksheet-shaped request: exactly one `rowDimensions` entry is the value (a numeric column or a row-level numeric `calc`), at most one `columnDimensions` entry the group; joins, filters (incl. `top`), casts, date parts and a `source` as in `/api/query`; no `measures` or `having` (400 `measures` / `having`); `limit` 1–5000 caps the groups | `QueryRequest` → `{ groups, truncated, outliers, outliersTruncated }`; a group is `{ label, min, q1, median, q3, max, lowerWhisker, upperWhisker }` (whiskers = extreme values inside Q1 − 1.5 IQR / Q3 + 1.5 IQR; IQR = interquartile range, Q3 − Q1), an outlier `{ label, value }`, at most 500 (`ApiLimits.MaxBoxOutliers`; `outliersTruncated` when more exist) |
 
 ### Measure values and aggregations
 
@@ -270,9 +271,9 @@ rows). Consumers must not assume numbers — [worksheet-charts.md](../concepts/w
 
 A dimension, measure or `topBy` may carry a `calc` tree; the browser sends only the tree, never formula text. Node kinds, role and typing rules and error wording: [api-calculated-fields.md](api-calculated-fields.md).
 
-### Histogram, box plot and removed routes
+### Histogram, single-table box plot and removed routes
 
-The histogram and box-plot requests carry `filters` (`StatFilter`: column, op, value, values), applied with the
+The histogram and single-table box-plot requests carry `filters` (`StatFilter`: column, op, value, values), applied with the
 same typed rules as the worksheet query. Filters on other tables can't apply to a single-table view, so the client counts them and shows a notice.
 
 There are no single-table `aggregate`, `preview` or `count` routes under `/api/databases/{db}/tables/{table}/`;

@@ -109,7 +109,9 @@ builder runs ([api.md § Limits](api.md#limits)).
     164, 452) gets the plain statement.
   - `uniq` is approximate. `sampled` is true at ≥ 1,000,000 rows.
 - **Box plot** — after the summary `SELECT`, two more bounded SELECTs run on the same filtered rows, joining
-  per-group Q1/Q3 (`CROSS JOIN` when ungrouped). The same bound filter parameters are reused.
+  per-group Q1/Q3 (`CROSS JOIN` when ungrouped). The same bound filter parameters are reused. `BoxPlotAsync(info, QueryRequest)` (`POST /api/boxplot`)
+  compiles the worksheet query up to its FROM / joins / WHERE and its value and group expressions (the box hook in `QueryCoreAsync`: the same
+  identifier checks, calculation compilation, casts and `join_use_nulls`), then runs the same three statements over `FROM <joins> WHERE …`; no sample, no cache.
   - `BuildBoxWhiskerSql`: `minIf`/`maxIf` inside the Tukey fences.
   - `BuildBoxOutlierSql`: values beyond them, with a `LIMIT 501` probe.
 - **Raw rows** — the columns are catalog-checked (default: the first 200) and filters use
@@ -204,7 +206,7 @@ A `calc` tree compiles in four steps (request rules, catalog, validate, compile)
 - **Pure, unit-tested helpers** (reached via `InternalsVisibleTo`): `BuildCondition`,
   `BuildSingleTableFilters`, `FilterValues`, `RequestRules`, `ClampBuckets`, `ClampDistinct`, `CsvUtil`.
   The `Clamp*` helpers are defence in depth: `RequestRules` rejects out-of-range input first.
-- **Histogram / box plot** are single-table: the column must be `DESCRIBE`-validated and **numeric**;
+- **Histogram / single-table box plot** are single-table: the column must be `DESCRIBE`-validated and **numeric**;
   the max value is clamped into the last bin. Their `filters` (`StatFilter`) go through the same typed
   `BuildSingleTableFilters` — `in` and `between` included.
 

@@ -11,7 +11,7 @@ open question, promote it to a decision.
 
 | Decisions | File |
 |---|---|
-| D1–D25 | this file |
+| D1–D25, D88 (the box plot is a worksheet-shaped request) | this file |
 | D26–D60, D65–D68, D73 (calculated fields, parameters, member labels, groups, split / unpivot) | [decisions-calculated-fields.md](decisions-calculated-fields.md) |
 | D61–D64, D69, D71–D72, D74, D79–D81, D85–D86 (dashboards, hierarchies, option controls, desktop-only, compound join keys, Gantt, stories, diverging hue pair) | [decisions-dashboards.md](decisions-dashboards.md) |
 | D70 (recent connection sources) | [decisions-connection.md](decisions-connection.md) |
