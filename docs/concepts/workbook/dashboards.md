@@ -55,9 +55,13 @@ Each dashboard has its own size (`Board/board-size.js`).
     (`layoutBoard(…, { fixed })`, `fixedRowH`), so drag and resize snap to the drawn rows.
   - Rows never shrink below 16px, so a tall stack in a short box overflows.
   - The panel scrolls when the window is smaller than the box.
-- **Limits:** 320–3840 × 240–2400 whole pixels (`sizeError`). An import outside them opens Automatic with an issue.
-- A loaded size that is not a preset gets its own option in the select.
-- Size is not part of undo / redo.
+- **Range** (the "Range…" option): an Automatic board bounded by up to four optional pixel limits (**Min width**, **Max width**, **Min height**, **Max height**; an empty input is no limit), saved as `range` on the dashboard.
+  - The board is the panel width clamped into the width limits, centred when narrower; a minimum above the panel makes the panel scroll.
+  - Its height is the rows' height clamped into the height limits; past the maximum the board scrolls inside itself.
+  - A fixed size wins and drops the range; print ignores the range (page width, stacked).
+  - An invalid set (out of limits, minimum above maximum, no limit) is refused in place (`aria-invalid`, status line), never clamped.
+- **Limits:** 320–3840 × 240–2400 whole pixels (`sizeError`, `rangeError`). An import outside them opens Automatic with an issue.
+- A loaded size that is not a preset gets its own option in the select. Size and range are not part of undo / redo.
 
 ### Canvas
 

@@ -222,7 +222,8 @@ What [workbook.md](../concepts/workbook/workbook.md) saves to `localStorage` and
   worksheets:    [ { name, sheet } ],      // sheet as above, minus pages.members
   dashboards:    [ { name, widgets: [ { kind: "sheet", sheet: worksheetIndex, x, y, w, h }
                                     | { kind: "text", heading, body, x, y, w, h } ],
-                     size?: { width, height } } ],   // fixed pixels; absent = automatic (older files). Anything outside the limits (not whole pixels, 320–3840 × 240–2400) → automatic with an import issue, never clamped
+                     size?: { width, height },
+                     range?: { minWidth?, maxWidth?, minHeight?, maxHeight? } } ],   // range: an automatic board's pixel limits (same limits; min <= max, one at least); invalid → dropped with an import issue   // fixed pixels; absent = automatic (older files). Anything outside the limits (not whole pixels, 320–3840 × 240–2400) → automatic with an import issue, never clamped
   stories?:      [ { name, steps: [ { caption, target: { kind: "worksheet" | "dashboard", index } } ] } ],   // P24d — optional (absent in older files), ≤ 20 steps, caption ≤ 300
   tabs:          [ { kind: "worksheet" | "dashboard" | "story", index } ],   // the strip's order, ≤ 50
   active:        { kind, index } | null    // null = Data Source
