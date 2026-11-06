@@ -131,7 +131,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Dashboard/toolbar-rules.js` — pure: `visibleTools(chartType, tools)` — which Marks slots are quiet — [worksheet-marks.md](../concepts/worksheet/worksheet-marks.md#marks-slots)
 - `Dashboard/field-choices.js` — pure: `choicesOf`, `sameRef`, `switchField`, `removeChoice` (a slot's field choices, P40)
 - `Dashboard/placement-model.js` — pure: `defaultShelf(role)` (measures to Rows, dimensions to Columns) for the `＋` button and double-click
-- `Dashboard/having-model.js` — pure: the measure filter (`HAVING_OPS`, `checkHaving`, `cleanHaving`, `havingPlan`, `havingSentence`, `havingNotice`, `havingBadge`)
+- `Dashboard/having-model.js` — pure: the measure filter (`HAVING_OPS`, `checkHaving`, `cleanHaving`, `havingPlan`, `havingSentence`, `havingNotice`, `havingBadge`, `sliderBounds`, `sliderStep`, `sliderValues` for the range slider)
 - `Dashboard/pill-options.js` — pure: `fieldPillOptions` / `filterPillOptions` (the entries of a pill's context popup), `filterSummary`, `markGrid` (Marks slots in rows of three)
 - `Dashboard/field-group.js` — the one collapsible `<details class="ws-group">` of the field pane (Marks, tables)
 - `Dashboard/fields-pane-model.js` — pure: the field pane's hide / show state (`fieldsPaneView`, `readCollapsed`, storage key)
