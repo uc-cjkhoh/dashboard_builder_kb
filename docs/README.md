@@ -20,7 +20,7 @@ the golden rules.
 | `concepts/` | what the app does: core concepts, data source, worksheet, workbook | [index](concepts/index.md) |
 | `how-to/` | task steps: local development, testing, deploying, troubleshooting | [index](how-to/index.md) |
 | `reference/` | API, ClickHouse SQL, state shapes, glossary, design system, source-table guidance | [index](reference/index.md) |
-| `decisions/` | why things are the way they are (D1–D82) | [README](decisions/README.md) |
+| `decisions/` | why things are the way they are (D1–D84) | [README](decisions/README.md) |
 | `operations/` | the live service, safe operation, credentials | [index](operations/index.md) |
 | `development/` | engineering rules, review gates, git workflow, KB upkeep, backlog, change logs | [index](development/index.md) |
 | `archive/` | frozen build plan and old run log, not maintained | [index](archive/index.md) |

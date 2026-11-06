@@ -119,7 +119,7 @@ dashboard_builder/          (this KB)
 │   ├── how-to/             # local-development · testing · deployment · troubleshooting
 │   ├── reference/          # api (+ -calculated-fields) · clickhouse-integration (+ clickhouse-calculations) · data-model · source-table-guidance · glossary
 │   │   └── design/         #   index (concept + rules) · tokens · layout · components · motion-accessibility
-│   ├── decisions/          # README (D1–D82 lookup, open questions) · decisions-* by topic
+│   ├── decisions/          # README (D1–D84 lookup, open questions) · decisions-* by topic
 │   ├── operations/         # live-service · safe-operations (+ git-ignored credentials.local.md)
 │   ├── development/        # coding-standards · sharp-edges · review-guidelines · git-workflow · kb-maintenance · hooks
 │   │   ├── backlog/        #   undone work by topic · recommended order · design specs

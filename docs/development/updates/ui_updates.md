@@ -4,6 +4,9 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-11-06
 
+- Data notes: count the trimmed length; cap the editor height (`cc4a2bb`)
+- Dashboard data notes: free-text note (<=1000, rejected not cut), saved in the workbook; dashboard print header (`609222a`)
+- Relating: flag each other table's best-matching column while a drag or keyboard pick is active (`db5187f`)
 - Size range: scroll-aware pointer, stable gutter, labelled inputs, per-input invalid, fixed-wins on import (`7044634`)
 - Worksheet font: Format -> Font (default / serif / mono system stacks) for chart and table text (`a0182d7`)
 - Dashboard size range: optional min/max width and height for an Automatic board (`6c1caa6`)

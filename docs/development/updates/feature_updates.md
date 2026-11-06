@@ -4,6 +4,13 @@ Functional changes (server, models, validation, calculations, charts, workbook).
 
 ## 2026-11-06
 
+- Having: merge duplicate import, correct MaxHaving comment (`ff31a48`)
+- How this is computed: say the measure filter at the Aggregates stage (`611f2d6`)
+- Measure filter: keep an operator with no number yet; badge for an unapplied filter; browser check and live smoke script (`72ed2d1`)
+- Filter on an aggregated measure (HAVING): bounded server clause, rules, pill editor, notice, workbook import (`2f6cb5e`)
+- Groups: number members are canonical integers (no 007 or -0) (`3a338ef`)
+- Groups on whole-number and true/false fields, listed by exact value (`b850f83`)
+- Double-click places a calculated field or uses a hierarchy from their dialogs (`4942bf3`)
 - Parameters dialog: one confirm for calculation readers and unlinked references (`7ba8fe3`)
 - Parameters: confirm a delete that unlinks readers (paramRefs); also clear shared filters; unbinding a band end keeps its value (`59b4fc7`)
 - Parameters: analytics band ends follow number parameters; deleting a parameter (or opening a workbook without it) clears every reference to it (`30e94ee`)
