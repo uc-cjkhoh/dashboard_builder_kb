@@ -112,7 +112,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Dashboard/chart.js` — the only ECharts adapter; one chart per container element (state in a `WeakMap`), every export takes the container first
   - [worksheet-charts.md](../concepts/worksheet/worksheet-charts.md#rendering--the-echarts-adapter)
 - `Dashboard/contrast.js` — pure: WCAG (Web Content Accessibility Guidelines) `luminance`, `contrastRatio`, `pickInk` (treemap label ink)
-- `Dashboard/colour-scale-model.js` — pure (T03-19): continuous colour ramp hues, pinned range validation and span — [worksheet-marks.md](../concepts/worksheet/worksheet-marks.md#member-colours-and-palette-order-t01-20-t03-33)
+- `Dashboard/colour-scale-model.js` — pure (T03-19): continuous colour ramp hues, diverging colours and symmetric range, pinned range validation and span — [worksheet-marks.md](../concepts/worksheet/worksheet-marks.md#member-colours-and-palette-order-t01-20-t03-33)
 - `Dashboard/scale-model.js` — pure:
   - `scalePlan` (limit / paging / Other / date grouping per chart type), `withOther`, `tableProgress`, `needsNextPage`, `bucketNotice` — [worksheet-table-view.md](../concepts/worksheet/worksheet-table-view.md#table-view--a-true-rows--columns-crosstab)
 - `Dashboard/date-axis.js` — pure:
