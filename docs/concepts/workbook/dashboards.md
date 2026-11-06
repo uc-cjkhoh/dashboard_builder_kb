@@ -16,6 +16,7 @@ A dashboard tab (`.tab--dashboard`) composes the workbook's worksheets, text blo
 - `board-panel.js` — the side panel
 - `board-interact.js` — pointer, keyboard and panel-drop wiring
 - `nav-edit.js` — the button widget's inline form
+- `notes-edit.js`, `board-notes.js` — the data note ([dashboard-print-notes.md](dashboard-print-notes.md))
 - `board.css`, `_Board.cshtml` (`#board-view`)
 - Pure, node-tested modules:
   - `board-layout.js` — cell ↔ pixel geometry
@@ -30,6 +31,7 @@ A dashboard tab (`.tab--dashboard`) composes the workbook's worksheets, text blo
 - **Worksheet widgets** show the worksheet's current sheet, read-only except for selecting marks. A mark click filters the other widgets (cross-widget filtering, never saved).
 - **Only the active dashboard renders**, and widgets reuse the worksheet editor's result cache, so re-showing an unchanged board sends no query.
 - **Undo / redo** covers layout edits for the session only. The layout itself is autosaved with the workbook.
+- **Data notes:** one free-text note per dashboard (**Notes** in the bar; [dashboard-print-notes.md](dashboard-print-notes.md)).
 - **Desktop only:** the board has no phone or tablet layout; print lays out a single column (fixed-size boards keep their arrangement).
 
 ## Layout
@@ -243,20 +245,9 @@ A click on a mark in one worksheet widget filters the **other** worksheet widget
 - **Resize** re-lays out the grid, and each chart re-fits through its own observer (`chart.js`); no query.
 - **After a reload**, a widget that drew a hint before its tables' columns arrived runs again once they do (`entity:loaded`).
 
-## Full screen and print
+## Data notes, full screen and print
 
-- **Full screen** shows the bar and canvas (the whole board) full screen, using the Fullscreen API with a fallback to a fixed overlay.
-  The button's text changes to "Exit full screen". Esc or the button exits.
-- **Print** prints the canvas only. The side panel, bar buttons and widget buttons are hidden (`@media print` in `board.css`).
-  - **Automatic size:** on `beforeprint` the board lays itself out **stacked at a fixed 1000px page width** (`layoutBoard(…, { stack: true })`),
-    and the widgets print **in flow, one column** (`position: relative`, `break-inside: avoid`).
-    This is because an absolutely positioned widget could be split or cropped across pages.
-    The on-screen arrangement (side by side) is not kept on paper.
-  - **Chart size:** each worksheet widget's chart is sized to its printed cell (`sizeChart(body, { width, height })`, from the cell box less header and padding).
-    This overrides the worksheet print rule that fixes every chart canvas at 1000 × 560. `afterprint` restores the screen layout and chart sizes.
-  - **Fixed size:** a **fixed-size** dashboard instead prints its box with the on-screen arrangement kept, absolutely positioned and
-    scaled down proportionally to the 1000px page width (never up).
-- Image and CSV export stay per worksheet (reach them with **Edit**).
+Notes under the bar, full screen and the printed header: [dashboard-print-notes.md](dashboard-print-notes.md).
 
 ## Tests
 
