@@ -48,7 +48,7 @@ Beside the data header and chart card, the **field pane** holds, top to bottom: 
 - **Resize** by dragging its right edge, or `←`/`→` on the handle.
 - **Hide / show** with the first button of the view bar; the worksheet takes the room. It sets `aria-expanded` and is remembered in `localStorage` as `dashboardbuilder.fields.collapsed`, like the sidebar rail.
 - **Calculated fields** and **Hierarchies** are not in the pane. While a worksheet is open they are two icons in the sidebar body ([layout.md](../../reference/design/layout.md#sidebar)), each opening a dialog to add, edit or use them (below).
-- **Add a field** by dragging it onto a shelf or tool, pressing its **`＋`**, or double-clicking it. The `＋` is the keyboard path; both send measures to Rows and dimensions to Columns.
+- **Add a field** by dragging it onto a shelf or tool, pressing its **`＋`**, or double-clicking it. The `＋` is the keyboard path; both send measures to Rows and dimensions to Columns. The same double-click and `＋` rule applies to the rows of the Calculated fields dialog.
 
 Style: the fields are the focus. Each table is a solid tile (`.ws-table`: `--line-2` stroke, `--elev-2`) on the quiet `--surface-2` pane. Its fields are flat 32px rows (hover wash, the add `+` on hover), with the type icon tinted by role (`--dim-ink` for dimensions, `--meas-ink` for measures), under sentence-case **Dimensions** / **Measures** labels. The groups share one collapsible design (`field-group.js`: `<details class="ws-group">`, chevron + bold name, 4px between rows, 8px between groups); collapsed groups survive a pane rebuild.
 
