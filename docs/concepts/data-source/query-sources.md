@@ -37,7 +37,7 @@ The row **preview** of each is in [schema-browser.md](schema-browser.md#union).
 ### Union columns
 
 - `Source table` comes first (text; the table's name).
-- Then come the columns **every table has with the same name and kind**. This is the preview's rule, stated on the card ("Columns shared by name and kind.").
+- Then come the columns **every table has with the same name and kind**. This is the preview's rule, stated on the card ("Columns shared by name and kind."). **Compare columns** on a union card (`Canvas/union-diff.js`, rules in `unionMismatch`, `Core/source-model.js`) reads each table's catalog columns and lists what the union leaves out: columns only some tables have (and which), and columns every table has but of unlike kinds. Read-only and client-side; it sends no query.
   There is no renaming or manual alignment.
 - A shared column already called `Source table` makes ours `Source table_`.
 
