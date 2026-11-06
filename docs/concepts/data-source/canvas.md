@@ -10,16 +10,23 @@ Drawing relationships on top of the cards is covered in [relationships.md](relat
 **Code:** `Features/Canvas/`
 
 - `_Canvas.cshtml` — the view markup
-- `canvas.js` — drop handling, cards, moving and removing
+- `canvas.js` — drop handling, cards, moving and removing, zoom and pan
+- `canvas-zoom.js` — zoom limits, wheel-to-zoom, pan-for-zoom and bring-into-view maths (pure)
 - `empty-state.js` — the empty-state choice (pure)
 - `canvas.css` — styles
 
 ## Canvas ground
 
-- The ground is a 24px dot grid that scrolls with the cards.
+- The ground is a 24px dot grid that moves with the cards (pan and zoom, below).
   It is drawn on `.view--model` with `--line-2` dots, offset by the 16px gutter, and `background-attachment: local`.
 - Cards snap to the grid's 8px steps.
   The free-slot step (312 + 48 = 360) is a whole number of dot cells.
+- **Zoom and pan** work only on an empty spot of the ground (the pointer is on `#model-view` itself, not on a card, link or badge). The ground is an open world, not a scroll area: `.view--model` is `overflow: hidden` and has no scrollbars.
+  - Dragging the ground pans it by the pointer distance, any distance in any direction, whether or not the cards fill the view, so the user can place the cards where they want them on screen. A drag under 4 px is a click; the cursor is a hand, closed while panning; the pan's release does not count as a click on the ground.
+  - The wheel zooms about the pointer, 25 % to 200 %, so the point under the pointer stays still. Ctrl + wheel is left to the browser. The wheel over a card still scrolls that card's column list.
+  - A card keeps its model `x` / `y` and size. The view draws it at model position times zoom plus the pan (`left` / `top`, and the CSS `scale` property from its top-left corner). A card drag moves it by the pointer distance divided by zoom, a table dropped from the sidebar lands at the pointer, a table added with its + button takes the first free slot from the top-left of what is on screen, and an already-added table is brought into view (`panToReveal`). If the browser scrolls the hidden view to reveal a focused row, canvas.js folds that scroll into the pan.
+  - The dot grid zooms and pans with the cards (`--zoom`, `--pan-x`, `--pan-y`). Links re-measure after every zoom and pan (`canvas:zoomed`); line widths and badges do not scale, only the cards do.
+  - Zoom and pan are view state: not saved in a workbook, reset on reload. No keyboard shortcut yet.
 - While a table chip is dragged over the canvas, the ground takes a faint accent wash and the dashed accent outline.
 
 ## Dragging a table onto the canvas

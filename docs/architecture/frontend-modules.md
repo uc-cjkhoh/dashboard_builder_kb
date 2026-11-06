@@ -45,7 +45,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 
 ### Canvas/ and Relations/ — the Data Source canvas
 
-- `Canvas/canvas.js` — drop handling, entity cards, card movement, empty state — [canvas.md](../concepts/data-source/canvas.md)
+- `Canvas/canvas.js` — drop handling, entity cards, card movement, zoom and pan (`canvas-zoom.js`), empty state — [canvas.md](../concepts/data-source/canvas.md)
 - `Canvas/empty-state.js` — pure: `emptyState({connected, databaseSelected})` → the sentence, button and control to focus
 - `Relations/relations.js` — drag- and keyboard-to-relate (`link-keys.js`), links, the Relationships description card (`relation-describe.js`), cardinality, pinned keys — [relationships.md](../concepts/data-source/relationships.md)
 - `Relations/join-preview-model.js`, `Relations/join-check.js` — pure wording and declared-vs-observed comparison of a join preview (`describePreview`, `observedCardinality`, `pct`, `previewRequest`); the dialog's "Check this join" section (DOM, `textContent` only)

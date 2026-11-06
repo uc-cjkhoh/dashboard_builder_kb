@@ -4,6 +4,14 @@ Functional changes (server, models, validation, calculations, charts, workbook).
 
 ## 2026-11-06
 
+- Box plot: gateway tests through the stub endpoint; drop an unused name (`dd11b16`)
+- Box plot refuses an aggregate-before-joining relationship (400 on joins) (`81e42a6`)
+- Slider span keyed by sheet, measure name and grain; debounced apply (`076975a`)
+- Box plot reads the worksheet query: joined tables, calculated fields, casts, sources (POST /api/boxplot) (`ef7e929`)
+- Aggregate-before-join review fixes: empty aggregation refused, stronger and wider gateway tests (`1188065`)
+- Table calculations: rank order (highest/lowest first) and tie rule (competition, dense, unique) (`b6cf5e3`)
+- Aggregate-before-join: a flagged two-table join groups each table to the key before joining, with a filter direction (`3ec1d8d`)
+- Diverging colours: choose the hue pair (Orange / Blue, Amber / Violet, Green / Violet) from tokens (`3f782d7`)
 - Trend models review fixes: short end label sized to its text, one minus sign, finite-only series, forecast notice, more fixtures (`320e517`)
 - Trend models: exponential and power fits, formula / R² / n in the trend label, plain message when values are not above zero (`86fb16c`)
 - Collapse all: clearer refusal wording (`329573a`)

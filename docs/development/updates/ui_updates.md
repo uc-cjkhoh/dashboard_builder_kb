@@ -4,6 +4,9 @@ Visual and interaction changes (styles, markup, layout, labels, icons, focus). G
 
 ## 2026-11-06
 
+- Range slider for a between measure filter (`fd6afbd`)
+- Relationship dialog: total each table by the key before joining, with a filter direction; saved, planned and described (`9c63174`)
+- Diverging pairs read dedicated --chart-div-<hue> tokens per theme (never red); pair select on its own line (`fa1a211`)
 - Stepped colour: flat-range steps, visible neutral step, 3-9 only, scatter browser check (`f7d4703`)
 - Crosstab: Expand all / Collapse all (corner buttons, counted status line, one undo step) (`c1364b0`)
 - Stepped colour: Format Steps (3-9) for heatmap and scatter colour, boundaries named in the legend (`c613b6b`)
