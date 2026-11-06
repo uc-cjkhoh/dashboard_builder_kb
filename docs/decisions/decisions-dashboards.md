@@ -158,3 +158,11 @@ Decided 2026-11-02 (autonomous build). A relationship may match on more than one
 
 - **Decision:** `format.colorPair` chooses the diverging scale's two hues from a short list (Orange / Blue, Amber / Violet, Green / Violet). Each end reads a dedicated `--chart-div-<hue>` token at draw time (not a categorical slot, whose order differs per palette), so a pair follows the light, dark and One Dark Pro themes and keeps the app's saturation ceiling (design rule 4). Red is never an end (it means danger).
 - **Not built:** a free-hex colour picker and custom palette editing. A typed hex would be a user colour held as workbook data with no theme variant and no saturation or contrast check; that needs its own contrast rule first (see the backlog entry).
+
+## D86 — Aggregate-before-joining is a per-relationship option on a two-table view
+
+- **Decision:** a relationship may carry `aggregateFirst` (and a `filterDirection`, both or single). A worksheet whose one join is flagged groups each table to the key plus the fields the view groups by, then joins and recombines the partial totals, so a sum or count is not repeated by a many-to-many or one-to-many fan-out.
+- **Why per relationship, opt-in:** the plain join stays the default and every existing view is unchanged; the author who knows a link fans out chooses the fix. The data-model needs no engine for it, only a query shape.
+- **Filter direction:** a filter is applied inside its own table's subquery. "Both" adds a key semi-join to the other table (what an inner join already does, kept explicit so it also holds with an outer join); "single" leaves the other table whole. Not a model-wide setting: it lives on the relationship it concerns.
+- **Bounds reject:** only recombinable aggregates (sum, count, count non-null, min, max, average), exactly two tables, no calculation and no top-N. Each is a 400 naming its field, never a silent fallback to the double-counting join.
+- **Rejected for now:** three or more tables (each edge would need its own grain), distinct count / median / percentile (not recombinable from per-key partials), and a per-measure choice.

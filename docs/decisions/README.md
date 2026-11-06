@@ -13,7 +13,7 @@ open question, promote it to a decision.
 |---|---|
 | D1–D25 | this file |
 | D26–D60, D65–D68, D73 (calculated fields, parameters, member labels, groups, split / unpivot) | [decisions-calculated-fields.md](decisions-calculated-fields.md) |
-| D61–D64, D69, D71–D72, D74, D79–D81, D85 (dashboards, hierarchies, option controls, desktop-only, compound join keys, Gantt, stories, diverging hue pair) | [decisions-dashboards.md](decisions-dashboards.md) |
+| D61–D64, D69, D71–D72, D74, D79–D81, D85–D86 (dashboards, hierarchies, option controls, desktop-only, compound join keys, Gantt, stories, diverging hue pair) | [decisions-dashboards.md](decisions-dashboards.md) |
 | D70 (recent connection sources) | [decisions-connection.md](decisions-connection.md) |
 | D82 (calculated fields as row filters), D84 (a filter on an aggregated measure, `HAVING`) | [decisions-filters.md](decisions-filters.md) |
 | D83 (groups on whole-number and true/false fields) | [decisions-calculated-fields.md](decisions-calculated-fields.md) |

@@ -11,7 +11,7 @@ The only place for work not yet built, grouped by topic. Read it before picking 
 |---|---|
 | [dashboards.md](dashboards.md) | Stories remainder, dashboard layout, image and spacer widgets, actions, navigation, P38, set action |
 | [calculations.md](calculations.md) | functions the engine lacks, LOD, table-calculation polish, P25 |
-| [data-model.md](data-model.md) | joins, union, groups, split, cast, hierarchies, P43 |
+| [data-model.md](data-model.md) | joins, union, groups, split, cast, hierarchies, aggregate-before-join |
 | [charts-and-formatting.md](charts-and-formatting.md) | chart, authoring, formatting and export gaps |
 | [analytics-and-maps.md](analytics-and-maps.md) | statistics, forecasting, clustering, P42, maps |
 | [platform.md](platform.md) | persistence, P45, P44, open risks, workbook additions, decisions to settle |
@@ -33,7 +33,7 @@ The only place for work not yet built, grouped by topic. Read it before picking 
 
 1. Calculation function remainders (logic, text, date) — the engine's tree path already exists.
 2. Table-calculation polish — builds on the function set.
-3. Data-model breadth (compound joins, union and split remainders, groups, hierarchies) — independent of the engine; compound joins come before P43.
+3. Data-model breadth (compound joins, union and split remainders, groups, hierarchies) — independent of the engine; compound joins come first.
 4. Chart gaps and formatting — client-only, ordered by priority.
 5. Actions, navigation, P38 and the set action (P39 remainder) — need dashboards and, for sets, P25.
 6. LOD — needs the core engine and written filter-order rules.

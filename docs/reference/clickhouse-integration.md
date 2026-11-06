@@ -129,6 +129,7 @@ builder runs ([api.md § Limits](api.md#limits)).
 - **Joins:** the base table is `t0`. Each join edge attaches a table aliased `tN` in order, so any
   dimension, measure or filter can live on any included table. An edge is `INNER`/`LEFT`/`RIGHT`/`FULL JOIN`
   (`type`, `JoinKeyword`). A compound key's `pairs` are catalog-validated and ANDed into `ON` (`JoinOn`; tests `CompoundJoinTests`, `tests/live/compound-smoke.mjs`). An outer one ends the request `SETTINGS join_use_nulls = 1` (right/full without it: 400).
+  **Aggregate-before-join** (`joins[0].aggregate`, [relationships.md](../concepts/data-source/relationships.md#aggregate-before-joining-many-to-many)): `AggregateJoin` writes each table as `(SELECT key, group-by fields, partial aggregates FROM table AS tN [WHERE its filters] GROUP BY …) AS tN`, so the outer expressions keep the same aliases; measures recombine as `sum(sum)`, `sum(count())`, `min(min)`, `max(max)`, `sum(sum) / nullIf(sum(count), 0)`; with filter direction `both` a filtered table also limits the other with `key IN (SELECT key … WHERE filters)`; no `SAMPLE`; the filter values stay bound (tests `AggregateJoinTests`).
   Filters are `WHERE`, so a NULL-extended side's rows drop. Right/full reject `top` (400) and skip `SAMPLE`. Tests: `JoinTypeTests`.
 - **Dimensions** arrive split by shelf — `rowDimensions[]` then `columnDimensions[]` — and group in that
   order, so each row's keys are `[rowDim…, colDim…]`. `measures[]` aggregate as `v0, v1, …`. No measures

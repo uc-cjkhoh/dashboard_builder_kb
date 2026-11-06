@@ -20,6 +20,7 @@ table column on one toasts "A union or unpivot can't be related to a table yet."
 - **Every table card needs a partner** once there are two or more; an unrelated card is held out of worksheets.
 - **Join type** is inner, left, right or full, worded with the table names.
 - **A relationship can match on several column pairs** ([compound key](#compound-keys-and-key-suggestion)): up to four, joined with AND.
+- **Total each table by the key before joining** (optional, per relationship) stops a measure being repeated when the other table repeats the key; a filter direction goes with it ([below](#aggregate-before-joining-many-to-many)).
 - **Check this join** previews match rates and key repeats; its warnings never block saving.
 - **Cardinality is intent, not a data guarantee** — joins can still fan out.
 
@@ -200,6 +201,29 @@ or picked; the section adds up to **three more pairs**, so the join is `a.k1 = b
   one past the limit or one reusing a column already in a relationship is skipped with an import issue.
 
 Not done: no pair added by dragging or relating two more columns of already-related tables.
+
+## Aggregate before joining (many-to-many)
+
+A join repeats a row of one table once per matching row of the other, so with a one-to-many or many-to-many link a sum or count over the repeated
+side double-counts. The dialog's **Totals** section has a checkbox, **Total each table by the key before joining, so a total isn't repeated**
+(off by default; `aggregateFirst` on the relationship, [D86](../../decisions/decisions-dashboards.md#d86--aggregate-before-joining-is-a-per-relationship-option-on-a-two-table-view)).
+Ticking it shows **Filters**, a two-way choice (`filterDirection`, "both" is the default and is not stored):
+
+- **A filter on either table also limits the other** — the other table keeps only keys the filtered table still has.
+- **A filter changes only its own table** — each table is filtered on its own, and the join type decides what happens to the other side's rows
+  (with an outer join they stay, with no match for the filtered side).
+
+In a worksheet each table becomes a subquery grouped to the join key plus the fields the view groups by, carrying a partial total per measure; the
+query joins those and combines the partials ([clickhouse-integration.md](../../reference/clickhouse-integration.md#worksheet-query-queryasync)).
+Fields from both tables still pair up as in any join (a field of the other table that has several values per key shows each). Built for a view of
+**exactly two tables**; the server refuses (400) a view of more tables with a flagged link, a calculated field, a top-N filter and an aggregation that
+can't be recombined (distinct count, median, percentile, standard deviation, variance, Attr). Sum, Count, Count (non-null), Min, Max and Average work;
+an average is the sum of sums over the sum of counts, so it is the average over rows. Approximate mode reads such a view exactly.
+
+The Relationships card swaps its "totals repeat" line for the two sentences above. Pure: `applyAggregate()`, `aggregateChoice()`,
+`normalizeFilterDirection()` in `relation-rules.js`; the dialog control is `buildAggregateChoice()` in `relations.js`; browser check `tests/live/agg-ui.mjs`.
+
+Not done: a view of more than two tables, calculations and top-N filters with it, and a per-field choice instead of a per-relationship one ([backlog](../../development/backlog/data-model.md)).
 
 ## Check this join (join safety preview)
 
