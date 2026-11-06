@@ -106,7 +106,7 @@ On Bar / Line / Area the card opens with a row of **items**: Reference line, Ban
   - With too few values (or typed ends that are equal) there is no band, and an info line says why.
   - A σ / percentile band's label says "(shown rows)".
 - **Which measure (line and band).** They read the measure chosen in **of**: any measure on the shelf, shown when there are two or more. A non-default choice is named in the label ("Average (sum discount): 35"). They read the rows shown, with the "Other" remainder left out.
-- **Trend** — Linear, Logarithmic (`a + b·ln(x+1)`) or Polynomial (2nd order) least squares, on the first measure in category order. Drawn dotted and named at its end with its R² ("Trend · R² 0.93").
+- **Trend** — Linear, Logarithmic (`a + b·ln(x+1)`), Exponential (`a·e^(b·x)`), Power (`a·(x+1)^b`) or Polynomial (2nd order), on the first measure in category order; x is the category's position (the first is 0). Exponential and power are fitted as a straight line through ln y, and their R² is measured on the original values. Drawn dotted and named at its end with the formula, R² and sample size ("Trend · y = 15.2·e^(0.251·x) · R² 0.86 · n = 9"); the full name is in the series tooltip. Exponential and power need every value above zero: otherwise no line is drawn and an info line says so (blanks are skipped, never counted as zero). On truncated data the existing "Analytics use only the rows shown" info line applies.
 - **Forecast** (Line / Area) — 3, 6 or 12 steps that extend the trend (linear if none is picked) into "Forecast +1 …" categories.
 
 ### Table / Text
