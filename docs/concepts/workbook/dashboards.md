@@ -58,8 +58,9 @@ Each dashboard has its own size (`Board/board-size.js`).
 - **Range** (the "Range…" option): an Automatic board bounded by up to four optional pixel limits (**Min width**, **Max width**, **Min height**, **Max height**; an empty input is no limit), saved as `range` on the dashboard.
   - The board is the panel width clamped into the width limits, centred when narrower; a minimum above the panel makes the panel scroll.
   - Its height is the rows' height clamped into the height limits; past the maximum the board scrolls inside itself.
-  - A fixed size wins and drops the range; print ignores the range (page width, stacked).
-  - An invalid set (out of limits, minimum above maximum, no limit) is refused in place (`aria-invalid`, status line), never clamped.
+  - A fixed size wins and drops the range (also on import, with an issue); print ignores the range (page width, stacked).
+  - Inputs are grouped under visible "Width" and "Height" labels with "Min" / "Max". An invalid set (out of limits, minimum above maximum, no limit) is refused in place: only the offending inputs get `aria-invalid`, the status line says which limit, and nothing is clamped or saved.
+  - The ranged board reserves a stable scrollbar gutter; drag, resize and drops add the board's scroll offset.
 - **Limits:** 320–3840 × 240–2400 whole pixels (`sizeError`, `rangeError`). An import outside them opens Automatic with an issue.
 - A loaded size that is not a preset gets its own option in the select. Size and range are not part of undo / redo.
 
