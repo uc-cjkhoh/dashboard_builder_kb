@@ -8,7 +8,7 @@ It is the **user's declaration**, used for joins and layout. ClickHouse never cr
 ([golden rule 5](../../development/coding-standards.md#5-relationships-are-logical-declarations-not-database-facts)).
 Shape: [data-model.md](../../reference/data-model.md#relationship).
 
-**Code:** `Features/Relations/` — `relations.js`, `relation-rules.js`, `link-drag.js`, `link-keys.js`, `key-pairs.js`, `key-pairs-ui.js`, `relations.css`.
+**Code:** `Features/Relations/` — `relations.js`, `relation-rules.js`, `link-drag.js`, `link-keys.js`, `relation-describe.js`, `key-pairs.js`, `key-pairs-ui.js`, `relations.css`.
 
 A **union or unpivot card** ([query-sources.md](query-sources.md)) takes no relationship. Its rows aren't draggable, and dropping a
 table column on one toasts "A union or unpivot can't be related to a table yet."
@@ -236,6 +236,14 @@ The relationship dialog (new link and edit) has a **Check this join** button. It
 - Closing the dialog cancels the request.
 
 Not done: no hint on the drawn line, and nothing is saved with the relationship.
+
+## The Relationships card
+
+A solid card (`.rel-notes`, a collapsible `<details>`, open by default) sits at the Data Source's top right, under the tab bar. It appears once there is
+at least one relationship and lists each one in plain words: `from → to · badge`, the key line (`orders.user_id = users.id`, a compound key joins its
+columns with `+`), what the cardinality means from the FROM side, which rows the join keeps, and — for 1:N and N:M — that the FROM side's totals repeat per
+matching row. Hovering an entry lights its link and key rows like hovering the link; the selected link's entry is washed. It scrolls inside when long and is
+hidden on other tabs. Wording is pure and unit-tested: `relation-describe.js` (`tests/js/relation-describe.test.mjs`); the card is built by `renderNotes()` in `relations.js`.
 
 ## What cardinality means
 

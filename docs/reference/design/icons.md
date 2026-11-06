@@ -45,3 +45,10 @@ Removed: `bookmark` and `bookmarks` (the Bookmarks feature was removed).
 - **Analytics:** `insights`, `analytics`, `profile` (a histogram: the Data Source field row's Profile button), `ref-line`, `band`, `trend`, `forecast`, `show-me`.
 - **Actions:** `undo`, `redo`, `expand`, `collapse`, `print`, `sort`, `sort-asc`, `sort-desc`, `format`, `eye`, `refresh`, `power`, `duplicate`, `grip`, `search`, `stroke-width`, `arrow-left`, `arrow-right`.
 - **Chart types:** `chart-bar`, `chart-stacked`, `chart-line`, `chart-area`, `chart-pie`, `chart-donut`, `chart-scatter`, `chart-combo`, `chart-square`, `chart-circle`, `chart-heatmap`, `chart-treemap`, `chart-histogram`, `chart-boxplot`, `chart-waterfall`, `chart-funnel`, `chart-gauge`, `chart-gantt`, `chart-bullet`, `chart-sankey`, `chart-multiples`, `chart-kpi`, `chart-text` (Table reuses `table`).
+
+## Favicon
+
+The tab icon is the sidebar's four-square brand mark in the lime (`#a9c43c`, a mid tone that reads on light and dark tabs), an inline SVG data URI in the
+`<link rel="icon">` in `Shell/Index.cshtml`. Inline means no extra request, no static-file mapping (the `/features` provider serves only `.css` / `.js`)
+and no path-prefix problem behind Apache; the browser never asks for `/favicon.ico`. An SVG cannot read the CSS tokens, so if `--accent` changes, change the hex there too.
+

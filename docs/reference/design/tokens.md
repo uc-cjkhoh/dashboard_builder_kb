@@ -40,16 +40,16 @@ Colours below are capped at HSL saturation 70 %.
 
 | Token | Light | Dark | Role |
 |---|---|---|---|
-| `--bg` | `#f6f3f3` | `#141113` | app background (under the wash) |
-| `--surface` / `--surface-2` / `--surface-3` | `#ffffff` / `#faf7f7` / `#f2eded` | `#1c181b` / `#221d21` / `#2b2529` | cards, overlays and data / subtle fill / hover |
+| `--bg` | `#efefec` | `#0b0b0c` | app background (under the wash) |
+| `--surface` / `--surface-2` / `--surface-3` | `#ffffff` / `#f6f6f3` / `#ebebe7` | `#1a1b1d` / `#232426` / `#2e2f32` | cards, overlays and data / subtle fill / hover |
 | `--ink` / `--ink-2` / `--ink-3` | `#1c1719` / `#423a3d` / `#6b6165` | `#f3eeef` / `#d8cfd2` / `#a89ea2` | primary / muted / caption text |
 | `--line` / `--line-2` | `#ebe4e5` / `#d9cfd1` | `#2e282c` / `#42393e` | strokes |
 | `--scrim` | `rgb(28 23 25 / .38)` | `rgb(0 0 0 / .55)` | dialog backdrop (plain dim, no blur) |
 
-The neutrals are warm (a faint red cast) so the crimson accent sits naturally. Captions (`--ink-3`) reach ≥ 5.1:1
+The neutrals are charcoal, almost colourless (ink `#141516` / `#ececea`, rules `#e3e3df` / `#2b2c2f`). The dark ground is deliberately darker than every surface on it (`#0b0b0c` under `#1a1b1d` cards and `#2e2f32` hover fills) so cards, shelves and buttons stand off the page. Captions (`--ink-3`) reach ≥ 5.1:1
 on every surface in both themes.
 
-`--wash` is the app background: three large, soft radial gradients (accent ~13 %, amber ~9 %, rose ~4 %)
+`--wash` is the app background: a faint ambient tint, three large radial gradients that fade out by ~70 % and are all derived from `--signal`, the lime of the Signal theme (every other preset and custom accent sets `--signal` to its own accent). It should be felt, not seen. Strengths are tokens: `--wash-1` (`--halo`, top right) 16 %, `--wash-2` (`--signal`, bottom left) 9 %, `--wash-3` (`--halo`, centre) 3 %, stepped down to 7 / 4 / 1 % in the dark schemes, where the same tint reads stronger. `--halo` is the accent mixed 65 % toward `--on-accent`, so it follows the theme
 on `--bg`. It is set as `background-color` + `background-image`, because a colour cannot sit in the
 first layer of a multi-layer `background` shorthand; the whole declaration would be dropped.
 
@@ -128,13 +128,13 @@ blur is never animated.
 `tests/js/contrast.test.mjs` pins `--ctl-edge` at ≥ 3:1 against the glass over the base and the strongest
 wash tint, in both themes.
 
-## Accent — one crimson
+## Accent — one blue
 
 | Token | Light | Dark | Role |
 |---|---|---|---|
-| `--accent` / `-hover` / `-pressed` | `#b82035` / `#9c1c32` / `#821729` | `#d42a3c` / `#b72031` / `#991b2a` | primary fill (white `--on-accent` ≥ 4.5:1 in every state); active tab underline, selected relationship, single chart series |
-| `--accent-ink` | `#a51d31` | `#eea0a7` | accent **text** |
-| `--accent-soft` / `--accent-line` | `#fcf0f2` / `#f3c3ca` | `#3a1a20` / `#6b2a33` | tint / stroke |
+| `--accent` / `-hover` / `-pressed` | `#1a1c1f` / `#2e3135` / `#0c0d0f` | `#c3df5a` / `#b3cf4a` / `#a2bd3e` | primary fill (`--on-accent` ≥ 4.5:1 in every state: white in light, `#12130f` on the dark lime); active tab underline, selected relationship, single chart series |
+| `--accent-ink` | `#1f57ae` | `#9cbced` | accent **text** |
+| `--accent-soft` / `--accent-line` | `#eef3fc` / `#c4d6f4` | `#172238` / `#2a4470` | tint / stroke |
 | `--focus` | `--ink` | `--ink` | neutral focus colour (kept for outlines a feature may still draw by hand; `:focus-visible` outlines are forced off) |
 
 Inputs on focus get the neutral wash and their caret; the border does not change. An invalid input uses
@@ -152,7 +152,7 @@ P41 in the heading is the product phase ID for workbook themes. A workbook may c
 
 What a theme can change:
 
-- **Accents:** Crimson (the default, with the values above), Blue, Teal, Violet and Graphite, each with
+- **Accents:** Signal (the default, with the values above), Ultramarine, Monospace (violet on slate), Blue, Crimson, Teal, Violet and Graphite, each with
   light and dark sets; or a **custom** `#rrggbb`. Every set keeps:
   - white `--on-accent` ≥ 4.5:1 on the accent and hover;
   - `--accent-ink` ≥ 4.5:1 on the surface **and** on `--accent-soft`;
@@ -167,7 +167,7 @@ What a theme can change:
   (`#456fc8`, text `#6aa8e0`) and chart colours (`#6aa8e0` `#98c379` `#c678dd` `#e5c07b` `#56b6c2` `#d19a66` `#abb2bf` `#e06c75`);
   both stay changeable. Surfaces are `--bg #181a1f`, `--surface #21252b`, `--surface-2 #282c34`, `--surface-3 #2c313a`;
   ink `#d7dae0` / `#abb2bf` / `#9aa2af`; lines `#3e4451` / `#4b5263`. Blue is desaturated to `#6aa8e0` (rule: HSL S ≤ 70 %),
-  and the same AA / 3:1 checks run on this block (`tests/js/contrast.test.mjs`). The default look stays crimson-on-warm-neutral.
+  and the same AA / 3:1 checks run on this block (`tests/js/contrast.test.mjs`). The default look is Signal on charcoal.
 - A saved theme with no `surface` is the default look (older workbooks open unchanged).
 
 `--print-paper` / `--print-ink` (`#ffffff` / `#000000`) are the print stylesheet's colours in every scheme.
@@ -177,7 +177,7 @@ What a theme can change:
 Green = connected / success · amber = connecting / loading / notice · **vermilion = error or destructive**
 · grey = idle. Status is always **icon + text + colour**
 ([golden rule 9](../../development/coding-standards.md#9-never-colour-alone)); that is what keeps danger apart
-from the crimson accent.
+from the accent.
 
 | Token group | Light (bg / ink / line) | Dark (bg / ink / line) | Meaning |
 |---|---|---|---|
@@ -199,12 +199,12 @@ mark wears the series colour.**
 
 | Token | Maps to | Role |
 |---|---|---|
-| `--chart-series` | `--accent` | a single data series (crimson) |
+| `--chart-series` | `--accent` | a single data series (blue) |
 | `--chart-axis` | `--line-2` | axis lines |
 | `--chart-grid` | `--line` | value-axis gridlines |
 | `--chart-label` | `--ink-2` | primary chart text |
 | `--chart-muted` | `--ink-3` | tick labels |
-| `--chart-cat-1..8` | light `#2a78d6` `#146f14` `#e87ba4` `#c99424` `#1eac79` `#de6e41` `#4a3aa7` `#df4d4c`; dark `#5696e1` `#3ba55c` `#ec93b7` `#e0b152` `#2ec48c` `#e3895e` `#a192ec` `#e77675` | categorical ramp, fixed order |
+| `--chart-cat-1..8` | light `#72872a` `#d9605a` `#d9a03a` `#7c63d6` `#2f9ea8` `#3f7fd0` `#4aa66a` `#6a6d72`; dark `#c3df5a` `#e0827c` `#deb062` `#9b86e6` `#5cc0c8` `#7aa3dc` `#6fc486` `#8e9094` | categorical ramp, fixed order |
 
 - **One series** wears the accent. **≥2 series** (multiple measures, or a Colour split) draw
   `--chart-cat-*` in order, with a legend. Beyond 8 values the ramp repeats; the legend disambiguates.
@@ -238,7 +238,7 @@ sizes, and no ad-hoc sizes.
 
 ## Elevation & focus
 
-- **Elevation (warm-tinted ramp).** Following Flat 2.0, shadows are soft and short, and there are no
+- **Elevation (indigo-tinted ramp).** Following Flat 2.0, shadows are soft and short, and there are no
   hover-lift transforms.
   - `--elev-card` / `--elev-card-hover` / `--card-rim`: Data Source cards (two-layer shadow + head
     highlight, light and dark).

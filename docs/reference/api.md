@@ -105,6 +105,7 @@ Controller: `Features/Connection/ConnectionController.cs`.
 |---|---|---|
 | `POST /api/connection` | validate and store the session connection (host, port, user, password, secure, allowInvalidCert); steps the guard settings down if the server refuses one | `SELECT 1` |
 | `GET /api/connection` | current connection view — password-free | — |
+| `GET /api/connection/ping` | liveness probe → `{ connected, reachable }`; `connected:false` = the session lost its connection; `reachable` = `SELECT 1` succeeded | `SELECT 1` |
 | `POST /api/connection/disconnect` | drop the session connection; body `{}` (proxy-safe) | — |
 | `DELETE /api/connection` | same, direct to Kestrel only — the `:8443` proxy 403s `DELETE` | — |
 

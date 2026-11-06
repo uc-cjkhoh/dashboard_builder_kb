@@ -101,9 +101,9 @@ ASP.NET Core MVC with **one folder per feature** under `Features/`: controller, 
 ### D22 — Fluent glass design language
 Supersedes [D7](#d7--design-language-red--black--white-fixed-no-scroll-shell).
 Windows 11 Fluent structure with Flat Design 2.0 surfaces:
-- **warm neutrals + one crimson accent**;
+- **charcoal neutrals + one Signal accent, the default from 2026-11-06 (Ultramarine, Monospace violet, then blue, before; crimson before 2026-11-05): near-black on paper in light, neon lime (`#c3df5a`, softened to S ≈ 70 %) on charcoal in dark, with dark `--on-accent` text on the lime; reference: a near-black dashboard with a lime accent. The saturation cap (S ≤ 70 %) holds, so the eye-catching quality comes from hue and lightness contrast, not saturation**;
 - **glass chrome** (sidebar, tab bar, worksheet header: translucent tint + backdrop blur + 1px stroke +
-  top rim) over a warm background wash;
+  top rim) over a faint accent-tint background wash;
 - **solid data surfaces and overlays** (entity cards, chart area, crosstab, menus, popovers, toasts,
   dialogs);
 - **light and dark** (System / Light / Dark toggle).

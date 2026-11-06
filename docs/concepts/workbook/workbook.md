@@ -104,7 +104,7 @@ The actions:
   - Parameters save with the workbook; disconnecting clears them from the screen.
 - **Theme…** (Settings menu) opens the theme dialog, with choices as labelled swatches:
   - a look: Default or One Dark Pro (dark-mode surfaces; it also picks the One Dark accent and chart colours);
-  - an accent: Crimson, Blue, Teal, Violet, Graphite or a custom colour (refused with the reason if it can't carry white text);
+  - an accent: Signal (the default), Ultramarine, Monospace, Blue, Crimson, Teal, Violet, Graphite or a custom colour (refused with the reason if it can't carry white text; Signal carries dark text on its dark-mode lime);
   - chart colours: Default, Colour-blind safe, Muted.
 
   Choices apply live and save with the workbook. Disconnecting returns the screen to the default theme until the workbook reopens

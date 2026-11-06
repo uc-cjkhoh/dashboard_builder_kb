@@ -11,7 +11,7 @@ The stack the app runs on and the boundaries of what it does.
 |---|---|
 | Runtime | .NET 10 LTS on AlmaLinux 9 |
 | Web | ASP.NET Core MVC in **feature folders** — one Shell page + attribute-routed JSON API controllers |
-| Frontend | vanilla JS ES modules + hand-written CSS with design tokens (Flat 2.0 + glass chrome, crimson accent, light/dark: System / Light / Dark toggle); no framework, no build step |
+| Frontend | vanilla JS ES modules + hand-written CSS with design tokens (Flat 2.0 + glass chrome, Signal accent (near-black / neon lime), light/dark: System / Light / Dark toggle); no framework, no build step |
 | Charts | Apache ECharts, self-hosted (SVG renderer) |
 | ClickHouse driver | `ClickHouse.Client` (ADO.NET over HTTPS, port `8443`) |
 | Hosting | Kestrel under systemd, behind Apache httpd TLS at path `/dashboardbuilder` |

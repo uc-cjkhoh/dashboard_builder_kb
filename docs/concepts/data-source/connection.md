@@ -12,6 +12,12 @@ The connection panel sits at the top of the sidebar. It adds the session's Click
 
 ## The form
 
+Layout (`form#conn-form`): the four fields are **one filled block** — a row each (Host, Port, User, Password), the labels in one shared lane (a subgrid: as wide as the longest label plus an 8px gap, so values align and no label touches its value),
+every row exactly 32px (the hairline between rows is an inset shadow, not a border); focus deepens the row's fill and an invalid row gets a 1px danger ring with its message under the value.
+Motion: rows enter in a 30ms stagger (fields, recent sources), the status dot settles / breathes / pops per state, the lost row rises in, the chevrons
+and switch thumbs ease, and **Connect** shows a spinner while it runs; all of it collapses under reduced motion. The open form is one rhythm: recent sources, the fields block, **Advanced** and the actions are stacked 8px apart; the fields and the options (switches + certificate
+warning) are two blocks with the same fill, radius and 8px side inset, and **Connect** / **Cancel** are two equal columns (Connect alone spans the row). Under the fields, **Advanced** is a quiet chevron row whose options are **switch rows** (still checkboxes; on = ink, never a hue), then a full-width **Connect**.
+
 | Field | Default | Notes |
 |---|---|---|
 | Host | — | required, ≤ 253; a host name, IPv4 or (bracketed) IPv6 — no scheme, port or path |
@@ -40,7 +46,7 @@ After each successful connect, the source is remembered in this browser so it ca
 - **The password is never stored** (golden rule 4). `recent-sources.js` copies only the fields above, and `sanitize` drops anything else on load
   ([D70](../../decisions/decisions-connection.md#d70--recent-connection-sources-are-non-secret-and-kept-in-the-browser)).
 - **Where it shows:** the list (`#conn-recent`) sits above the form while the form is open, set off from it by one hairline.
-  Each row is flat — no box: a server glyph, the host (bold, ellipsised), and `user · port` beneath. Hover or focus washes the row and reveals the × (`.conn-recent__remove`).
+  Each row is one flat line: the host (ellipsised) and the user in grey (full `host · user · :port` in the tooltip). Hover or focus washes the row and reveals the × (`.conn-recent__remove`).
   It is hidden when there are none or while the summary shows.
 - **Picking one** refills the fields, opens Advanced if needed, clears the password and focuses it.
   The host is refilled exactly as it was entered (`formValues`), because a recent source is stored from the entered value, never a derived one.
@@ -65,14 +71,24 @@ After each successful connect, the source is remembered in this browser so it ca
    - Success shows a toast.
    - Failure shows the field error (when the server names a field) or a danger toast. Failure messages carry no credentials.
 3. **Once connected**, the form is **collapsed by default** into a one-line **compact summary** (`.conn-summary`, control height):
-   a dot and the host, as entered.
-   - The host's tooltip is `user · TLS · :port` (`summaryTitle`).
-   - A bypassed certificate check adds a warning icon (`#conn-warn`, "Certificate not verified").
-   - The summary has two icon actions:
-     - **change** (edit icon, `aria-expanded`) toggles the form open (with **Cancel**) and closed again.
+   a **single status row** — status slot, host (as entered; no certificate icon — the opt-in is shown in Advanced and the tooltip), then one right-aligned group (`.conn-row__actions`) of two icon buttons:
+   **Change connection** (edit) and **Disconnect** (power). There is no menu and no manual "check connection" button; liveness is probed automatically
+   (and **Retry** appears when lost). Above the tile sits a visible group title, **Connections** (`.sidebar__title`; **Databases & Tables** titles the lower group, shown once connected), flush with the tile edge. Below the tile, a full-width hairline divider (`#sidebar-divider`, shown once connected) separates Connection from
+   Databases & Tables; its gap flexes 24px → 8px as the table list needs height. Connected, the tile is inset 4px so the dot sits on the
+   12px icon lane of the rows below and the host on their 36px text lane.
+   - **The status slot is the panel's only coloured element, and it shows liveness, not "connected once".**
+     Filled green dot = the last probe reached ClickHouse; hollow grey pulsing ring = checking (one failed probe);
+     red cross-in-circle = **lost** (two failed probes in a row, or the browser went offline). Lost also dims the host and adds a row
+     under the summary — "Connection lost" in danger ink plus **Retry**. A screen-reader status (`#conn-health-text`) mirrors it.
+     Rules: `Connection/connection-health.js` (pure, unit-tested).
+   - **Probes:** `GET /api/connection/ping` every 30 s while the tab is visible, on returning to the tab, on `online`, and on Retry.
+     It is silent (no activity-bar entry). If the server answers `connected:false` the session ended (2 h idle, restart), so the UI
+     returns to the form with a toast instead of showing a stale dot. Cancel from "change" keeps the last probe's state.
+   - The summary's actions:
+     - **Change connection** (menu) opens the form (with **Cancel**); Cancel returns to the row.
        The existing connection stays active until a new connect succeeds.
        The form always holds the active connection's host, port and user (`formFromView`), also after a page reload.
-     - **disconnect** (power icon) sends `POST /api/connection/disconnect` with `{}` (the proxy blocks `DELETE`).
+     - **Disconnect** (in the menu) sends `POST /api/connection/disconnect` with `{}` (the proxy blocks `DELETE`).
        The form returns and the workspace is cleared: cards and tabs fade out.
        Reconnecting to the same server reopens them from the autosaved workbook ([workbook.md](../workbook/workbook.md#auto-save)).
 4. **On page load**, `GET /api/connection` restores the summary for an existing session (a password-free view).

@@ -25,9 +25,10 @@ previews rows, and profiles columns.
   It has a disabled "Select a database…" placeholder. On disconnect it clears.
 - **Open list.** Where the browser supports customizable selects, the open list takes the table rows' design
   (`appearance: base-select`, `@supports` in `schema.css`):
-  - a solid panel (`--surface`, one stroke, `--elev-16`, 8px radius) of flat 32px rows;
+  - a solid panel (`--surface`, one stroke, `--elev-16`, 8px radius on its bottom corners) of flat 32px rows;
   - names start on the closed control's text lane;
   - an ink wash on hover / focus;
+  - **one component with the closed control:** while open, the panel continues the tile — same width (select + the tile's 1px stroke, via `anchor-size(width)`), no gap, the tile's bottom corners squared and its bottom stroke dropped, a hairline between the row and the list; a long name is cut with an ellipsis, never widens it;
   - the current database bold, with an accent tick at the right;
   - the app's chevron (flipped while open) in place of the browser's built-in (user-agent) triangle;
   - the placeholder is not listed.

@@ -80,7 +80,7 @@ inline errors, dropzone hints, the connect-first gate). Inline `display` fights 
 - All colour, space and type values are CSS custom properties in `Features/Core/core.css` `:root`.
 - A workbook theme may override only the accent set and `--chart-cat-*`, from the checked values in
   `Core/theme-model.js` ([tokens.md](../reference/design/tokens.md#workbook-themes-p41)).
-- The default accent is **crimson** (`--accent-*`). **Danger is a separate vermilion** (`--danger-*`)
+- The default accent is **blue** (`--accent-*`). **Danger is a separate vermilion** (`--danger-*`)
   and always comes with an icon and words, so a red accent is never mistaken for an error.
 - Success is `--ok-*` and notices are `--warn-*`. Field pills are never red. Charts read `--chart-*` tokens.
 - `tests/js/tokens.test.mjs` fails on a hex outside `:root`, a retired token or a glass overlay.

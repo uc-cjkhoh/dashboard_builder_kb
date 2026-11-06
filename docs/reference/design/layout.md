@@ -94,11 +94,11 @@ Related items share one edge, measured on what the eye sees (glyphs and text), n
 
 The sidebar has **no section titles and no dividers** below the brand row; the Connection / Database /
 Tables headings are screen-reader-only. Spacing groups the connected summary and the database picker,
-then the search box and table list. The connected summary is a flat row: status dot on the gutter,
-host, and edit and disconnect ghost buttons. **Union** and **Unpivot** are pinned under the scrolling
+then the search box and table list. The connected summary is a flat row: status slot on the gutter (green dot, grey ring or red cross — the last liveness probe),
+host, then change and disconnect icon buttons right-aligned on the row (no menu). A flexible gap with an edge-to-edge hairline (`.sidebar__divider`) separates the connection tile from Databases & Tables. **Union** and **Unpivot** are pinned under the scrolling
 list with one hairline above them.
 
-The **performance** gauge tile (`#perf-btn`) closes the body: the same 40px sidebar tool tile as the worksheet tools, pinned to the bottom and centred in the rail on a worksheet or dashboard (where the body shows only the tools, or only this tile). It is **not shown on the Data Source tab**, which has no queries to time, nor while the sidebar is collapsed.
+The **performance** gauge tile (`#perf-btn`) closes the body: the same 40px sidebar tool tile as the worksheet tools, pinned to the bottom and centred in the rail on a worksheet or dashboard (where the body shows only the tools, or only this tile). It is **not in the DOM on the Data Source tab** (`Shell/sidebar.js` removes it there, which has no queries to time, and appends it back on a worksheet or dashboard tab), nor shown while the sidebar is collapsed.
 
 ## Tab bar
 

@@ -23,7 +23,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 - `Shell/app.js` — bootstrap
   - hydrates `[data-icon]` placeholders, installs the global `error` / `unhandledrejection` handlers (danger toast "Something went wrong — try again."; aborted queries and the benign `ResizeObserver loop` notice are ignored), wires every module's `init*`, listeners before the initial status check
 - `Shell/scheme-toggle.js` — the tab bar's appearance toggle: System / Light / Dark radio menu (`Core/menu.js`), glyph + label follow the choice
-- `Shell/perf-panel.js` — the sidebar's gauge tile (`#perf-btn`, bottom of the sidebar body) opens the Performance dialog: recent query / render timings newest first (time in the app zone, kind, query ms, rows, cache hit or miss, render ms) with a one-line summary, **Copy as text** (tab-separated) and **Clear**; a native `<dialog>` (Esc closes, focus returns to the button); updates live while open
+- `Shell/perf-panel.js` — the sidebar's gauge tile (`#perf-btn`, bottom of the sidebar body; `sidebar.js` takes it out of the DOM on the Data Source tab and puts it back elsewhere) opens the Performance dialog: recent query / render timings newest first (time in the app zone, kind, query ms, rows, cache hit or miss, render ms) with a one-line summary, **Copy as text** (tab-separated) and **Clear**; a native `<dialog>` (Esc closes, focus returns to the button); updates live while open
 - `Core/timezone.js` — pure: the app time zone (`<meta name="app-timezone">`, [time-zone.md](../reference/time-zone.md)): `clockIn`, `dateIn`, `todayIn`, `offsetLabel`.
 - `Shell/activity-bar.js` — the **activity chip** (`#activity`, bottom-right, solid, `role=status` / `aria-live=polite`): while any API request is in flight it says what the app is waiting on and for how long ("Loading tables in sales… · 3 s"). Shown after 300 ms (no flash on fast requests), refreshed each second, `hidden` when idle.
 - `Core/activity-model.js` — pure: `describeRequest(method, path)` builds the plain-words label from the method and URL path **only** (database / table / column names; never a request body — golden rule 4); `createActivity()` tracks in-flight requests; `activityLine(snapshot)` is the text (oldest request, "+n more", elapsed, "still waiting on ClickHouse" after 10 s). `api.js` registers every request in `request()` and `exportCsv()` and clears it in `finally`, so success, error and abort all end it.
@@ -34,7 +34,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 
 - `Connection/connection.js` — connection form, compact summary, gating — [connection.md](../concepts/data-source/connection.md)
 - `Connection/recent-sources.js` — pure: `remember` / `forget` / `sanitize` recent connection sources (host as entered, port, user, TLS flags — never a password), most recent first, max 5; `formValues` refills the form from one
-- `Connection/connection-rules.js` — pure: `advancedShouldOpen` (the Advanced section opens when TLS is off or the cert opt-in is on), `summaryTitle` / `summaryWarns` (compact-summary tooltip and cert warning), `formFromView`
+- `Connection/connection-rules.js` — pure: `advancedShouldOpen` (the Advanced section opens when TLS is off or the cert opt-in is on), `summaryTitle` (compact-summary tooltip), `formFromView`
 
 ### Schema/ — database picker and table list
 
@@ -47,7 +47,7 @@ Grouped by feature folder; each entry is the module, then what it owns.
 
 - `Canvas/canvas.js` — drop handling, entity cards, card movement, empty state — [canvas.md](../concepts/data-source/canvas.md)
 - `Canvas/empty-state.js` — pure: `emptyState({connected, databaseSelected})` → the sentence, button and control to focus
-- `Relations/relations.js` — drag- and keyboard-to-relate (`link-keys.js`), links, cardinality, pinned keys — [relationships.md](../concepts/data-source/relationships.md)
+- `Relations/relations.js` — drag- and keyboard-to-relate (`link-keys.js`), links, the Relationships description card (`relation-describe.js`), cardinality, pinned keys — [relationships.md](../concepts/data-source/relationships.md)
 - `Relations/join-preview-model.js`, `Relations/join-check.js` — pure wording and declared-vs-observed comparison of a join preview (`describePreview`, `observedCardinality`, `pct`, `previewRequest`); the dialog's "Check this join" section (DOM, `textContent` only)
 - `Relations/link-route.js` — pure: `linkSides` (which card edge each end uses), `linkRoute` (the elbow's corner points, lanes, badge spot), `roundedPath` — the link geometry
 - `Relations/key-pairs.js`, `Relations/key-pairs-ui.js` — a compound key: pure `suggestPairs`, `addPair`, `compoundName`, `MAX_EXTRA_PAIRS`; the dialog's "Also match on" section (native controls, `textContent` only)

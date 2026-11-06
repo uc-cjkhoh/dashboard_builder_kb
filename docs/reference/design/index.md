@@ -10,10 +10,10 @@ change, then the topic file from the [map](#map). **Source of truth:** `Features
 
 ## Concept
 
-> **Flat 2.0 + glass · warm neutrals + crimson · light and dark · calm.**
+> **Flat 2.0 + glass · charcoal neutrals + Signal (near-black in light, neon lime in dark) · light and dark · calm.**
 > Glass only on chrome that has nothing but the background wash beneath it (sidebar, tab bar, worksheet
 > header) · everything that floats over content — menus, popovers, toasts, dialogs — is solid · one
-> crimson accent · danger is a separate vermilion that always carries an icon and words · a fixed
+> violet accent · danger is a separate vermilion that always carries an icon and words · a fixed
 > full-screen shell — no page scroll; panels scroll internally.
 
 The builder is a two-world layout. A **left glass rail** owns connection and schema browsing; the
@@ -21,7 +21,7 @@ The builder is a two-world layout. A **left glass rail** owns connection and sch
 
 - **Structure** follows Windows 11 Fluent: 4/8/16/24 px spacing, one 8 px radius, 32 px controls and a
   soft elevation ramp.
-- **Surfaces** follow Flat Design 2.0. The fixed chrome is translucent and blurs a warm background wash.
+- **Surfaces** follow Flat Design 2.0. The fixed chrome is translucent and blurs a faint accent-tint background wash.
   Entity cards, the chart area, the crosstab and every overlay stay solid, so text is never read
   through other text.
 - **Light or dark** is the viewer's choice: a **System / Light / Dark** toggle at the right end of the
@@ -35,7 +35,7 @@ groups. Nothing is removed: an encoding that holds fields is always shown.
 
 ## Rules that never bend
 
-- **Tokens only** — never hardcode a hex. The accent is crimson (`--accent-*`). Error / destructive is
+- **Tokens only** — never hardcode a hex. The accent is blue (`--accent-*`). Error / destructive is
   the vermilion `--danger-*` and is never shown by colour alone. Success is `--ok-*`, notices `--warn-*`.
   Field pills are blue / teal / violet, never red, so a pill never reads as an error.
 - **Glass never overlaps content** — a surface that can sit on top of text (menu, popover, toast, dialog)
