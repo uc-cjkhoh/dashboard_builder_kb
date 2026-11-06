@@ -39,7 +39,7 @@ The editing dialog has:
 
 ## Field pane group
 
-Calculations are not in the field pane itself. On a worksheet tab, the sidebar's calculator icon opens the **Calculated fields** dialog (`Dashboard/calc-manager.js`). It lists one row per calculation: one element, its chip: the type icon, the name, the role chip such as `Aggregate · number`, the add **+**, a **⋯** menu and a pencil **Edit** button built into the chip ; double-clicking a row (not its buttons) places the calculation on its default shelf, as in the field pane: an aggregate to Rows, a row-level one to Columns, with the dialog staying open; the **+** is the keyboard path — all on one line. **New calculated field** sits in the dialog footer and is disabled at the count limit. The dialog redraws while open whenever calculations change. The **⋯** menu:
+Calculations are not in the field pane itself. On a worksheet tab, the sidebar's calculator icon opens the **Calculated fields** dialog (`Dashboard/calc-manager.js`). It lists one row per calculation: one element, its chip: the type icon, the name, the role chip such as `Aggregate · number`, the add **+**, a **⋯** menu and a pencil **Edit** button built into the chip. Double-clicking a row (not its buttons) places the calculation on its default shelf, as in the field pane: an aggregate to Rows, a row-level one to Columns, with the dialog staying open; the **+** is the keyboard path — all on one line. **New calculated field** sits in the dialog footer and is disabled at the count limit. The dialog redraws while open whenever calculations change. The **⋯** menu: Clicking the name does not edit (it would clash with double-click placement); use the pencil, the **⋯** menu or the context menu.
 
 | Action | Behaviour |
 |---|---|
