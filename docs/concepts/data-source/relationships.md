@@ -183,6 +183,9 @@ or picked; the section adds up to **three more pairs**, so the join is `a.k1 = b
 
 - **Suggestions.** Buttons "+ Add Region = region" offer free column pairs with the same name (exact first, else ignoring case and `_` `-` spaces)
   and the same kind. Nothing is added until one is pressed. Pure: `suggestPairs()` in `key-pairs.js`.
+- **First pair.** While a column is being dragged or picked from the keyboard, each other table's best-matching free column (same name, exact
+  first, same kind) is flagged: dotted outline, the word **Match** and "suggested match" in its accessible name. It is only a hint; any
+  column can still be chosen, and the keyboard path (roving rows, `[` `]`, Enter) is unchanged. Pure: `suggestTarget()` in `key-pairs.js`.
 - **By hand.** Two selects (one per table, free columns only, each with its kind) and **Add pair**. A pair of different kinds, a column already
   in a relationship or an already matched column is refused with a line of text beside a warning icon (`addPair()`).
 - **Remove.** Each added pair is a row `a = b` with a Remove button.
