@@ -113,7 +113,7 @@ A measure pill's aggregation radios offer only what the column's type supports (
 
 A measure pill's **fx** button opens its editor.
 
-- **Calculations:** **Running total, % of total, Difference, % difference, Compound growth** (per-period rate since the group's first value, `(v / v₀)^(1/steps) − 1` in %; blank when the first value is not positive), **Rank** (competition style, highest first), **Percentile rank** (0–100%, highest = 100) or **Moving average** (window 2–30).
+- **Calculations:** **Running total, % of total, Difference, % difference, Compound growth** (per-period rate since the group's first value, `(v / v₀)^(1/steps) − 1` in %; blank when the first value is not positive), **Rank** (competition style 1, 2, 2, 4 and highest first by default; an **Order** of lowest first and a **Ties** rule of dense 1, 2, 2, 3 or unique 1, 2, 3, 4 in result order are chosen in the editor; a non-default choice shows in the measure label, e.g. "rank (lowest first, dense)"; Other and blanks get none), **Percentile rank** (0–100%, highest = 100) or **Moving average** (window 2–30).
 - **Along:** Columns, Rows (Auto = Columns when it has dimensions) or **Specific dimensions**:
   - a checkbox per Rows / Columns dimension; the ticked ones run together, the rest restart;
   - unticking all re-ticks all;
