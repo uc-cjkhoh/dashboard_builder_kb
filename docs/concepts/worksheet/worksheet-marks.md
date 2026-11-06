@@ -99,14 +99,14 @@ The Tooltip tool panel also holds a **Tooltip text** editor: free text with `<Fi
 
 - **Reverse palette** (`format.paletteReverse`, boolean, default off) reverses the eight categorical colours' order and swaps the continuous ramp's ends (heatmap and scatter colour). Member colours are unaffected.
 - **Continuous colour scale** (T03-19; Format, on Scatter and Heatmap):
-  - **Colour scale** (`format.colorScale`, default `sequential`) — Low → high, or Diverging: orange (`--chart-cat-6`) below a centre, the surface at it, blue (`--chart-cat-1`) above. **Colour centre** (`format.colorCentre`, blank = 0 when the data straddles it, else the middle) replaces the Colour ramp control while Diverging. The scale's ends are made symmetric about the centre (the larger distance from it, after any pins) so the middle colour sits on the centre; the legend names it in words ("centre 20"). Reverse palette swaps orange and blue.
+  - **Colour scale** (`format.colorScale`, default `sequential`) — Low → high, or Diverging: warm (`--chart-div-low`, orange) below a centre, the surface at it, cool (`--chart-div-high`, blue) above; the pair is theme-stable ([tokens.md](../../reference/design/tokens.md)) and shared with the table scale. The centre is bounded to ±1e15 (a toast refuses more; a saved one is cleared on import). Switching back to Low → high keeps the centre for later. **Colour centre** (`format.colorCentre`, blank = 0 when the data straddles it, else the middle) replaces the Colour ramp control while Diverging. The scale's ends are made symmetric about the centre (the larger distance from it, after any pins) so the middle colour sits on the centre; the legend names it in words ("centre 20"). Reverse palette swaps warm and cool. **Colour from / to are hidden while Diverging** (the ends follow the centre; a stored pin is kept but ignored, and returns with Low → high), so no "beyond range" note shows.
   - **Colour ramp** (Low → high only) — Brand (accent soft → accent), Blue, Green, Amber or Violet (the surface blended 20 % toward that categorical token, up to the token). `format.colorRamp`, default `brand`.
-  - **Colour from / to** (`format.colorMin` / `colorMax`; blank = the data's own end) pin the ends of the scale. A value beyond a pinned end takes that end's colour (it saturates; nothing is greyed out). While a pin is active the legend reads "beyond range: end colour".
+  - **Colour from / to** (Low → high only; `format.colorMin` / `colorMax`; blank = the data's own end) pin the ends of the scale. A value beyond a pinned end takes that end's colour (it saturates; nothing is greyed out). While a pin is active the legend reads "beyond range: end colour".
   - The controls show on a Heatmap, and on a Scatter only while a numeric field is on Color.
   - A minimum not below the maximum is refused with a toast; a saved one is cleared on import and reported.
   - An unpinned heatmap uses its plain data span. Reverse palette still swaps the ramp's ends.
   - Table cell scales have their own conditional-formatting colours and are unaffected.
-  - Code: `Dashboard/colour-scale-model.js` (`RAMP_CHOICES`, `SCALE_CHOICES`, `rampColours`, `divergingColours`, `divergingRange`, `mixHex`, `colourRangeError`, `rangeOf`).
+  - Code: `Dashboard/colour-scale-model.js` (`RAMP_CHOICES`, `SCALE_CHOICES`, `rampColours`, `divergingColours`, `divergingRange`, `colourCentreError`, `mixHex`, `colourRangeError`, `rangeOf`).
 
 ### Table look (T01-23)
 

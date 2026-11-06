@@ -204,6 +204,7 @@ mark wears the series colour.**
 | `--chart-grid` | `--line` | value-axis gridlines |
 | `--chart-label` | `--ink-2` | primary chart text |
 | `--chart-muted` | `--ink-3` | tick labels |
+| `--chart-div-low` / `--chart-div-high` | light `#d98a4a` / `#2b62b8`; dark `#e2b48c` / `#5a8ad6`; One Dark Pro `#e0b084` / `#5c9ddb` | diverging colour: warm below the centre, cool above (theme-stable; HSL S ≤ 70 %; the warm end is lighter than the cool end, so the pair also differs in lightness: simulated CIE L* gap light 27 / 15, dark 23 / 14 for deuteranopia / protanopia; One Dark Pro is the weakest at 17 / 8) |
 | `--chart-cat-1..8` | light `#72872a` `#d9605a` `#d9a03a` `#7c63d6` `#2f9ea8` `#3f7fd0` `#4aa66a` `#6a6d72`; dark `#c3df5a` `#e0827c` `#deb062` `#9b86e6` `#5cc0c8` `#7aa3dc` `#6fc486` `#8e9094` | categorical ramp, fixed order |
 
 - **One series** wears the accent. **≥2 series** (multiple measures, or a Colour split) draw
