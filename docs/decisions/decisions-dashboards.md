@@ -156,5 +156,5 @@ Decided 2026-11-02 (autonomous build). A relationship may match on more than one
 
 ## D85 — The diverging scale picks its hues from tokens, not a free-hex picker
 
-- **Decision:** `format.colorPair` chooses the diverging scale's two hues from a short list (Orange / Blue, Amber / Violet, Green / Violet). Each end reads a design token at draw time, so a pair follows the light, dark and One Dark Pro themes and keeps the app's saturation ceiling (design rule 4). Red is never an end (it means danger).
+- **Decision:** `format.colorPair` chooses the diverging scale's two hues from a short list (Orange / Blue, Amber / Violet, Green / Violet). Each end reads a dedicated `--chart-div-<hue>` token at draw time (not a categorical slot, whose order differs per palette), so a pair follows the light, dark and One Dark Pro themes and keeps the app's saturation ceiling (design rule 4). Red is never an end (it means danger).
 - **Not built:** a free-hex colour picker and custom palette editing. A typed hex would be a user colour held as workbook data with no theme variant and no saturation or contrast check; that needs its own contrast rule first (see the backlog entry).
